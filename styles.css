@@ -32,7 +32,8 @@ body{
   margin:0;background:var(--bg);color:var(--ink);
   font-family:var(--sans);font-size:16px;line-height:1.55;
   -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(900px 500px at 78% -8%,rgba(124,92,224,.18),transparent 70%),
+  background-image:radial-gradient(760px 380px at 14% 0px,rgba(124,92,224,.1),transparent 72%),
+                   radial-gradient(900px 500px at 78% -8%,rgba(124,92,224,.18),transparent 70%),
                    radial-gradient(700px 420px at 0% 20%,rgba(232,121,249,.07),transparent 70%);
   background-repeat:no-repeat;
 }
@@ -139,7 +140,7 @@ h2.sec{font-family:var(--serif);font-weight:700;font-size:clamp(24px,3vw,34px);l
 .status.bad{color:var(--bad)}
 
 /* ============================================================ hero */
-.hero{padding:56px 0 44px;border-bottom:1px solid var(--rule);background:radial-gradient(760px 360px at 14% 0%,rgba(124,92,224,.1),transparent 72%)}
+.hero{padding:56px 0 44px;border-bottom:1px solid var(--rule)}
 .hero-grid{display:grid;gap:40px;grid-template-columns:1.45fr .95fr;align-items:start}
 .hero-copy .lead{margin-top:20px}
 .hero .lead{margin-top:18px}
@@ -711,6 +712,8 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
     radial-gradient(45% 55% at 28% 42%,rgba(124,92,224,.18),transparent 70%),
     radial-gradient(40% 50% at 72% 24%,rgba(232,121,249,.11),transparent 72%);
   filter:blur(10px);pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
   animation:aurora 18s ease-in-out infinite alternate;
 }
 .hero-home{padding-bottom:0;border-bottom:0}
