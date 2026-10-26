@@ -943,6 +943,12 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
   background:linear-gradient(180deg,rgba(32,26,44,.84),rgba(22,17,32,.9));
   -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
 }
+@media (max-width:1080px){
+  .hero-home .start-card{
+    background:linear-gradient(180deg,rgba(32,26,44,.96),rgba(22,17,32,.98));
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+  }
+}
 /* появление текста героя */
 .hero-home .hero-copy > *{animation:heroUp .75s var(--ease) both}
 .hero-home .hero-copy > :nth-child(2){animation-delay:.07s}
