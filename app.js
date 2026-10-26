@@ -555,6 +555,7 @@
     document.body.style.overflow = '';
     window.scrollTo(0, 0);
     initReveal();
+    init3D();
     animateBars();
     animateCounters();
     updateCompare();
@@ -566,6 +567,7 @@
     app.innerHTML = '<div class="view" style="padding:70px 0">' +
       '<p class="eyebrow">Ошибка 404</p>' +
       '<h1 class="display">Такой страницы <em>нет</em></h1>' +
+      '<div class="cube404" aria-hidden="true"><div class="cube404-in"><i>4</i><i>0</i><i>4</i><i>·</i><i>·</i><i>·</i></div></div>' +
       '<p class="lead" style="margin-top:16px">Адрес <span class="mono">' + h(path) + '</span> не найден. Вернитесь в каталог или начните с опросника.</p>' +
       '<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Каталог профессий</a>' +
       '<a class="btn" href="#/quiz">Опросник</a></div></div>';
@@ -588,6 +590,70 @@
       }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
     }
     els.forEach(function (e) { io.observe(e); });
+  }
+
+  /* ---------------------------------------------------------- 3D: tilt + parallax */
+  var TILT_SEL = '.fcard,.spec-card,.city-card,.geo-card,.adv-card,.ind-card,.cc,.uni,.stat,.res';
+  var canTilt = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var noMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var tiltEl = null, tiltBox = null, tiltQueued = false, tiltX = 0, tiltY = 0;
+
+  function tiltPaint() {
+    tiltQueued = false;
+    if (!tiltEl || !tiltBox) return;
+    var s = tiltEl.style;
+    s.setProperty('--rx', (((tiltY - tiltBox.top) / tiltBox.height - .5) * -7).toFixed(2) + 'deg');
+    s.setProperty('--ry', (((tiltX - tiltBox.left) / tiltBox.width - .5) * 7).toFixed(2) + 'deg');
+    s.setProperty('--gx', ((tiltX - tiltBox.left) / tiltBox.width * 100).toFixed(1) + '%');
+    s.setProperty('--gy', ((tiltY - tiltBox.top) / tiltBox.height * 100).toFixed(1) + '%');
+  }
+  function tiltQueue(x, y) {
+    tiltX = x; tiltY = y;
+    if (tiltQueued) return;
+    tiltQueued = true;
+    requestAnimationFrame(tiltPaint);
+  }
+  function tiltClear(el) {
+    el.style.removeProperty('--rx'); el.style.removeProperty('--ry');
+    el.style.removeProperty('--gx'); el.style.removeProperty('--gy');
+  }
+  if (canTilt && !noMotion) {
+    document.addEventListener('pointerover', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var el = e.target.closest ? e.target.closest(TILT_SEL) : null;
+      if (!el || el === tiltEl) return;
+      if (tiltEl) tiltClear(tiltEl);
+      tiltEl = el; tiltBox = el.getBoundingClientRect();
+      tiltQueue(e.clientX, e.clientY);
+    }, { passive: true });
+    document.addEventListener('pointermove', function (e) {
+      if (!tiltEl || e.pointerType !== 'mouse') return;
+      tiltQueue(e.clientX, e.clientY);
+    }, { passive: true });
+    document.addEventListener('pointerout', function (e) {
+      if (!tiltEl) return;
+      if (e.relatedTarget && tiltEl.contains(e.relatedTarget)) return;
+      tiltClear(tiltEl); tiltEl = null; tiltBox = null;
+    }, { passive: true });
+  }
+  function init3D(root) {
+    var scope = root || app;
+    if (canTilt && !noMotion) {
+      var cards = scope.querySelectorAll(TILT_SEL);
+      for (var i = 0; i < cards.length; i++) cards[i].classList.add('tilt');
+    }
+    var hero = scope.querySelector('.hero');
+    if (!hero || !canTilt || noMotion || hero.dataset.px) return;
+    hero.dataset.px = '1';
+    hero.addEventListener('pointermove', function (e) {
+      var r = hero.getBoundingClientRect();
+      hero.style.setProperty('--mx', ((e.clientX - r.left) / r.width - .5).toFixed(3));
+      hero.style.setProperty('--my', ((e.clientY - r.top) / r.height - .5).toFixed(3));
+    }, { passive: true });
+    hero.addEventListener('pointerleave', function () {
+      hero.style.setProperty('--mx', '0');
+      hero.style.setProperty('--my', '0');
+    });
   }
 
   function animateBars(root) {
@@ -842,6 +908,9 @@
     var colTop = C.slice().sort(function (a, b) { return b.count - a.count; }).slice(0, 4);
     var specTop = SPECIALTIES.slice(0, 6);
     var geoTop = DISTRICTS.slice();
+    var codes = [];
+    SPECIALTIES.forEach(function (s) { if (codes.indexOf(s.code) < 0) codes.push(s.code); });
+    var ribbon = codes.slice(0, 14).map(function (c) { return '<span>' + h(c) + '</span>'; }).join('');
 
     app.innerHTML = '<div class="view">' +
       '<section class="hero">' +
@@ -858,6 +927,9 @@
             '<span>2027–2030</span></div>' +
           '</div>' +
           '<aside class="panel start-card">' +
+            '<div class="orb-scene" aria-hidden="true"><div class="orb">' +
+              '<div class="orb-ring"><b></b></div><div class="orb-ring"><b></b></div><div class="orb-ring"><b></b></div>' +
+              '<div class="orb-core"></div></div></div>' +
             '<h2>Порядок работы</h2>' +
             '<div class="start-steps">' +
               '<div class="start-step"><b>01</b><span>Отметьте предметы ЕГЭ, которые планируете сдавать.</span></div>' +
@@ -878,6 +950,7 @@
           statCard(TOTAL_PROGRAMS, 'программ и специальностей') +
           statCard(DISTRICTS.length, 'федеральных округов') +
         '</div>' +
+        '<div class="ribbon" aria-hidden="true"><div class="ribbon-track">' + ribbon + ribbon + '</div></div>' +
       '</section>' +
 
       '<section class="sec-head reveal"><div><p class="eyebrow">Спрос</p><h2 class="sec">Ведущие профессии по индексу спроса</h2></div>' +
