@@ -940,7 +940,9 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
 }
 @keyframes canvasIn{from{opacity:0}to{opacity:1}}
 .hero-home .start-card{
-  background:linear-gradient(180deg,rgba(32,26,44,.84),rgba(22,17,32,.9));
+  background:
+    linear-gradient(180deg,rgba(32,26,44,.86),rgba(22,17,32,.93)),
+    url('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Moscow-City_skyline.jpg/960px-Moscow-City_skyline.jpg') center/cover no-repeat;
   -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
 }
 @media (max-width:1080px){
@@ -986,6 +988,29 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
   animation:ribbonSheen 8s linear infinite;
 }
 @keyframes ribbonSheen{0%{background-position:180% 0}100%{background-position:-90% 0}}
+
+/* фото-акценты: приглушённые кадры без конкуренции с текстом */
+.photo-band{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 4px}
+.pb{
+  position:relative;margin:0;height:168px;overflow:hidden;border-radius:14px;
+  border:1px solid var(--rule);
+  background:linear-gradient(150deg,rgba(124,92,224,.18),rgba(20,15,30,.9));
+}
+.pb img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  opacity:.5;filter:grayscale(1) contrast(.92) brightness(.82);transform:scale(1.03);
+  transition:opacity .5s var(--ease),transform .8s var(--ease),filter .5s var(--ease);
+}
+.pb::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(16,12,26,.12),rgba(16,12,26,.9)),
+    linear-gradient(120deg,rgba(124,92,224,.3),transparent 65%);
+}
+.pb figcaption{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;display:grid;gap:3px}
+.pb figcaption span{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(214,203,255,.82)}
+.pb figcaption b{font-family:var(--serif);font-size:14px;font-weight:700;line-height:1.2;color:var(--ink)}
+.pb:hover img{opacity:.66;filter:grayscale(.55) contrast(.96) brightness(.9);transform:scale(1.06)}
 
 /* наклон карточек с мягким бликом */
 .tilt{
@@ -1042,6 +1067,10 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
 @media (max-width:760px){
   .dice-btn{margin-left:0}
   .to-top{display:none}
+  .photo-band{grid-template-columns:1fr 1fr}
+  .pb:first-child{grid-column:1/-1;height:150px}
+  .pb{height:122px}
+  .pb figcaption b{font-size:12.5px}
 }
 @media (hover:none){
   .tilt:hover,.tilt:focus-visible{transform:none}
@@ -1064,7 +1093,7 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
     --ink:#111;--ink-2:#333;--ink-3:#555;--ink-4:#666;--violet:#5b3fc4;
   }
   body{background:#fff!important;background-image:none!important;color:#111}
-  .hdr,.ftr,.palette,.cmp-bar,.toast,.skip,.report-actions,.quiz-nav,.toc,.passport .btn,.burger,.search-btn{display:none!important}
+  .hdr,.ftr,.palette,.cmp-bar,.toast,.skip,.report-actions,.quiz-nav,.toc,.passport .btn,.burger,.search-btn,.photo-band{display:none!important}
   .view{animation:none}
   .wrap{max-width:none;padding:0}
   main{padding:0}
@@ -1090,5 +1119,6 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
   .hero-copy,.start-card{transform:none}
   .hero-home .hero-copy > *{animation:none}
   .hero-canvas{display:none}
+  .pb img,.pb:hover img{transform:none}
   .ribbon-track,.cube404-in{animation:none!important}
 }
