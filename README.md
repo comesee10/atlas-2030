@@ -43,6 +43,8 @@ powershell -ExecutionPolicy Bypass -File .\publish-github.ps1
 
 Скрипт отправляет `index.html`, `styles.css`, `app.js`, `data.js`, `favicon.svg`, `robots.txt`, `sitemap.xml` и `README.md` через GitHub API. Git в системе не требуется. После отправки Pages пересобирает сайт за 1–2 минуты.
 
+После правок CSS или JavaScript обновите параметр `?v=` у подключённых файлов в `index.html`, иначе браузер может показать старую версию из кеша.
+
 ### Netlify (альтернатива)
 
 1. Откройте <https://app.netlify.com/drop>.
