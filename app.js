@@ -593,7 +593,7 @@
   }
 
   /* ---------------------------------------------------------- 3D: tilt + parallax */
-  var TILT_SEL = '.fcard,.spec-card,.city-card,.geo-card,.adv-card,.ind-card,.cc,.uni,.stat,.res';
+  var TILT_SEL = '.fcard,.spec-card,.city-card,.geo-card,.adv-card,.ind-card,.cc';
   var canTilt = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
   var noMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var tiltEl = null, tiltBox = null, tiltQueued = false, tiltX = 0, tiltY = 0;
@@ -602,8 +602,8 @@
     tiltQueued = false;
     if (!tiltEl || !tiltBox) return;
     var s = tiltEl.style;
-    s.setProperty('--rx', (((tiltY - tiltBox.top) / tiltBox.height - .5) * -7).toFixed(2) + 'deg');
-    s.setProperty('--ry', (((tiltX - tiltBox.left) / tiltBox.width - .5) * 7).toFixed(2) + 'deg');
+    s.setProperty('--rx', (((tiltY - tiltBox.top) / tiltBox.height - .5) * -5).toFixed(2) + 'deg');
+    s.setProperty('--ry', (((tiltX - tiltBox.left) / tiltBox.width - .5) * 5).toFixed(2) + 'deg');
     s.setProperty('--gx', ((tiltX - tiltBox.left) / tiltBox.width * 100).toFixed(1) + '%');
     s.setProperty('--gy', ((tiltY - tiltBox.top) / tiltBox.height * 100).toFixed(1) + '%');
   }
@@ -649,10 +649,14 @@
       var r = hero.getBoundingClientRect();
       hero.style.setProperty('--mx', ((e.clientX - r.left) / r.width - .5).toFixed(3));
       hero.style.setProperty('--my', ((e.clientY - r.top) / r.height - .5).toFixed(3));
+      hero.style.setProperty('--px', (e.clientX - r.left).toFixed(0) + 'px');
+      hero.style.setProperty('--py', (e.clientY - r.top).toFixed(0) + 'px');
     }, { passive: true });
     hero.addEventListener('pointerleave', function () {
       hero.style.setProperty('--mx', '0');
       hero.style.setProperty('--my', '0');
+      hero.style.setProperty('--px', '50%');
+      hero.style.setProperty('--py', '35%');
     });
   }
 
@@ -701,13 +705,21 @@
   }
 
   var progressEl = document.getElementById('scrollProgress');
+  var toTopEl = document.getElementById('toTop');
+  var topRing = toTopEl ? toTopEl.querySelector('circle') : null;
   function updateProgress() {
-    if (!progressEl) return;
     var doc = document.documentElement;
     var max = doc.scrollHeight - doc.clientHeight;
     var p = max > 0 ? Math.min(1, Math.max(0, doc.scrollTop / max)) : 0;
-    progressEl.style.transform = 'scaleX(' + p + ')';
+    if (progressEl) progressEl.style.transform = 'scaleX(' + p + ')';
+    if (toTopEl) {
+      toTopEl.classList.toggle('show', p > .06 && max > 420);
+      if (topRing) topRing.style.strokeDashoffset = (125.7 * (1 - p)).toFixed(1);
+    }
   }
+  if (toTopEl) toTopEl.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: noMotion ? 'auto' : 'smooth' });
+  });
   window.addEventListener('scroll', updateProgress, { passive: true });
   window.addEventListener('resize', updateProgress);
 
@@ -913,7 +925,7 @@
     var ribbon = codes.slice(0, 14).map(function (c) { return '<span>' + h(c) + '</span>'; }).join('');
 
     app.innerHTML = '<div class="view">' +
-      '<section class="hero">' +
+      '<section class="hero hero-home">' +
         '<div class="hero-grid">' +
           '<div class="hero-copy">' +
             '<p class="eyebrow">Раздел I · Навигатор</p>' +
@@ -927,9 +939,6 @@
             '<span>2027–2030</span></div>' +
           '</div>' +
           '<aside class="panel start-card">' +
-            '<div class="orb-scene" aria-hidden="true"><div class="orb">' +
-              '<div class="orb-ring"><b></b></div><div class="orb-ring"><b></b></div><div class="orb-ring"><b></b></div>' +
-              '<div class="orb-core"></div></div></div>' +
             '<h2>Порядок работы</h2>' +
             '<div class="start-steps">' +
               '<div class="start-step"><b>01</b><span>Отметьте предметы ЕГЭ, которые планируете сдавать.</span></div>' +
@@ -1067,6 +1076,10 @@
           sortBtn('salary', 'По зарплате', st.sort) +
           sortBtn('alpha', 'По алфавиту', st.sort) +
         '</div>' +
+        '<button class="btn btn-sm dice-btn" id="randomProf" type="button" title="Открыть случайную профессию">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 2.5 21 7v10l-9 4.5L3 17V7z"/><path d="M12 12v9.5M3 7l9 5 9-5"/></svg>' +
+          '<span>Мне повезёт</span>' +
+        '</button>' +
       '</div>' +
       '<div class="chips" id="sphereChips" style="margin-top:14px">' +
         sphereChip('', 'Все сферы', st.sphere) +
@@ -1086,6 +1099,9 @@
       listEl.innerHTML = list.length ? list.map(profRow).join('') :
         '<li class="empty"><b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</li>';
       countEl.textContent = 'Показано ' + list.length + ' из ' + P.length;
+      listEl.classList.remove('swap');
+      void listEl.offsetWidth;
+      listEl.classList.add('swap');
       updateCompare();
       var params = new URLSearchParams();
       if (st.q) params.set('q', st.q);
@@ -1120,6 +1136,15 @@
       var b = e.target.closest('.cmp');
       if (!b) return;
       toggleCompare(b.getAttribute('data-slug'));
+    });
+
+    var randomBtn = document.getElementById('randomProf');
+    if (randomBtn) randomBtn.addEventListener('click', function () {
+      var pool = filteredProfessions(st);
+      if (!pool.length) pool = P;
+      var pick = pool[Math.floor(Math.random() * pool.length)];
+      randomBtn.classList.add('spin');
+      setTimeout(function () { location.hash = '#/professions/' + pick.slug; }, 200);
     });
 
     repaint();
