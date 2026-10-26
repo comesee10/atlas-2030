@@ -12,7 +12,7 @@
 
 Резервная одностраничная копия: <https://html.cafe/xaa936a27> — тот же атлас, собранный в один файл `atlas-2030-standalone.html`.
 
-Короткие ссылки: <https://clck.ru/3WhQic> и <https://tinyurl.com/2247wo4z>.
+Короткие ссылки на основной адрес: <https://clck.ru/3WhSB9> и <https://tinyurl.com/22j4nek9>.
 
 ## Как посмотреть локально
 
