@@ -129,6 +129,16 @@ $j.professions.Count; $j.universities.Count; $j.colleges.Count
 - Фото-акценты: три приглушённых кадра на главной (практика, кампус, город) с duotone-обработкой и маской, а также едва заметная фотография в карточке «Порядок работы». Фотографии загружаются с Wikimedia Commons (CC BY 2.0 / CC BY-SA 3.0); авторы указаны в подвале и в подсказках к кадрам. При недоступности изображений остаётся градиентный фон.
 - Динамическая таблица «Где учиться» на страницах профессий: топ-12 программ по минимальному баллу, на мобильных превращается в карточки.
 
+## Фотографии
+
+На главной используются три приглушённых кадра с Wikimedia Commons; они загружаются по прямым ссылкам и не входят в размер standalone-файла:
+
+- «Практика» — [Engineering Fabrication Laboratory](https://commons.wikimedia.org/wiki/File:Engineering_Fabrication_Laboratory_%28Student_Shop%29_%2811422729155%29.jpg), UC Davis College of Engineering, CC BY 2.0.
+- «Кампус» — [Moscow State University](https://commons.wikimedia.org/wiki/File:Moscow_State_University.jpg), Dmitry A. Mottl, CC BY-SA 3.0.
+- «Город» — [Moscow-City skyline](https://commons.wikimedia.org/wiki/File:Moscow-City_skyline.jpg), Bradmoscu, CC BY-SA 3.0.
+
+Если внешние изображения недоступны, на их месте остаётся градиентный фон, поэтому вёрстка и читаемость не меняются.
+
 ## Ограничения
 
 - Проходные баллы — ориентир по кампаниям 2024–2025 гг., а не гарантия поступления.
