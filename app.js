@@ -556,6 +556,7 @@
     window.scrollTo(0, 0);
     initReveal();
     init3D();
+    initConstellation();
     animateBars();
     animateCounters();
     updateCompare();
@@ -658,6 +659,262 @@
       hero.style.setProperty('--px', '50%');
       hero.style.setProperty('--py', '35%');
     });
+  }
+
+  /* ---------------------------------------------------------- hero constellation */
+  var constellationRAF = 0;
+  function initConstellation() {
+    var canvas = document.querySelector('.hero-canvas');
+    if (constellationRAF) { cancelAnimationFrame(constellationRAF); constellationRAF = 0; }
+    if (!canvas) return;
+    if (noMotion || !canTilt || window.innerWidth < 900) { canvas.style.display = 'none'; return; }
+
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var N = 48, nodes = [], pts = [], links = [];
+    for (var i = 0; i < N; i++) {
+      var y = 1 - (i + 0.5) / N * 2;
+      var rr = Math.sqrt(Math.max(0, 1 - y * y));
+      var th = i * 2.399963229728653;
+      nodes.push({ x: Math.cos(th) * rr, y: y, z: Math.sin(th) * rr, major: i % 6 === 0 });
+      pts.push({ x: 0, y: 0, z: 0, s: 0, major: false });
+    }
+    for (var a0 = 0; a0 < N; a0++) {
+      for (var b0 = a0 + 1; b0 < N; b0++) {
+        var dt0 = nodes[a0].x * nodes[b0].x + nodes[a0].y * nodes[b0].y + nodes[a0].z * nodes[b0].z;
+        if (dt0 > 0.64) links.push([a0, b0, 1 - dt0]);
+      }
+    }
+
+    var grid = [], orbits = [];
+    for (var mi = 0; mi < 4; mi++) {
+      var arrM = [], mm = mi * Math.PI / 4;
+      for (var mk = 0; mk <= 48; mk++) {
+        var ma = mk / 48 * Math.PI * 2;
+        arrM.push({ x: Math.cos(ma) * Math.cos(mm), y: Math.sin(ma), z: Math.cos(ma) * Math.sin(mm) });
+      }
+      grid.push(arrM);
+    }
+    for (var pi0 = 1; pi0 <= 2; pi0++) {
+      var lat = pi0 === 1 ? .55 : -.55, arrP = [];
+      for (var pk = 0; pk <= 48; pk++) {
+        var pa = pk / 48 * Math.PI * 2;
+        arrP.push({ x: Math.cos(pa) * Math.cos(lat), y: Math.sin(lat), z: Math.sin(pa) * Math.cos(lat) });
+      }
+      grid.push(arrP);
+    }
+    orbits.push({ r: 1.16, tilt: .62, speed: .00011, ph: 0, col: '232,121,249' });
+    orbits.push({ r: 1.38, tilt: -1.1, speed: -.00008, ph: 2.1, col: '167,139,250' });
+
+    var glow = document.createElement('canvas');
+    glow.width = glow.height = 64;
+    var gx = glow.getContext('2d');
+    var gr = gx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(214,203,255,.95)');
+    gr.addColorStop(.3, 'rgba(167,139,250,.5)');
+    gr.addColorStop(1, 'rgba(124,92,224,0)');
+    gx.fillStyle = gr; gx.fillRect(0, 0, 64, 64);
+
+    var dpr = Math.min(1.6, window.devicePixelRatio || 1);
+    var W = 0, H = 0, cx = 0, cy = 0, Rx = 0, Ry = 0;
+    var ay = 0.3, ax = -0.12, tay = 0.3, tax = -0.12;
+    var ca = 1, sa = 0, cb = 1, sb = 0;
+    var mx = 0, my = 0, hx = -999, hy = -999, hover = false;
+    var last = 0, t0 = 0, pulses = [], nextPulse = 0, shoot = null, nextShoot = 0;
+    var tmp = { x: 0, y: 0, z: 0, s: 0 };
+
+    function resize() {
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      if (!W || !H) return;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx = W * 0.52; cy = H * 0.42;
+      Rx = W * 0.42; Ry = H * 0.37;
+    }
+    resize();
+
+    var hero = canvas.parentNode;
+    hero.addEventListener('pointermove', function (e) {
+      var b = hero.getBoundingClientRect();
+      hx = e.clientX - b.left; hy = e.clientY - b.top;
+      mx = hx / b.width - 0.5;
+      my = hy / b.height - 0.5;
+      hover = true;
+    }, { passive: true });
+    hero.addEventListener('pointerleave', function () { mx = 0; my = 0; hover = false; });
+
+    function project(p, out) {
+      var x1 = p.x * ca - p.z * sa;
+      var z1 = p.x * sa + p.z * ca;
+      var y1 = p.y * cb - z1 * sb;
+      var z2 = p.y * sb + z1 * cb;
+      var s = 1 / (1 + z2 * 0.26);
+      out.x = cx + x1 * Rx * s;
+      out.y = cy + y1 * Ry * s;
+      out.z = z2;
+      out.s = s;
+      return out;
+    }
+
+    function curve(A, B, t, out) {
+      var mxp = (A.x + B.x) * 0.5, myp = (A.y + B.y) * 0.5;
+      var dx = mxp - cx, dy = myp - cy, ln = Math.sqrt(dx * dx + dy * dy) || 1;
+      var qx = mxp + dx / ln * 24, qy = myp + dy / ln * 24;
+      var u = 1 - t;
+      out.x = u * u * A.x + 2 * u * t * qx + t * t * B.x;
+      out.y = u * u * A.y + 2 * u * t * qy + t * t * B.y;
+      return out;
+    }
+
+    function orbitPoint(o, ang, out) {
+      var x = Math.cos(ang) * o.r, y = Math.sin(ang) * o.r;
+      out.x = x;
+      out.y = y * Math.cos(o.tilt);
+      out.z = y * Math.sin(o.tilt);
+      return out;
+    }
+
+    function frame(ts) {
+      if (!canvas.isConnected) { constellationRAF = 0; return; }
+      if (W !== canvas.clientWidth || H !== canvas.clientHeight) resize();
+      if (!t0) t0 = ts;
+      var dt = Math.min(40, ts - (last || ts));
+      last = ts;
+      var intro = Math.min(1, (ts - t0) / 1500);
+      intro = intro * intro * (3 - 2 * intro);
+
+      tay += dt * 0.00005;
+      tax = -0.12 + my * 0.4;
+      ay += (tay + mx * 0.6 - ay) * 0.05;
+      ax += (tax - ax) * 0.05;
+      ca = Math.cos(ay); sa = Math.sin(ay); cb = Math.cos(ax); sb = Math.sin(ax);
+
+      ctx.clearRect(0, 0, W, H);
+
+      var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(Rx, Ry) * 1.05);
+      g.addColorStop(0, 'rgba(124,92,224,.16)');
+      g.addColorStop(.45, 'rgba(124,92,224,.05)');
+      g.addColorStop(1, 'rgba(124,92,224,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(cx - Rx, cy - Ry, Rx * 2, Ry * 2);
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(167,139,250,.08)';
+      for (var gi = 0; gi < grid.length; gi++) {
+        var G = grid[gi];
+        ctx.beginPath();
+        for (var gk = 0; gk < G.length; gk++) {
+          project(G[gk], tmp);
+          if (gk === 0) ctx.moveTo(tmp.x, tmp.y); else ctx.lineTo(tmp.x, tmp.y);
+        }
+        ctx.stroke();
+      }
+      for (var oi = 0; oi < orbits.length; oi++) {
+        var O = orbits[oi];
+        ctx.strokeStyle = 'rgba(' + O.col + ',.09)';
+        ctx.beginPath();
+        for (var ok = 0; ok <= 64; ok++) {
+          orbitPoint(O, ok / 64 * Math.PI * 2, tmp);
+          project(tmp, tmp);
+          if (ok === 0) ctx.moveTo(tmp.x, tmp.y); else ctx.lineTo(tmp.x, tmp.y);
+        }
+        ctx.stroke();
+      }
+
+      for (var i = 0; i < N; i++) {
+        project(nodes[i], pts[i]);
+        pts[i].major = nodes[i].major;
+      }
+
+      ctx.lineWidth = 1;
+      for (var li = 0; li < links.length; li++) {
+        var L = links[li], A = pts[L[0]], B = pts[L[1]];
+        var dep0 = (A.z + B.z) * .25 + .5;
+        var al = (0.05 + dep0 * 0.34) * (1 - L[2] * 1.3) * intro;
+        if (al < .015) continue;
+        curve(A, B, .5, tmp);
+        ctx.strokeStyle = 'rgba(167,139,250,' + al.toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(A.x, A.y);
+        ctx.quadraticCurveTo(tmp.x, tmp.y, B.x, B.y); ctx.stroke();
+      }
+
+      if (hover && intro > .5) {
+        ctx.globalAlpha = .34;
+        ctx.drawImage(glow, hx - 70, hy - 70, 140, 140);
+        ctx.globalAlpha = 1;
+        for (var fi = 0; fi < N; fi++) {
+          var F = pts[fi];
+          var fdx = F.x - hx, fdy = F.y - hy, fd = Math.sqrt(fdx * fdx + fdy * fdy);
+          if (fd > 170) continue;
+          var fa = (1 - fd / 170) * .38 * ((F.z + 1) / 2);
+          ctx.strokeStyle = 'rgba(214,203,255,' + fa.toFixed(3) + ')';
+          ctx.beginPath(); ctx.moveTo(F.x, F.y); ctx.lineTo(hx, hy); ctx.stroke();
+        }
+      }
+
+      if (ts > nextPulse && links.length) {
+        nextPulse = ts + 700 + Math.random() * 900;
+        pulses.push({ l: Math.floor(Math.random() * links.length), t: 0 });
+      }
+      for (var pi = pulses.length - 1; pi >= 0; pi--) {
+        var pu = pulses[pi];
+        pu.t += dt / 1500;
+        if (pu.t >= 1) { pulses.splice(pi, 1); continue; }
+        var PL = links[pu.l];
+        for (var k = 0; k < 4; k++) {
+          var tt = pu.t - k * .035;
+          if (tt < 0) continue;
+          curve(pts[PL[0]], pts[PL[1]], tt, tmp);
+          ctx.globalAlpha = (1 - pu.t) * (1 - k / 4) * .9;
+          ctx.drawImage(glow, tmp.x - 7, tmp.y - 7, 14, 14);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      for (var ni = 0; ni < N; ni++) {
+        var P = pts[ni], dep = (P.z + 1) / 2;
+        var size = (P.major ? 30 : 16) * (.55 + dep * .75) * intro;
+        if (size < 1) continue;
+        ctx.globalAlpha = .42 + dep * .58;
+        ctx.drawImage(glow, P.x - size / 2, P.y - size / 2, size, size);
+        ctx.globalAlpha = 1;
+      }
+
+      for (var si = 0; si < orbits.length; si++) {
+        var SO = orbits[si];
+        for (var sk = 0; sk < 7; sk++) {
+          orbitPoint(SO, SO.ph + ts * SO.speed - sk * .05, tmp);
+          project(tmp, tmp);
+          var sz = (sk === 0 ? 20 : 11) * intro;
+          ctx.globalAlpha = (1 - sk / 7) * (sk === 0 ? 1 : .4);
+          ctx.drawImage(glow, tmp.x - sz / 2, tmp.y - sz / 2, sz, sz);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      if (!shoot && ts > nextShoot) {
+        nextShoot = ts + 5000 + Math.random() * 6000;
+        shoot = { x: cx - Rx * (.2 + Math.random() * .5), y: cy - Ry * (.7 + Math.random() * .3), vx: 2.4 + Math.random() * 1.4, vy: 1.1 + Math.random() * .7, t: 0 };
+      }
+      if (shoot) {
+        shoot.t += dt; shoot.x += shoot.vx * dt * .06; shoot.y += shoot.vy * dt * .06;
+        var st = Math.min(1, shoot.t / 900);
+        ctx.lineWidth = 1.4;
+        ctx.strokeStyle = 'rgba(232,121,249,' + ((1 - st) * .5).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.moveTo(shoot.x, shoot.y);
+        ctx.lineTo(shoot.x - shoot.vx * 26, shoot.y - shoot.vy * 26);
+        ctx.stroke();
+        ctx.globalAlpha = (1 - st) * .8;
+        ctx.drawImage(glow, shoot.x - 8, shoot.y - 8, 16, 16);
+        ctx.globalAlpha = 1;
+        if (shoot.t > 900) shoot = null;
+      }
+
+      constellationRAF = requestAnimationFrame(frame);
+    }
+    constellationRAF = requestAnimationFrame(frame);
   }
 
   function animateBars(root) {
@@ -926,6 +1183,7 @@
 
     app.innerHTML = '<div class="view">' +
       '<section class="hero hero-home">' +
+        '<canvas class="hero-canvas" aria-hidden="true"></canvas>' +
         '<div class="hero-grid">' +
           '<div class="hero-copy">' +
             '<p class="eyebrow">Раздел I · Навигатор</p>' +
