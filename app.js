@@ -707,6 +707,37 @@
     orbits.push({ r: 1.16, tilt: .62, speed: .00011, ph: 0, col: '232,121,249' });
     orbits.push({ r: 1.38, tilt: -1.1, speed: -.00008, ph: 2.1, col: '167,139,250' });
 
+    var shapes = [];
+    (function () {
+      var cv = [], ce = [], i, j, k, d;
+      for (i = 0; i < 8; i++) cv.push({ x: (i & 1 ? 1 : -1) * .62, y: (i & 2 ? 1 : -1) * .62, z: (i & 4 ? 1 : -1) * .62 });
+      for (i = 0; i < 8; i++) for (j = i + 1; j < 8; j++) {
+        d = 0;
+        for (k = 0; k < 3; k++) if (((i >> k) & 1) !== ((j >> k) & 1)) d++;
+        if (d === 1) ce.push([i, j]);
+      }
+      var cf = [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]];
+      shapes.push({ v: cv, e: ce, f: cf, q: [], p: [.1, -.95, .12], s: .22, sp: .00028, ph: 0, c: '232,121,249' });
+
+      var ov = [], oe = [];
+      for (i = 0; i < 6; i++) ov.push({ x: i === 0 ? 1 : i === 1 ? -1 : 0, y: i === 2 ? 1 : i === 3 ? -1 : 0, z: i === 4 ? 1 : i === 5 ? -1 : 0 });
+      for (i = 0; i < 6; i++) for (j = i + 1; j < 6; j++) if ((i >> 1) !== (j >> 1)) oe.push([i, j]);
+      var of = [[0, 2, 4], [0, 4, 3], [0, 3, 5], [0, 5, 2], [1, 4, 2], [1, 3, 4], [1, 5, 3], [1, 2, 5]];
+      shapes.push({ v: ov, e: oe, f: of, q: [], p: [-.6, -.35, .1], s: .24, sp: -.00034, ph: 1.2, c: '167,139,250' });
+
+      var tv = [], te = [], TR = 12, Tr = 6;
+      for (i = 0; i < TR; i++) for (j = 0; j < Tr; j++) {
+        var u = i / TR * Math.PI * 2, vv = j / Tr * Math.PI * 2;
+        tv.push({ x: (.62 + .24 * Math.cos(vv)) * Math.cos(u), y: .24 * Math.sin(vv), z: (.62 + .24 * Math.cos(vv)) * Math.sin(u) });
+      }
+      for (i = 0; i < TR; i++) for (j = 0; j < Tr; j++) {
+        var a = i * Tr + j;
+        te.push([a, ((i + 1) % TR) * Tr + j]);
+        te.push([a, i * Tr + (j + 1) % Tr]);
+      }
+      shapes.push({ v: tv, e: te, q: [], p: [-1, -.82, -.1], s: .24, sp: .00022, ph: 2.4, c: '214,203,255' });
+    })();
+
     var glow = document.createElement('canvas');
     glow.width = glow.height = 64;
     var gx = glow.getContext('2d');
@@ -820,6 +851,46 @@
           if (ok === 0) ctx.moveTo(tmp.x, tmp.y); else ctx.lineTo(tmp.x, tmp.y);
         }
         ctx.stroke();
+      }
+
+      for (var sh = 0; sh < shapes.length; sh++) {
+        var S = shapes[sh], ang = ts * S.sp + S.ph;
+        var c1 = Math.cos(ang), s1 = Math.sin(ang);
+        var c2 = Math.cos(ang * .63), s2 = Math.sin(ang * .63);
+        for (var vi = 0; vi < S.v.length; vi++) {
+          var V = S.v[vi];
+          var vx = V.x * c1 - V.z * s1, vz = V.x * s1 + V.z * c1;
+          var vy = V.y * c2 - vz * s2; vz = V.y * s2 + vz * c2;
+          tmp.x = S.p[0] + vx * S.s;
+          tmp.y = S.p[1] + vy * S.s;
+          tmp.z = S.p[2] + vz * S.s;
+          project(tmp, S.q[vi] || (S.q[vi] = { x: 0, y: 0, z: 0, s: 0 }));
+        }
+        if (S.f) for (var fi = 0; fi < S.f.length; fi++) {
+          var F = S.f[fi], fz = 0;
+          ctx.beginPath();
+          for (var fj = 0; fj < F.length; fj++) {
+            var FQ = S.q[F[fj]];
+            fz += FQ.z;
+            if (fj === 0) ctx.moveTo(FQ.x, FQ.y); else ctx.lineTo(FQ.x, FQ.y);
+          }
+          ctx.closePath();
+          fz /= F.length;
+          ctx.fillStyle = 'rgba(' + S.c + ',' + ((.018 + (fz * .25 + .5) * .045) * intro).toFixed(3) + ')';
+          ctx.fill();
+        }
+        ctx.lineWidth = 1.2;
+        for (var ei = 0; ei < S.e.length; ei++) {
+          var A2 = S.q[S.e[ei][0]], B2 = S.q[S.e[ei][1]];
+          var al2 = (.06 + ((A2.z + B2.z) * .25 + .5) * .45) * intro;
+          if (al2 < .01) continue;
+          ctx.strokeStyle = 'rgba(' + S.c + ',' + al2.toFixed(3) + ')';
+          ctx.beginPath(); ctx.moveTo(A2.x, A2.y); ctx.lineTo(B2.x, B2.y); ctx.stroke();
+        }
+        project({ x: S.p[0], y: S.p[1], z: S.p[2] }, tmp);
+        ctx.globalAlpha = .15 * intro;
+        ctx.drawImage(glow, tmp.x - 52, tmp.y - 52, 104, 104);
+        ctx.globalAlpha = 1;
       }
 
       for (var i = 0; i < N; i++) {
@@ -1234,6 +1305,12 @@
       '<section class="sec-head reveal"><div><p class="eyebrow">Каталог</p><h2 class="sec">Приоритетные направления</h2></div>' +
       '<a class="sec-link" href="#/professions">Все ' + P.length + ' профессий →</a></section>' +
       '<div class="fgrid">' + featured.map(fcard).join('') + '</div>' +
+
+      '<section class="photo-band reveal" aria-label="Практика, кампусы и города">' +
+        '<figure class="pb"><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Engineering_Fabrication_Laboratory_%28Student_Shop%29_%2811422729155%29.jpg/960px-Engineering_Fabrication_Laboratory_%28Student_Shop%29_%2811422729155%29.jpg" alt="Студенты в инженерной лаборатории" loading="lazy" decoding="async" title="UC Davis College of Engineering · CC BY 2.0 · Wikimedia Commons"><figcaption><span>01 · Практика</span><b>Лаборатории и проектные команды</b></figcaption></figure>' +
+        '<figure class="pb"><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Moscow_State_University.jpg/960px-Moscow_State_University.jpg" alt="Главное здание Московского государственного университета" loading="lazy" decoding="async" title="D. A. Mottl · CC BY-SA 3.0 · Wikimedia Commons"><figcaption><span>02 · Кампус</span><b>Библиотеки, общежития, аудитории</b></figcaption></figure>' +
+        '<figure class="pb"><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Moscow-City_skyline.jpg/960px-Moscow-City_skyline.jpg" alt="Деловой центр Москва-Сити" loading="lazy" decoding="async" title="Bradmoscu · CC BY-SA 3.0 · Wikimedia Commons"><figcaption><span>03 · Город</span><b>Стажировки рядом с домом</b></figcaption></figure>' +
+      '</section>' +
 
       '<section class="sec-head reveal"><div><p class="eyebrow">После 11 класса</p><h2 class="sec">Вузы с наиболее высокими баллами</h2></div>' +
       '<a class="sec-link" href="#/universities">Все вузы и баллы →</a></section>' +
