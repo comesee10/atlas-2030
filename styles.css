@@ -941,7 +941,7 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;b
 @keyframes canvasIn{from{opacity:0}to{opacity:1}}
 .hero-home .start-card{
   background:
-    linear-gradient(180deg,rgba(32,26,44,.86),rgba(22,17,32,.93)),
+    linear-gradient(180deg,rgba(32,26,44,.9),rgba(22,17,32,.95)),
     url('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Moscow-City_skyline.jpg/960px-Moscow-City_skyline.jpg') center/cover no-repeat;
   -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
 }
