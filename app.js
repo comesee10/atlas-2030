@@ -567,7 +567,7 @@
     app.innerHTML = '<div class="view" style="padding:70px 0">' +
       '<p class="eyebrow">Ошибка 404</p>' +
       '<h1 class="display">Такой страницы <em>нет</em></h1>' +
-      '<div class="cube404" aria-hidden="true"><div class="cube404-in"><i>4</i><i>0</i><i>4</i><i>·</i><i>·</i><i>·</i></div></div>' +
+      '<div class="cube404" aria-hidden="true"><div class="cube404-in"><i>4</i><i>0</i><i>4</i><i>4</i><i>0</i><i>4</i></div></div>' +
       '<p class="lead" style="margin-top:16px">Адрес <span class="mono">' + h(path) + '</span> не найден. Вернитесь в каталог или начните с опросника.</p>' +
       '<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Каталог профессий</a>' +
       '<a class="btn" href="#/quiz">Опросник</a></div></div>';
