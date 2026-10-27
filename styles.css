@@ -420,6 +420,60 @@ font-size:13px;z-index:120;transition:opacity .2s,transform .2s;box-shadow:var(-
 .ftr-col .muted{font-size:12.5px;line-height:1.6}
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .reveal.in{opacity:1;transform:none}
+.data-date{
+margin-top:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+text-transform:uppercase;color:var(--ink-4);
+}
+.index-hint{
+display:inline-grid;place-items:center;width:17px;height:17px;margin-left:5px;
+border:1px solid var(--rule-2);border-radius:50%;
+font-family:var(--mono);font-size:10px;line-height:1;color:var(--ink-3);
+background:none;cursor:pointer;vertical-align:1px;
+transition:color .18s var(--ease),border-color .18s var(--ease),background .18s var(--ease),transform .18s var(--ease);
+}
+.index-hint:hover,.index-hint.on{color:#150f24;background:var(--violet);border-color:var(--violet);transform:scale(1.12)}
+.index-tooltip{
+margin:2px 0 14px;padding:9px 13px;border-left:2px solid var(--violet);
+background:rgba(167,139,250,.07);border-radius:0 8px 8px 0;
+animation:tipIn .28s var(--ease);
+}
+.index-tooltip p{font-size:12.5px;line-height:1.6;color:var(--ink-2);margin:0}
+@keyframes tipIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.cta-block{display:flex;justify-content:center;margin:22px 0 6px}
+.cta-block .btn{
+padding:14px 26px;font-size:14.5px;
+animation:ctaPulse 3.2s ease-in-out infinite;
+}
+.cta-block .btn:hover{animation-play-state:paused}
+@keyframes ctaPulse{
+0%,100%{box-shadow:0 10px 30px -14px rgba(124,92,224,.75)}
+50%{box-shadow:0 14px 38px -10px rgba(146,116,244,1)}
+}
+.bar-row{opacity:0;transform:translateX(-10px);animation:barRowIn .45s var(--ease) forwards}
+.bars .bar-row:nth-child(1){animation-delay:.05s}
+.bars .bar-row:nth-child(2){animation-delay:.11s}
+.bars .bar-row:nth-child(3){animation-delay:.17s}
+.bars .bar-row:nth-child(4){animation-delay:.23s}
+.bars .bar-row:nth-child(5){animation-delay:.29s}
+.bars .bar-row:nth-child(6){animation-delay:.35s}
+.bars .bar-row:nth-child(7){animation-delay:.41s}
+.bars .bar-row:nth-child(8){animation-delay:.47s}
+@keyframes barRowIn{to{opacity:1;transform:none}}
+.hero-home .start-step{opacity:0;animation:stepIn .5s var(--ease) forwards}
+.hero-home .start-step:nth-child(1){animation-delay:.35s}
+.hero-home .start-step:nth-child(2){animation-delay:.5s}
+.hero-home .start-step:nth-child(3){animation-delay:.65s}
+@keyframes stepIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.sec-link{position:relative;overflow:hidden}
+.sec-link:hover{transform:translateX(3px);transition:transform .2s var(--ease),color .15s,border-color .15s}
+.btn-primary{position:relative;overflow:hidden}
+.btn-primary::after{
+content:"";position:absolute;top:0;bottom:0;left:-70%;width:45%;
+background:linear-gradient(105deg,transparent,rgba(255,255,255,.35),transparent);
+transform:skewX(-18deg);pointer-events:none;
+}
+.btn-primary:hover::after{animation:sheen .85s var(--ease)}
+@keyframes sheen{to{left:130%}}
 @media (max-width:1099px){
 .hdr-in{height:56px;gap:10px}
 .brand-sub{display:none}
