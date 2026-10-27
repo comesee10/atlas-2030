@@ -1260,6 +1260,16 @@ requestAnimationFrame(step);
 els.forEach(function (e) { counterIO.observe(e); });
 }
 var progressEl = document.getElementById('scrollProgress');
+// Подсказка «что такое индекс спроса» — делегирование, кнопка живёт в renderHome.
+document.addEventListener('click', function (e) {
+var hint = e.target.closest ? e.target.closest('.index-hint') : null;
+if (!hint) return;
+var tip = hint.closest('.chart-head') ? hint.closest('.chart-head').parentNode.querySelector('.index-tooltip') : null;
+if (!tip) return;
+tip.hidden = !tip.hidden;
+hint.classList.toggle('on', !tip.hidden);
+hint.setAttribute('aria-expanded', tip.hidden ? 'false' : 'true');
+});
 var toTopEl = document.getElementById('toTop');
 var topRing = toTopEl ? toTopEl.querySelector('circle') : null;
 function updateProgress() {
@@ -1453,14 +1463,11 @@ function renderHome() {
 setTitle('Профессии·2030 — атлас востребованных профессий');
 var byIndex = P.slice().sort(function (a, b) { return b.index - a.index; });
 var top = byIndex.slice(0, 8);
-var featured = P.slice(0, 6);
+var featured = P.slice().sort(function (a, b) { return b.growth - a.growth; }).slice(0, 6);
 var uniTop = U.slice().sort(function (a, b) { return b.avg - a.avg; }).slice(0, 3);
 var colTop = C.slice().sort(function (a, b) { return b.count - a.count; }).slice(0, 4);
 var specTop = SPECIALTIES.slice(0, 6);
 var geoTop = DISTRICTS.slice();
-var codes = [];
-SPECIALTIES.forEach(function (s) { if (codes.indexOf(s.code) < 0) codes.push(s.code); });
-var ribbon = codes.slice(0, 14).map(function (c) { return '<span>' + h(c) + '</span>'; }).join('');
 app.innerHTML = '<div class="view">' +
 '<section class="hero hero-home">' +
 '<canvas class="hero-canvas" aria-hidden="true"></canvas>' +
@@ -1497,26 +1504,23 @@ statCard(U.length, 'вузов с баллами') +
 statCard(TOTAL_PROGRAMS, 'программ и специальностей') +
 statCard(DISTRICTS.length, 'федеральных округов') +
 '</div>' +
-'<div class="ribbon" aria-hidden="true"><div class="ribbon-track">' + ribbon + ribbon + '</div></div>' +
+'<p class="data-date reveal">Данные и баллы актуальны на октябрь 2026 · проходные баллы: приёмные кампании 2024–2025</p>' +
 '</section>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Спрос</p><h2 class="sec">Ведущие профессии по индексу спроса</h2></div>' +
 '<a class="sec-link" href="#/professions?sort=index">Весь рейтинг →</a></section>' +
-'<div class="panel chart reveal"><div class="chart-head"><p class="label">Индекс спроса · 0–100</p>' +
-'<p class="mono tiny" style="color:var(--ink-4)">оценка атласа</p></div><div class="bars">' +
+'<div class="panel chart reveal"><div class="chart-head"><p class="label">Индекс спроса · 0–100 <button class="index-hint" aria-label="Что такое индекс спроса" title="Что такое индекс спроса">?</button></p>' +
+'<p class="mono tiny" style="color:var(--ink-4)">оценка атласа</p></div>' +
+'<div class="index-tooltip" hidden><p>Комбинация числа вакансий, динамики к 2030 и дефицита специалистов. 100 — максимальный спрос.</p></div><div class="bars">' +
 top.map(function (p) {
 return '<div class="bar-row"><a class="n" href="#/professions/' + p.slug + '">' + h(p.title) + '</a>' +
 '<div class="bar-track"><div class="bar-fill" data-v="' + (p.index / 100) + '"></div></div>' +
 '<span class="v">' + p.index + '</span></div>';
 }).join('') +
 '</div></div>' +
-'<section class="sec-head reveal"><div><p class="eyebrow">Каталог</p><h2 class="sec">Приоритетные направления</h2></div>' +
-'<a class="sec-link" href="#/professions">Все ' + P.length + ' профессий →</a></section>' +
+'<div class="cta-block reveal"><a class="btn btn-primary" href="#/quiz">Пройти опросник и подобрать программы →</a></div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Рост к 2030</p><h2 class="sec">Профессии с самым быстрым ростом</h2></div>' +
+'<a class="sec-link" href="#/professions?sort=growth">Весь каталог →</a></section>' +
 '<div class="fgrid">' + featured.map(fcard).join('') + '</div>' +
-'<section class="photo-band reveal" aria-label="Практика, кампусы и города">' +
-'<figure class="pb"><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Engineering_Fabrication_Laboratory_%28Student_Shop%29_%2811422729155%29.jpg/960px-Engineering_Fabrication_Laboratory_%28Student_Shop%29_%2811422729155%29.jpg" alt="Студенты в инженерной лаборатории" loading="lazy" decoding="async" title="UC Davis College of Engineering · CC BY 2.0 · Wikimedia Commons"><figcaption><span>01 · Практика</span><b>Лаборатории и проектные команды</b></figcaption></figure>' +
-'<figure class="pb"><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Moscow_State_University.jpg/960px-Moscow_State_University.jpg" alt="Главное здание Московского государственного университета" loading="lazy" decoding="async" title="D. A. Mottl · CC BY-SA 3.0 · Wikimedia Commons"><figcaption><span>02 · Кампус</span><b>Библиотеки, общежития, аудитории</b></figcaption></figure>' +
-'<figure class="pb"><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Moscow-City_skyline.jpg/960px-Moscow-City_skyline.jpg" alt="Деловой центр Москва-Сити" loading="lazy" decoding="async" title="Bradmoscu · CC BY-SA 3.0 · Wikimedia Commons"><figcaption><span>03 · Город</span><b>Стажировки рядом с домом</b></figcaption></figure>' +
-'</section>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">После 11 класса</p><h2 class="sec">Вузы с наиболее высокими баллами</h2></div>' +
 '<a class="sec-link" href="#/universities">Все вузы и баллы →</a></section>' +
 '<div class="uni-grid">' + uniTop.map(uniMini).join('') + '</div>' +
@@ -2319,6 +2323,13 @@ if (!p || !d) { render404('/professions/' + slug); return; }
 setTitle(p.title + ' — Профессии·2030');
 var progs = PROG[slug] || [];
 var mb = minBudget(slug);
+// Топ городов по числу программ этой профессии — для блока «где учат».
+var cityCount = {};
+progs.forEach(function (pr) {
+var c = pr.uni && pr.uni.city;
+if (c) cityCount[c] = (cityCount[c] || 0) + 1;
+});
+var topCities = Object.keys(cityCount).sort(function (a, b) { return cityCount[b] - cityCount[a]; }).slice(0, 5);
 var similar = (d.similar || []).filter(function (s) { return D[s.slug]; }).slice(0, 5);
 var inCmp = compare.has(p.slug);
 app.innerHTML = '<div class="view">' +
@@ -2342,6 +2353,10 @@ app.innerHTML = '<div class="view">' +
 '<div class="pp-row"><p class="pp-k">Зарплата, тыс. ₽/мес</p><p class="pp-v" style="font-size:22px">' + h(String(p.salary).replace(' тыс. ₽', '')) + '</p></div>' +
 '<div class="pp-row"><p class="pp-k">Программ в атласе</p><p class="pp-v" style="font-size:22px">' + progs.length + '</p></div>' +
 '<div class="pp-row"><p class="pp-k">Мин. балл на бюджет</p><p class="pp-v" style="font-size:22px">' + (mb ? '≈' + mb : '—') + '</p></div>' +
+(topCities.length ? '<div class="pp-row"><p class="pp-k">Где больше всего учат</p><p class="pp-v" style="font-size:13.5px;font-family:var(--sans);font-weight:500;line-height:1.55">' +
+topCities.map(function (c) {
+return '<a href="#/universities?q=' + encodeURIComponent(c) + '" style="color:var(--violet)">' + h(c) + ' · ' + cityCount[c] + '</a>';
+}).join('<span style="color:var(--ink-4)"> · </span>') + '</p></div>' : '') +
 '<a class="btn btn-primary btn-sm" href="#/quiz">Проверить свои шансы</a>' +
 (similar.length ? '<div class="similar"><p class="label" style="margin-bottom:8px">Смежные профессии</p>' +
 similar.map(function (s) {
