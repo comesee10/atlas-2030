@@ -1504,8 +1504,10 @@ statCard(U.length, 'вузов с баллами') +
 statCard(TOTAL_PROGRAMS, 'программ и специальностей') +
 statCard(DISTRICTS.length, 'федеральных округов') +
 '</div>' +
-'<p class="data-date reveal">Данные и баллы актуальны на октябрь 2026 · проходные баллы: приёмные кампании 2024–2025</p>' +
 '</section>' +
+// Дата — вне .hero-home: у секции overflow:hidden, и transform reveal
+// уводил текст за границу обрезки (IntersectionObserver не срабатывал).
+'<p class="data-date reveal">Данные и баллы актуальны на октябрь 2026 · проходные баллы: приёмные кампании 2024–2025</p>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Спрос</p><h2 class="sec">Ведущие профессии по индексу спроса</h2></div>' +
 '<a class="sec-link" href="#/professions?sort=index">Весь рейтинг →</a></section>' +
 '<div class="panel chart reveal"><div class="chart-head"><p class="label">Индекс спроса · 0–100 <button class="index-hint" aria-label="Что такое индекс спроса" title="Что такое индекс спроса">?</button></p>' +
