@@ -308,6 +308,15 @@ table.data .p{font-family:var(--mono);color:var(--ink-2);font-variant-numeric:ta
 .qline.on i{transform:scaleX(1)}
 .quiz h2{font-family:var(--serif);font-size:clamp(20px,2.4vw,26px);font-weight:700;line-height:1.2;margin-bottom:6px}
 .quiz .hint{font-size:13px;color:var(--ink-3);margin-bottom:20px}
+.quiz-modes{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+.qm{
+font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+padding:8px 14px;border:1px solid var(--rule-2);border-radius:999px;color:var(--ink-3);
+transition:color .18s var(--ease),border-color .18s var(--ease),background .18s var(--ease);
+}
+.qm:hover{color:var(--violet);border-color:var(--violet)}
+.qm.on{background:rgba(167,139,250,.16);border-color:var(--violet);color:var(--violet)}
+.oge-fixed{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .exam{
 display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--rule-2);border-radius:8px;
