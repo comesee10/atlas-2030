@@ -473,7 +473,7 @@ syncChoiceOpen();
 }
 function updateChoice() {
 if (!choiceBtn) return;
-var n = compare.size + (loadQuiz() ? 1 : 0);
+var n = compare.size + (loadQuiz() ? 1 : 0) + (loadOgeQuiz() ? 1 : 0);
 if (choiceN) {
 choiceN.hidden = n === 0;
 choiceN.textContent = n;
@@ -490,8 +490,10 @@ return '#/professions' + (s ? '?' + s : '');
 }
 function choiceBody() {
 var quiz = loadQuiz();
+var oge = loadOgeQuiz();
 var list = P.filter(function (p) { return compare.has(p.slug); });
 var sph = quiz && quiz.sphere ? SPHERES.filter(function (x) { return x.code === quiz.sphere; })[0] : null;
+var sphOge = oge && oge.sphere ? SPHERES.filter(function (x) { return x.code === oge.sphere; })[0] : null;
 var quizHtml = quiz
 ? '<div class="ch-tags">' +
 '<span class="tag">ЕГЭ: ' + h(quiz.exams.join(' · ')) + '</span>' +
@@ -505,6 +507,19 @@ var quizHtml = quiz
 '</div>'
 : '<p class="ch-empty">Ответы не сохранены. Опросник заполняется в браузере и остаётся доступным при следующем визите.</p>' +
 '<div class="ch-acts"><a class="btn btn-sm btn-primary" href="#/quiz" data-choice-close>Пройти опросник</a></div>';
+var ogeHtml = oge
+? '<div class="ch-tags">' +
+'<span class="tag">ОГЭ: ' + h(oge.exams.map(function (s) { return OGE_FULL[s]; }).join(' · ')) + '</span>' +
+'<span class="tag">Аттестат: ' + oge.grade.toFixed(2).replace('.', ',') + '</span>' +
+'<span class="tag">Сфера: ' + h(sphOge ? sphOge.name : 'любая') + '</span>' +
+'</div>' +
+'<p class="ch-hint">Опросник после 9 класса открыт на шаге ' + oge.step + ' из 4. Ответы восстанавливаются при возврате на страницу.</p>' +
+'<div class="ch-acts">' +
+'<a class="btn btn-sm btn-primary" href="' + h('#/quiz-oge?' + ogeParams(oge).toString()) + '" data-choice-close>Продолжить (ОГЭ)</a>' +
+'<button class="btn btn-sm" data-choice-reset-oge>Сбросить ответы</button>' +
+'</div>'
+: '<p class="ch-empty">Ответы для поступления после 9 класса не сохранены.</p>' +
+'<div class="ch-acts"><a class="btn btn-sm btn-primary" href="#/quiz-oge" data-choice-close>Подобрать колледж</a></div>';
 var cmpHtml = list.length
 ? '<ul class="ch-list">' + list.map(function (p) {
 return '<li><a href="#/professions/' + h(p.slug) + '" data-choice-close>' + h(p.title) + '</a>' +
@@ -523,7 +538,8 @@ var filterHtml = quiz
 '<div class="ch-acts"><a class="btn btn-sm btn-primary" href="' + h(choiceFilterLink(quiz)) + '" data-choice-close>Применить фильтр</a></div>'
 : '<p class="ch-hint">Фильтр собирается из ответов опросника: сфера и предметы ЕГЭ.</p>' +
 '<div class="ch-acts"><a class="btn btn-sm" href="#/quiz" data-choice-close>Заполнить опросник</a></div>';
-return '<section class="ch-sec"><p class="label">Опросник</p>' + quizHtml + '</section>' +
+return '<section class="ch-sec"><p class="label">Опросник · ЕГЭ</p>' + quizHtml + '</section>' +
+'<section class="ch-sec"><p class="label">Опросник · ОГЭ</p>' + ogeHtml + '</section>' +
 '<section class="ch-sec"><p class="label">Сравнение · ' + list.length + ' из 3</p>' + cmpHtml + '</section>' +
 '<section class="ch-sec"><p class="label">Сквозной фильтр</p>' + filterHtml + '</section>';
 }
@@ -579,6 +595,7 @@ compare.clear(); saveCompare(); updateCompare(); refreshChoice(); return;
 }
 if (e.target.closest('[data-choice-cmp]')) { closeChoice(); openCompare(); return; }
 if (e.target.closest('[data-choice-reset]')) { clearQuizSaved(); refreshChoice(); return; }
+if (e.target.closest('[data-choice-reset-oge]')) { clearOgeSaved(); refreshChoice(); return; }
 });
 document.addEventListener('keydown', function (e) {
 if (choiceModal.hidden) return;
@@ -623,7 +640,7 @@ if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-cur
 }
 var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
 var PAGE_TITLES = {
-quiz: 'Опросник', professions: 'Профессии', universities: 'Вузы',
+quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
 about: 'О проекте', methodology: 'Методология'
 };
@@ -754,6 +771,16 @@ inLanguage: 'ru',
 isAccessibleForFree: true,
 provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
 });
+} else if (path === '/quiz-oge') {
+g.push({
+'@type': 'Course',
+name: 'Опросник после 9 класса: колледжи и специальности СПО',
+description: 'Подбор специальностей колледжей по предметам ОГЭ, интересующей сфере и среднему баллу аттестата с оценкой шансов на бюджет.',
+url: absUrl('#/quiz-oge'),
+inLanguage: 'ru',
+isAccessibleForFree: true,
+provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+});
 }
 return g;
 }
@@ -790,6 +817,7 @@ history.replaceState(null, '', '#' + path + (s ? '?' + s : ''));
 var ROUTES = [
 [/^\/$/, renderHome],
 [/^\/quiz$/, renderQuiz],
+[/^\/quiz-oge$/, renderQuizOge],
 [/^\/professions$/, renderProfessions],
 [/^\/professions\/([^/]+)$/, function (m) { renderProfession(decodeURIComponent(m[1])); }],
 [/^\/universities$/, renderUniversities],
@@ -1919,6 +1947,8 @@ app.innerHTML = '<div class="view">' +
 '<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Колледжи: <em>после 9 класса</em></h1>' +
 '<p class="lead">' + C.length + ' ' + plural(C.length, 'специальность', 'специальности', 'специальностей') +
 ' среднего профессионального образования. Срок обучения, средний балл аттестата и профессии, в которые ведёт специальность.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary btn-sm" href="#/quiz-oge">Подобрать по ОГЭ</a>' +
+'<a class="btn btn-sm" href="#/quiz">После 11 класса · ЕГЭ</a></div>' +
 '</section>' +
 '<div class="toolbar">' +
 '<label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
@@ -2399,7 +2429,7 @@ app.innerHTML = '<div class="view">' +
 '<h1>' + h(c.title) + '</h1>' +
 '<p class="lead">' + h(c.desc) + '</p>' +
 '<div class="hero-cta">' +
-'<a class="btn btn-primary btn-sm" href="#/quiz">Проверить шансы</a>' +
+'<a class="btn btn-primary btn-sm" href="#/quiz-oge">Проверить шансы</a>' +
 '<a class="btn btn-sm" href="#/colleges?sphere=' + h(c.sphereCode) + '">Ещё в этой сфере</a>' +
 '</div>' +
 '</header>' +
@@ -2691,6 +2721,17 @@ bindQuiz(st);
 quizSync(st);
 initReveal(root);
 }
+// Переключатель «после 11 класса (ЕГЭ) / после 9 класса (ОГЭ)» на страницах опросников.
+function quizModeSwitch(active) {
+function link(id, href, label) {
+var on = active === id;
+return '<a class="qm' + (on ? ' on' : '') + '" href="' + href + '"' + (on ? ' aria-current="page"' : '') + '>' + label + '</a>';
+}
+return '<nav class="quiz-modes" aria-label="После какого класса подбирать">' +
+link('ege', '#/quiz', 'После 11 класса · ЕГЭ') +
+link('oge', '#/quiz-oge', 'После 9 класса · ОГЭ') +
+'</nav>';
+}
 function renderQuiz(m, q) {
 setTitle('Опросник: куда поступать — Профессии·2030');
 var st = quizFromUrl(q);
@@ -2700,9 +2741,336 @@ app.innerHTML = '<div class="view">' +
 '<h1 class="display" style="font-size:clamp(30px,4.6vw,48px)">Опросник: куда <em>поступать</em></h1>' +
 '<p class="lead">Четыре шага: предметы ЕГЭ, интересующая сфера, ожидаемая сумма баллов и результат. На выходе — профессии и конкретные программы с оценкой шансов на бюджет.</p>' +
 '</section>' +
+quizModeSwitch('ege') +
 '<div id="quizRoot"></div>' +
 '</div>';
 paintQuiz(st);
+}
+// Предметы ОГЭ по выбору. В паспортах специальностей колледжей они записаны
+// полными названиями («Информатика, Физика») — держим соответствие коротким кодам.
+var OGE_SUBJECTS = ['Инф', 'Физ', 'Хим', 'Био', 'Общ', 'Ист', 'Лит', 'Ин.яз', 'Гео'];
+var OGE_FULL = {
+'Инф': 'Информатика', 'Физ': 'Физика', 'Хим': 'Химия', 'Био': 'Биология',
+'Общ': 'Обществознание', 'Ист': 'История', 'Лит': 'Литература',
+'Ин.яз': 'Иностранный язык', 'Гео': 'География'
+};
+var OGE_BY_FULL = {};
+OGE_SUBJECTS.forEach(function (s) { OGE_BY_FULL[OGE_FULL[s]] = s; });
+function parseOgeUseful(str) {
+return String(str || '').split(',').map(function (s) {
+return OGE_BY_FULL[s.trim()];
+}).filter(Boolean);
+}
+// Предрасчёт по каждой специальности: полезные ОГЭ и ориентир среднего балла.
+// Балл аттестата — десятичная дробь («4.35»), поэтому parseFloat, а не num()
+// (num убирает все нецифровые символы и вернул бы 435).
+var CINFO = {};
+C.forEach(function (c) {
+var d = CD[c.slug] || {};
+var row = (d.passport || []).filter(function (r) { return /ОГЭ/.test(r.k); })[0];
+var g = parseFloat(String(c.price).replace(',', '.'));
+CINFO[c.slug] = { useful: parseOgeUseful(row && row.v), grade: isNaN(g) ? 0 : g };
+});
+function ogeFromUrl(q) {
+var st = { step: 1, exams: ['Инф', 'Физ'], sphere: '', grade: 4.2 };
+var has = q.has('e') || q.has('s') || q.has('g') || q.has('step');
+if (!has) {
+var saved = loadOgeQuiz();
+if (saved) return saved;
+}
+var e = q.get('e');
+if (e) {
+var arr = e.split(',').filter(function (s) { return OGE_SUBJECTS.indexOf(s) >= 0; });
+if (arr.length) st.exams = arr.slice(0, 2);
+}
+var s = q.get('s');
+if (s && SPHERES.some(function (x) { return x.code === s; })) st.sphere = s;
+var g = parseInt(q.get('g'), 10);
+if (g >= 300 && g <= 500) st.grade = g / 100;
+var step = parseInt(q.get('step'), 10);
+if (step >= 1 && step <= 4) st.step = step;
+return st;
+}
+function ogeParams(st) {
+var p = new URLSearchParams();
+if (st.step > 1) p.set('step', st.step);
+p.set('e', st.exams.join(','));
+if (st.sphere) p.set('s', st.sphere);
+if (st.grade !== 4.2) p.set('g', Math.round(st.grade * 100));
+return p;
+}
+function loadOgeQuiz() {
+try {
+var raw = localStorage.getItem('atlas:quiz-oge');
+if (!raw) return null;
+var o = JSON.parse(raw);
+if (!o || !o.e || !o.e.length) return null;
+var exams = o.e.filter(function (s) { return OGE_SUBJECTS.indexOf(s) >= 0; }).slice(0, 2);
+if (!exams.length) return null;
+var st = { step: 1, exams: exams, sphere: '', grade: 4.2 };
+if (o.s && SPHERES.some(function (x) { return x.code === o.s; })) st.sphere = o.s;
+var g = parseInt(o.g, 10);
+if (g >= 300 && g <= 500) st.grade = g / 100;
+var step = parseInt(o.step, 10);
+if (step >= 1 && step <= 4) st.step = step;
+return st;
+} catch (e) { return null; }
+}
+function saveOgeQuiz(st) {
+try {
+var isDefault = st.step === 1 && !st.sphere && st.grade === 4.2 && st.exams.join(',') === 'Инф,Физ';
+if (isDefault) localStorage.removeItem('atlas:quiz-oge');
+else localStorage.setItem('atlas:quiz-oge', JSON.stringify({ e: st.exams, s: st.sphere, g: Math.round(st.grade * 100), step: st.step }));
+} catch (e) {}
+updateChoice();
+syncChoiceOpen();
+}
+function clearOgeSaved() {
+try { localStorage.removeItem('atlas:quiz-oge'); } catch (e) {}
+updateChoice();
+syncChoiceOpen();
+}
+function ogeSync(st) {
+syncUrl('/quiz-oge', ogeParams(st));
+saveOgeQuiz(st);
+}
+function ogeStatus(info, grade) {
+if (!info.grade) return { cls: 'warn', text: 'Балл не указан' };
+if (grade >= info.grade) return { cls: 'ok', text: 'Аттестат проходит' };
+if (info.grade - grade <= 0.15) return { cls: 'warn', text: 'Пограничная зона' };
+return { cls: 'bad', text: 'Нужен балл выше' };
+}
+function computeOgeReport(st) {
+return C.map(function (c) {
+var info = CINFO[c.slug] || { useful: [], grade: 0 };
+var matched = info.useful.filter(function (s) { return st.exams.indexOf(s) >= 0; });
+var coverage = info.useful.length ? matched.length / info.useful.length : 0;
+var sphereMatch = !!st.sphere && c.sphereCode === st.sphere;
+var gap = info.grade - st.grade;
+var gradeFit = gap <= 0 ? 1 : Math.max(0, 1 - gap / 0.8);
+var demand = Math.min(1, c.count / 9);
+var score = 100 * (0.42 * coverage + 0.18 * (sphereMatch ? 1 : 0) + 0.25 * gradeFit + 0.15 * demand);
+return {
+c: c, info: info, matched: matched, coverage: coverage, sphereMatch: sphereMatch, gap: gap,
+score: Math.max(0, Math.min(100, Math.round(score)))
+};
+}).sort(function (a, b) { return b.score - a.score || b.c.count - a.c.count; });
+}
+function ogeReportHtml(st) {
+var res = computeOgeReport(st);
+var hits = res.filter(function (r) { return r.coverage > 0 || r.sphereMatch; });
+var top = hits.slice(0, 6);
+var sph = SPHERES.filter(function (s) { return s.code === st.sphere; })[0];
+var head = '<div class="report-head"><div><p class="eyebrow">Результат подбора · после 9 класса</p>' +
+'<h2 class="big">' + (hits.length
+? 'Найдено <b>' + hits.length + '</b> ' + plural(hits.length, 'специальность', 'специальности', 'специальностей')
+: 'Пока ничего не нашлось') + '</h2></div>' +
+'<div class="report-actions"><button class="btn btn-sm" id="copyLink">Скопировать ссылку</button>' +
+'<button class="btn btn-sm" id="printBtn">Печать / PDF</button>' +
+'<button class="btn btn-sm btn-ghost" id="restart">Заново</button></div></div>';
+var tags = '<div class="report-sum">' +
+'<span class="tag">ОГЭ: ' + h(st.exams.map(function (s) { return OGE_FULL[s]; }).join(' · ')) + '</span>' +
+'<span class="tag">Аттестат: ' + st.grade.toFixed(2).replace('.', ',') + '</span>' +
+'<span class="tag">Сфера: ' + h(sph ? sph.name : 'любая') + '</span></div>';
+if (!top.length) {
+return head + tags + '<div class="report-empty"><b>Подходящих специальностей не нашлось</b>' +
+'<p>Попробуйте выбрать другие предметы по выбору или снизить ожидаемый средний балл аттестата.</p>' +
+'<div class="hero-cta" style="justify-content:center"><button class="btn btn-sm" id="adjust">Изменить ответы</button></div></div>';
+}
+var tip = '<div class="tip"><b>Как читать статусы.</b> «Аттестат проходит» — средний балл не ниже ориентира приёма. «Пограничная зона» — не более 0,15 балла ниже. «Нужен балл выше» — стоит смотреть менее конкурсные специальности или платное. Это ориентир, а не гарантия: конкурс аттестатов зависит от набора и региона.</div>';
+// Если в выбранной сфере ни одна специальность не попала в топ, подсказываем,
+// какие предметы ОГЭ нужны для профильных направлений.
+if (st.sphere && !top.some(function (r) { return r.sphereMatch; })) {
+var need = [];
+res.filter(function (r) { return r.sphereMatch; }).forEach(function (r) {
+r.info.useful.forEach(function (s) {
+if (st.exams.indexOf(s) < 0 && need.indexOf(s) < 0) need.push(s);
+});
+});
+if (need.length) {
+tip += '<div class="tip"><b>Сфера «' + h(sph ? sph.name : '') + '».</b> Профильные специальности требуют других предметов ОГЭ — ' +
+h(need.map(function (s) { return OGE_FULL[s]; }).join(' и ')) +
+'. Добавьте их на первом шаге, чтобы поднять такие специальности в списке.</div>';
+}
+}
+var cards = top.map(function (r) {
+var status = ogeStatus(r.info, st.grade);
+return '<article class="panel res reveal">' +
+'<div class="res-top"><div><a href="#/colleges/' + h(r.c.slug) + '"><h3>' + h(r.c.title) + '</h3></a>' +
+'<span class="label">' + h(r.c.code) + ' · ' + h(r.c.sphereCode) + '</span></div>' +
+'<div class="res-score"><span class="v">' + r.score + '</span><span class="k">совпадение</span></div></div>' +
+'<div class="res-unis"><div class="res-uni"><span class="u"><b>' + h(r.c.duration) + '</b> · ' +
+r.c.count + ' ' + plural(r.c.count, 'колледж', 'колледжа', 'колледжей') +
+'<br><span class="status ' + status.cls + '">' + status.text + '</span></span>' +
+'<span class="sc" title="Ориентир среднего балла аттестата">от ' + h(r.c.price) + '</span></div></div>' +
+'<p class="res-why">Полезные ОГЭ: <b>' + h(r.info.useful.map(function (s) { return OGE_FULL[s]; }).join(' · ')) + '</b>' +
+' · совпало ' + r.matched.length + ' из ' + r.info.useful.length +
+(r.sphereMatch ? ' · сфера совпала' : '') + '</p>' +
+'<a class="res-more" href="#/colleges/' + h(r.c.slug) + '">Специальность в колледжах →</a>' +
+'</article>';
+}).join('');
+return head + tags + tip + '<div class="res-grid">' + cards + '</div>' +
+'<p class="quiz-note">Показаны 6 лучших совпадений из ' + hits.length + '. Ссылка на результат сохраняет ответы — её можно отправить родителям.</p>' +
+'<div class="quiz-foot"><span class="quiz-count">Шаг 4 из 4 · результат</span>' +
+'<div class="quiz-nav"><button class="btn" id="adjust">Изменить ответы</button>' +
+'<a class="btn btn-primary" href="#/colleges">Все специальности</a></div></div>';
+}
+function ogeStepBody(st) {
+if (st.step === 2) {
+return '<h2>Какая сфера ближе?</h2>' +
+'<p class="hint">Сфера поднимает в списке профильные специальности. Шаг можно пропустить.</p>' +
+'<div class="sphere-grid" id="sphereGrid">' +
+'<button class="sphere" data-sphere="" aria-pressed="' + (st.sphere === '' ? 'true' : 'false') + '">' +
+'<span class="c">Любая</span><span class="n">Все сферы</span>' +
+'<span class="d">Показать всё, что подходит по предметам и баллу аттестата</span></button>' +
+SPHERES.map(function (s) {
+var n = C.filter(function (c) { return c.sphereCode === s.code; }).length;
+return '<button class="sphere" data-sphere="' + s.code + '" aria-pressed="' + (st.sphere === s.code ? 'true' : 'false') + '">' +
+'<span class="c">' + s.code + '</span><span class="n">' + h(s.name) + '</span>' +
+'<span class="d">' + h(SPHERE_DESC[s.code] || '') + ' · ' + n + ' ' +
+plural(n, 'специальность', 'специальности', 'специальностей') + '</span></button>';
+}).join('') +
+'</div>' +
+'<div class="quiz-foot"><span class="quiz-count">Шаг 2 из 4</span>' +
+'<div class="quiz-nav"><button class="btn" data-back>← Назад</button>' +
+'<button class="btn btn-primary" data-next>Дальше →</button></div></div>';
+}
+if (st.step === 3) {
+var pct = Math.round((st.grade - 3) / 2 * 100);
+return '<h2>Средний балл аттестата</h2>' +
+'<p class="hint">Среднее арифметическое итоговых оценок за 9 класс. Колледжи принимают по конкурсу аттестатов.</p>' +
+'<div class="slider-box"><div class="row"><span class="big" id="gradeVal">' + st.grade.toFixed(2).replace('.', ',') + '</span>' +
+'<span class="hint">из 5,00</span></div>' +
+'<input id="gradeRange" type="range" min="3" max="5" step="0.05" value="' + st.grade + '" style="--p:' + pct + '%" aria-label="Средний балл аттестата">' +
+'</div>' +
+'<div class="quick">' + [3.5, 4, 4.5, 4.8].map(function (v) {
+return '<button data-quick="' + v + '">' + v.toFixed(1).replace('.', ',') + '</button>';
+}).join('') + '</div>' +
+'<div class="quiz-foot"><span class="quiz-count">Шаг 3 из 4</span>' +
+'<div class="quiz-nav"><button class="btn" data-back>← Назад</button>' +
+'<button class="btn btn-primary" data-next>Показать результат →</button></div></div>' +
+'<p class="quiz-note">Шкала ориентировочная: 3,5–3,9 — чаще платное или менее конкурсные специальности, 4,0–4,4 — бюджет в региональных колледжах, 4,5 и выше — самые конкурсные направления.</p>';
+}
+if (st.step === 4) return ogeReportHtml(st);
+return '<h2>Какие предметы ОГЭ выбраны?</h2>' +
+'<p class="hint">Русский язык и математика обязательны для всех. Выберите до двух предметов по выбору — их колледжи учитывают в конкурсе аттестатов.</p>' +
+'<div class="oge-fixed"><span class="tag">Русский язык · обязательный</span><span class="tag">Математика · обязательный</span></div>' +
+'<div class="exam-grid" id="examGrid">' + OGE_SUBJECTS.map(function (s) {
+var on = st.exams.indexOf(s) >= 0;
+return '<button class="exam" data-exam="' + s + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
+'<span class="c">' + s + '</span><span class="n">' + OGE_FULL[s] + '</span>' +
+'<span class="tick">✓</span></button>';
+}).join('') + '</div>' +
+'<div class="quiz-foot"><span class="quiz-count" id="examCount">' + st.exams.length + ' из 2 выбрано</span>' +
+'<div class="quiz-nav"><button class="btn btn-primary" data-next ' + (st.exams.length ? '' : 'disabled') + '>Дальше →</button></div></div>' +
+'<p class="quiz-note">Подбор учитывает «полезные ОГЭ» из паспорта специальности: чем больше совпадений, тем выше позиция в списке.</p>';
+}
+function bindOgeQuiz(st) {
+var root = document.getElementById('quizRoot');
+var grid = document.getElementById('examGrid');
+if (grid) {
+grid.addEventListener('click', function (e) {
+var b = e.target.closest('[data-exam]');
+if (!b) return;
+var s = b.getAttribute('data-exam');
+var i = st.exams.indexOf(s);
+if (i >= 0) {
+st.exams.splice(i, 1);
+} else {
+if (st.exams.length >= 2) { toast('Можно выбрать не больше двух предметов'); return; }
+st.exams.push(s);
+}
+b.setAttribute('aria-pressed', st.exams.indexOf(s) >= 0 ? 'true' : 'false');
+var c = document.getElementById('examCount');
+if (c) c.textContent = st.exams.length + ' из 2 выбрано';
+var next = root.querySelector('[data-next]');
+if (next) next.disabled = !st.exams.length;
+ogeSync(st);
+});
+}
+var sp = document.getElementById('sphereGrid');
+if (sp) {
+sp.addEventListener('click', function (e) {
+var b = e.target.closest('[data-sphere]');
+if (!b) return;
+st.sphere = b.getAttribute('data-sphere');
+sp.querySelectorAll('[data-sphere]').forEach(function (x) {
+x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+});
+ogeSync(st);
+});
+}
+var range = document.getElementById('gradeRange');
+if (range) {
+range.addEventListener('input', function () {
+st.grade = Math.round(Number(range.value) * 100) / 100;
+document.getElementById('gradeVal').textContent = st.grade.toFixed(2).replace('.', ',');
+range.style.setProperty('--p', Math.round((st.grade - 3) / 2 * 100) + '%');
+ogeSync(st);
+});
+var quick = root.querySelector('.quick');
+if (quick) {
+quick.addEventListener('click', function (e) {
+var b = e.target.closest('[data-quick]');
+if (!b) return;
+st.grade = Number(b.getAttribute('data-quick'));
+range.value = st.grade;
+range.dispatchEvent(new Event('input'));
+});
+}
+}
+root.onclick = function (e) {
+var next = e.target.closest('[data-next]');
+var back = e.target.closest('[data-back]');
+if (next) {
+if (st.step === 1 && !st.exams.length) { toast('Необходимо выбрать хотя бы один предмет'); return; }
+st.step = Math.min(4, st.step + 1);
+paintQuizOge(st);
+window.scrollTo({ top: Math.max(0, root.getBoundingClientRect().top + window.scrollY - 84), behavior: 'smooth' });
+} else if (back) {
+st.step = Math.max(1, st.step - 1);
+paintQuizOge(st);
+window.scrollTo({ top: Math.max(0, root.getBoundingClientRect().top + window.scrollY - 84), behavior: 'smooth' });
+}
+};
+if (st.step === 4) {
+var copy = document.getElementById('copyLink');
+if (copy) copy.addEventListener('click', copyLink);
+var pr = document.getElementById('printBtn');
+if (pr) pr.addEventListener('click', function () { window.print(); });
+var rs = document.getElementById('restart');
+if (rs) rs.addEventListener('click', function () {
+st.step = 1;
+st.exams = ['Инф', 'Физ'];
+st.sphere = '';
+st.grade = 4.2;
+paintQuizOge(st);
+});
+var adj = document.getElementById('adjust');
+if (adj) adj.addEventListener('click', function () { st.step = 1; paintQuizOge(st); });
+}
+}
+function paintQuizOge(st) {
+var root = document.getElementById('quizRoot');
+if (!root) return;
+root.innerHTML = '<div class="quiz panel">' + quizSteps(st.step) + ogeStepBody(st) + '</div>';
+bindOgeQuiz(st);
+ogeSync(st);
+initReveal(root);
+}
+function renderQuizOge(m, q) {
+setTitle('Опросник после 9 класса: колледжи — Профессии·2030');
+var st = ogeFromUrl(q);
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел II · Опросник · После 9 класса</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,48px)">Куда пойти <em>после 9 класса</em></h1>' +
+'<p class="lead">Четыре шага: предметы ОГЭ по выбору, интересующая сфера, средний балл аттестата и результат. На выходе — специальности колледжей с оценкой шансов на бюджет.</p>' +
+'</section>' +
+quizModeSwitch('oge') +
+'<div id="quizRoot"></div>' +
+'</div>';
+paintQuizOge(st);
 }
 window.addEventListener('hashchange', route);
 if (!location.hash || location.hash === '#') {
