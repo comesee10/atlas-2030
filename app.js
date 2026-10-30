@@ -437,6 +437,7 @@ if (st.step > 1) p.set('step', st.step);
 p.set('e', st.exams.join(','));
 if (st.sphere) p.set('s', st.sphere);
 if (st.sum !== 240) p.set('b', st.sum);
+if (st.mathLevel && st.exams.indexOf('Мат') >= 0) p.set('mlevel', st.mathLevel);
 return p;
 }
 function loadQuiz() {
@@ -447,7 +448,7 @@ var o = JSON.parse(raw);
 if (!o || !o.e || !o.e.length) return null;
 var exams = o.e.filter(function (s) { return SUBJECTS.indexOf(s) >= 0; }).slice(0, 3);
 if (!exams.length) return null;
-var st = { step: 1, exams: exams, sphere: '', sum: 240 };
+var st = { step: 1, exams: exams, sphere: '', sum: 240, mathLevel: o.mlevel === 'basic' ? 'basic' : 'profile' };
 if (o.s && SPHERES.some(function (x) { return x.code === o.s; })) st.sphere = o.s;
 var b = parseInt(o.b, 10);
 if (b >= 120 && b <= 300) st.sum = b;
@@ -459,9 +460,9 @@ return st;
 function saveQuiz(st) {
 try {
 var isDefault = st.step === 1 && !st.sphere && st.sum === 240 &&
-st.exams.join(',') === 'Рус,Мат,Инф';
+st.exams.join(',') === 'Рус,Мат,Инф' && (st.mathLevel || 'profile') === 'profile';
 if (isDefault) localStorage.removeItem('atlas:quiz');
-else localStorage.setItem('atlas:quiz', JSON.stringify({ e: st.exams, s: st.sphere, b: st.sum, step: st.step }));
+else localStorage.setItem('atlas:quiz', JSON.stringify({ e: st.exams, s: st.sphere, b: st.sum, step: st.step, mlevel: st.mathLevel || 'profile' }));
 } catch (e) {}
 updateChoice();
 syncChoiceOpen();
@@ -2449,8 +2450,8 @@ prepareRich(rich);
 buildToc(rich);
 }
 function quizFromUrl(q) {
-var st = { step: 1, exams: ['Рус', 'Мат', 'Инф'], sphere: '', sum: 240 };
-var has = q.has('e') || q.has('s') || q.has('b') || q.has('step');
+var st = { step: 1, exams: ['Рус', 'Мат', 'Инф'], sphere: '', sum: 240, mathLevel: 'profile' };
+var has = q.has('e') || q.has('s') || q.has('b') || q.has('step') || q.has('mlevel');
 if (!has) {
 var saved = loadQuiz();
 if (saved) return saved;
@@ -2464,6 +2465,8 @@ var s = q.get('s');
 if (s && SPHERES.some(function (x) { return x.code === s; })) st.sphere = s;
 var b = parseInt(q.get('b'), 10);
 if (b >= 120 && b <= 300) st.sum = b;
+var ml = q.get('mlevel');
+if (ml === 'basic' || ml === 'profile') st.mathLevel = ml;
 var step = parseInt(q.get('step'), 10);
 if (step >= 1 && step <= 4) st.step = step;
 return st;
@@ -2500,7 +2503,10 @@ var exams = st.exams;
 var sum = st.sum;
 return P.map(function (p) {
 var progs = PROG[p.slug] || [];
-var fit = progs.filter(function (pr) { return fitsEge(pr.ege, exams); });
+var fit = progs.filter(function (pr) {
+var mathRestricted = st.mathLevel === 'basic' && exams.indexOf('Мат') >= 0 && /Мат/.test(pr.ege) && ['D-01', 'D-02'].indexOf(p.sphereCode) >= 0;
+return !mathRestricted && fitsEge(pr.ege, exams);
+});
 var affordable = fit.filter(function (pr) { return pr.budget && pr.budget <= sum + 10; });
 var coverage = progs.length ? fit.length / progs.length : 0;
 var budgets = fit.map(function (pr) { return pr.budget || 999; });
@@ -2541,6 +2547,7 @@ var head = '<div class="report-head"><div><p class="eyebrow">Результат 
 '<button class="btn btn-sm" id="printBtn">Печать / PDF</button>' +
 '<button class="btn btn-sm btn-ghost" id="restart">Заново</button></div></div>';
 var tags = '<div class="report-sum"><span class="tag">ЕГЭ: ' + h(st.exams.join(' · ')) + '</span>' +
+'<span class="tag">Математика: ' + (st.mathLevel === 'basic' ? 'базовый уровень' : 'профильный уровень') + '</span>' +
 '<span class="tag">Сумма: ' + st.sum + ' из 300</span>' +
 '<span class="tag">Сфера: ' + h(sphereObj ? sphereObj.name : 'любая') + '</span></div>';
 if (!top.length) {
@@ -2622,6 +2629,7 @@ return '<button class="exam" data-exam="' + s + '" aria-pressed="' + (on ? 'true
 '<span class="c">' + SUBJ_CODE[s] + '</span><span class="n">' + SUBJ_FULL[s] + '</span>' +
 '<span class="tick">✓</span></button>';
 }).join('') + '</div>' +
+'<div class="math-level" id="mathLevelBox" ' + (st.exams.indexOf('Мат') >= 0 ? '' : 'hidden') + '><p class="label">Уровень математики</p><div class="math-level-grid"><button type="button" class="math-level-btn" data-math-level="profile" aria-pressed="' + ((st.mathLevel || 'profile') === 'profile' ? 'true' : 'false') + '"><b>Профильный</b><span>Для технических, ИТ и экономических программ</span></button><button type="button" class="math-level-btn" data-math-level="basic" aria-pressed="' + (st.mathLevel === 'basic' ? 'true' : 'false') + '"><b>Базовый</b><span>Для программ, где не нужен профильный экзамен</span></button></div></div>' +
 '<div class="quiz-foot"><span class="quiz-count" id="examCount">' + st.exams.length + ' из 3 выбрано</span>' +
 '<div class="quiz-nav"><button class="btn btn-primary" data-next ' + (st.exams.length ? '' : 'disabled') + '>Дальше →</button></div></div>' +
 '<p class="quiz-note">Программа подходит, если все её экзамены есть среди выбранных. Альтернативы вроде «Инф / Физ» учитываются как «или».</p>';
@@ -2637,6 +2645,7 @@ st.step = 1;
 st.exams = ['Рус', 'Мат', 'Инф'];
 st.sphere = '';
 st.sum = 240;
+st.mathLevel = 'profile';
 paintQuiz(st);
 });
 var adj = document.getElementById('adjust');
@@ -2660,11 +2669,21 @@ st.exams.push(s);
 b.setAttribute('aria-pressed', st.exams.indexOf(s) >= 0 ? 'true' : 'false');
 var c = document.getElementById('examCount');
 if (c) c.textContent = st.exams.length + ' из 3 выбрано';
+var mlBox = document.getElementById('mathLevelBox');
+if (mlBox) mlBox.hidden = st.exams.indexOf('Мат') < 0;
 var next = root.querySelector('[data-next]');
 if (next) next.disabled = !st.exams.length;
 quizSync(st);
 });
 }
+var ml = document.getElementById('mathLevelBox');
+if (ml) ml.addEventListener('click', function (e) {
+var b = e.target.closest('[data-math-level]');
+if (!b) return;
+st.mathLevel = b.getAttribute('data-math-level');
+ml.querySelectorAll('[data-math-level]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+quizSync(st);
+});
 var sp = document.getElementById('sphereGrid');
 if (sp) {
 sp.addEventListener('click', function (e) {
