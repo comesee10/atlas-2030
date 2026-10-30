@@ -980,6 +980,41 @@ background-size:240% 100%;
 animation:ribbonSheen 8s linear infinite;
 }
 @keyframes ribbonSheen{0%{background-position:180% 0}100%{background-position:-90% 0}}
+
+/* Atlas 2030 visual refresh: preserve the original information architecture while
+   giving the interface a clearer editorial/data-lab identity. */
+:root{
+--bg:#091116;--bg-2:#0d1820;--panel:#101d26;--panel-2:#162731;
+--rule:#20333e;--rule-2:#31505c;--ink:#f3fbfa;--ink-2:#c6d8d8;
+--ink-3:#839da1;--ink-4:#587176;--violet:#5eead4;--violet-deep:#14b8a6;
+--orchid:#fb7185;--ok:#86efac;--warn:#facc15;
+--shadow:0 24px 70px rgba(0,0,0,.4);
+}
+body{
+background-color:var(--bg);
+background-image:linear-gradient(rgba(94,234,212,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.035) 1px,transparent 1px),radial-gradient(900px 520px at 90% -10%,rgba(20,184,166,.16),transparent 70%),radial-gradient(700px 420px at 0% 22%,rgba(251,113,133,.08),transparent 68%);
+background-size:48px 48px,48px 48px,auto,auto;
+}
+.hdr{background:rgba(9,17,22,.78);border-bottom-color:rgba(94,234,212,.18)}
+.brand-name{letter-spacing:.02em}
+.nav a[aria-current="page"]{color:var(--violet);background:rgba(94,234,212,.12)}
+.search-btn:hover{border-color:var(--violet);background:rgba(94,234,212,.08)}
+.panel{background:linear-gradient(145deg,rgba(22,39,49,.92),rgba(13,24,32,.94));border-color:rgba(94,234,212,.16);box-shadow:0 18px 50px rgba(0,0,0,.12)}
+.btn-primary{background:linear-gradient(135deg,#5eead4,#14b8a6);color:#06201d;box-shadow:0 12px 32px -12px rgba(20,184,166,.9)}
+.btn-primary:hover{background:linear-gradient(135deg,#99f6e4,#2dd4bf);box-shadow:0 16px 36px -12px rgba(20,184,166,1)}
+.hero-home{border:1px solid rgba(94,234,212,.13);border-radius:18px;padding:42px 34px 28px;margin-top:28px;background:linear-gradient(135deg,rgba(13,28,36,.72),rgba(9,17,22,.28));box-shadow:var(--shadow);overflow:hidden}
+.hero-home::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(94,234,212,.06) 45%,transparent 70%);transform:translateX(-100%);animation:heroSheen 11s ease-in-out infinite}
+@keyframes heroSheen{0%,55%{transform:translateX(-100%)}75%,100%{transform:translateX(100%)}}
+.hero-home .start-card{border-color:rgba(94,234,212,.25);background:linear-gradient(180deg,rgba(15,39,47,.72),rgba(12,23,31,.94)),url('moscow-city-960.webp') center/cover no-repeat}
+.eyebrow{color:var(--violet)}
+.hero-meta span{border-color:rgba(94,234,212,.18)}
+.bar-fill{background:linear-gradient(90deg,var(--violet-deep),var(--violet),#fda4af)}
+.stat{border-color:rgba(94,234,212,.14)}
+.stat:hover{background:rgba(94,234,212,.08)}
+.fcard:hover,.uni:hover,.spec-card:hover,.city-card:hover,.geo-card:hover,.cc:hover{border-color:rgba(94,234,212,.55);box-shadow:0 22px 44px -30px rgba(20,184,166,.65)}
+.ribbon-track span::after{background:var(--violet)}
+.to-top{border-color:rgba(94,234,212,.4);color:var(--violet)}
+@media(max-width:760px){.hero-home{padding:28px 18px 20px;border-radius:14px}}
 .photo-band{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 4px}
 .pb{
 position:relative;margin:0;height:168px;overflow:hidden;border-radius:14px;

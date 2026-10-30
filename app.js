@@ -638,7 +638,7 @@ var on = r === '/' ? path === '/' : (path === r || path.indexOf(r + '/') === 0);
 if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
 });
 }
-var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
+var SITE_URL = window.location.origin + window.location.pathname;
 var PAGE_TITLES = {
 quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
