@@ -27,6 +27,6 @@
       var p = A.professions.filter(function (v) { return v.slug === slug; })[0] || A.professions[0];
       return { direction: direction, code: ['09.03.04','10.03.01','24.03.01','27.03.04'][j % 4], professionSlug: p.slug, profession: p.title, ege: j % 2 ? 'Рус + Мат + Инф / Физ' : 'Рус + Мат + Инф', budget: String(245 + (i % 8) * 4), paid: String(180 + (i % 6) * 5) };
     });
-    A.universities.push({ city: x[1], short: x[0], full: x[2], avg: 238 + (i % 10) * 4, programs: programs, review: { score: (4.2 + (i % 8) * .1).toFixed(1), text: 'Сильная практика и понятная траектория от учебной программы к стажировке.' } });
+    A.universities.push({ city: x[1], short: x[0], full: x[2], avg: 238 + (i % 10) * 4, format: i % 3 === 0 ? 'очно-заочная' : 'очная', dorm: i % 4 !== 1, programs: programs });
   });
 })();

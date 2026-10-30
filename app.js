@@ -1755,6 +1755,14 @@ var q = norm(st.q);
 return U.filter(function (u) {
 if (st.district && u.district !== st.district) return false;
 if (st.region && u.region !== st.region) return false;
+if (st.city && u.city !== st.city) return false;
+if (st.minAvg && Number(u.avg || 0) < st.minAvg) return false;
+if (st.format && u.format && u.format !== st.format) return false;
+if (st.dorm === 'yes' && u.dorm === false) return false;
+if (st.dorm === 'no' && u.dorm === true) return false;
+if (st.mode === 'budget' && !u.programs.some(function (p) { return !!p.budget; })) return false;
+if (st.mode === 'paid' && !u.programs.some(function (p) { return !!p.paid; })) return false;
+if (st.exam && !u.programs.some(function (p) { return String(p.ege || '').indexOf(st.exam) >= 0; })) return false;
 if (!q) return true;
 var hay = u.short + ' ' + u.full + ' ' + u.city + ' ' + u.region + ' ' + u.district + ' ' + u.programs.map(function (p) {
 return p.direction + ' ' + p.profession + ' ' + p.code;
@@ -1808,7 +1816,7 @@ return '<div class="region-block">' +
 return out;
 }
 function renderUniversities(m, q) {
-var st = { q: q.get('q') || '', district: q.get('district') || '', region: q.get('region') || '', sort: q.get('sort') || 'avg' };
+var st = { q: q.get('q') || '', district: q.get('district') || '', region: q.get('region') || '', city: q.get('city') || '', mode: q.get('mode') || '', format: q.get('format') || '', dorm: q.get('dorm') || '', exam: q.get('exam') || '', minAvg: parseInt(q.get('minAvg') || '0', 10), sort: q.get('sort') || 'avg' };
 if (st.district && !districtByCode(st.district)) st.district = '';
 if (st.region) {
 var rr = REGION_BY_NAME[st.region];
@@ -1842,6 +1850,12 @@ FEDERAL.map(function (d) { return sphereChip(d.code, d.code + ' · ' + d.short, 
 '<div class="filter-row"><label class="select-field" for="regionSelect"><span class="label">Регион</span>' +
 '<select id="regionSelect">' + regionOptions(st) + '</select></label>' +
 '</div>' +
+'<div class="filter-row uni-practical"><label class="select-field" for="citySelect"><span class="label">Город</span><select id="citySelect"><option value="">Все города</option>' + CITIES.map(function (city) { return '<option value="' + h(city) + '"' + (st.city === city ? ' selected' : '') + '>' + h(city) + '</option>'; }).join('') + '</select></label>' +
+'<label class="select-field" for="modeSelect"><span class="label">Форма финансирования</span><select id="modeSelect"><option value="">Бюджет и платное</option><option value="budget"' + (st.mode === 'budget' ? ' selected' : '') + '>Только бюджет</option><option value="paid"' + (st.mode === 'paid' ? ' selected' : '') + '>Только платное</option></select></label>' +
+'<label class="select-field" for="examSelect"><span class="label">ЕГЭ</span><select id="examSelect"><option value="">Любые предметы</option>' + SUBJECTS.map(function (s) { return '<option value="' + s + '"' + (st.exam === s ? ' selected' : '') + '>' + h(SUBJ_FULL[s]) + '</option>'; }).join('') + '</select></label>' +
+'<label class="select-field" for="formatSelect"><span class="label">Форма обучения</span><select id="formatSelect"><option value="">Любая</option><option value="очная"' + (st.format === 'очная' ? ' selected' : '') + '>Очная</option><option value="очно-заочная"' + (st.format === 'очно-заочная' ? ' selected' : '') + '>Очно-заочная</option></select></label>' +
+'<label class="select-field" for="dormSelect"><span class="label">Общежитие</span><select id="dormSelect"><option value="">Не учитывать</option><option value="yes"' + (st.dorm === 'yes' ? ' selected' : '') + '>Есть</option><option value="no"' + (st.dorm === 'no' ? ' selected' : '') + '>Нет</option></select></label>' +
+'<label class="select-field" for="minAvgSelect"><span class="label">Средний балл от</span><select id="minAvgSelect"><option value="0">Любой</option><option value="220"' + (st.minAvg === 220 ? ' selected' : '') + '>220+</option><option value="250"' + (st.minAvg === 250 ? ' selected' : '') + '>250+</option><option value="270"' + (st.minAvg === 270 ? ' selected' : '') + '>270+</option></select></label></div>' +
 '</div>' +
 '<p class="mono tiny" id="uniCount" style="margin-top:18px;color:var(--ink-4)"></p>' +
 '<h2 class="sr-only">Список вузов по регионам</h2>' +
@@ -1851,6 +1865,12 @@ var grid = document.getElementById('uniGrid');
 var countEl = document.getElementById('uniCount');
 var searchEl = document.getElementById('uniSearch');
 var regionEl = document.getElementById('regionSelect');
+var cityEl = document.getElementById('citySelect');
+var modeEl = document.getElementById('modeSelect');
+var examEl = document.getElementById('examSelect');
+var formatEl = document.getElementById('formatSelect');
+var dormEl = document.getElementById('dormSelect');
+var minAvgEl = document.getElementById('minAvgSelect');
 function repaint() {
 var list = filteredUnis(st);
 grid.innerHTML = list.length ? groupedUnis(list, st) :
@@ -1868,6 +1888,12 @@ var params = new URLSearchParams();
 if (st.q) params.set('q', st.q);
 if (st.district) params.set('district', st.district);
 if (st.region) params.set('region', st.region);
+if (st.city) params.set('city', st.city);
+if (st.mode) params.set('mode', st.mode);
+if (st.exam) params.set('exam', st.exam);
+if (st.format) params.set('format', st.format);
+if (st.dorm) params.set('dorm', st.dorm);
+if (st.minAvg) params.set('minAvg', st.minAvg);
 if (st.sort !== 'avg') params.set('sort', st.sort);
 syncUrl('/universities', params);
 initReveal(grid);
@@ -1902,6 +1928,12 @@ st.district = r.district;
 document.querySelectorAll('#districtChips button').forEach(function (x) {
 x.setAttribute('aria-pressed', x.getAttribute('data-sphere') === st.district ? 'true' : 'false');
 });
+cityEl.addEventListener('change', function () { st.city = cityEl.value; repaint(); });
+modeEl.addEventListener('change', function () { st.mode = modeEl.value; repaint(); });
+examEl.addEventListener('change', function () { st.exam = examEl.value; repaint(); });
+formatEl.addEventListener('change', function () { st.format = formatEl.value; repaint(); });
+dormEl.addEventListener('change', function () { st.dorm = dormEl.value; repaint(); });
+minAvgEl.addEventListener('change', function () { st.minAvg = parseInt(minAvgEl.value, 10) || 0; repaint(); });
 regionEl.innerHTML = regionOptions(st);
 regionEl.value = st.region;
 }
@@ -2504,7 +2536,7 @@ var sum = st.sum;
 return P.map(function (p) {
 var progs = PROG[p.slug] || [];
 var fit = progs.filter(function (pr) {
-var mathRestricted = st.mathLevel === 'basic' && exams.indexOf('Мат') >= 0 && /Мат/.test(pr.ege) && ['D-01', 'D-02'].indexOf(p.sphereCode) >= 0;
+var mathRestricted = st.mathLevel === 'basic' && exams.indexOf('Мат') >= 0 && /Мат/.test(pr.ege) && ['D-01', 'D-02', 'D-04', 'D-05'].indexOf(p.sphereCode) >= 0;
 return !mathRestricted && fitsEge(pr.ege, exams);
 });
 var affordable = fit.filter(function (pr) { return pr.budget && pr.budget <= sum + 10; });
