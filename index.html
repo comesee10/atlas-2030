@@ -7,50 +7,53 @@
 <meta name="description" content="Атлас профессий 2027–2030: 47 профессий, 178 вузов, 1552 программы и 169 специальностей в 69 регионах России. Опросник по ЕГЭ, подбор вузов и колледжей, проходные баллы и прозрачная методология.">
 <meta name="theme-color" content="#100C1A">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="canonical" href="./">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<link rel="canonical" href="https://comesee10.github.io/atlas-2030/">
 <meta property="og:title" content="Профессии·2030 — атлас востребованных профессий">
 <meta property="og:description" content="Опросник по ЕГЭ и ОГЭ, подбор профессий 2027–2030, вузов и колледжей с проходными баллами. Все федеральные округа России.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="./">
+<meta property="og:url" content="https://comesee10.github.io/atlas-2030/">
 <meta property="og:site_name" content="Профессии·2030">
 <meta property="og:locale" content="ru_RU">
-<meta property="og:image" content="og.png">
+<meta property="og:image" content="https://comesee10.github.io/atlas-2030/og.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Профессии·2030 — атлас востребованных профессий 2027–2030">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap&subset=cyrillic">
+<meta name="twitter:title" content="Профессии·2030 — атлас востребованных профессий">
+<meta name="twitter:description" content="Опросник, профессии, вузы и колледжи России с маршрутами поступления.">
+<meta name="twitter:image" content="https://comesee10.github.io/atlas-2030/og.png">
 <link rel="stylesheet" href="styles.css?v=20261026-14">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="leaflet.css">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://www.google.com https://*.tile.openstreetmap.org; font-src 'self' data:; connect-src 'self'; frame-src 'none';">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "./#website",
-      "url": "./",
+      "@id": "https://comesee10.github.io/atlas-2030/#website",
+      "url": "https://comesee10.github.io/atlas-2030/",
       "name": "Профессии·2030",
       "inLanguage": "ru",
       "description": "Атлас востребованных профессий 2027–2030: опросник по ЕГЭ и ОГЭ, подбор вузов и колледжей, проходные баллы."
     },
     {
       "@type": "Dataset",
-      "@id": "./#dataset",
+      "@id": "https://comesee10.github.io/atlas-2030/#dataset",
       "name": "Профессии·2030: востребованные профессии, вузы и проходные баллы",
       "description": "47 профессий, 178 вузов, 1552 программы и 169 специальностей в 69 регионах России: индекс спроса, рост вакансий, зарплаты, наборы ЕГЭ и ориентировочные проходные баллы на бюджет.",
-      "url": "./",
+      "url": "https://comesee10.github.io/atlas-2030/",
       "keywords": "профессии 2030, вузы России, проходные баллы, ЕГЭ, ОГЭ, специальности, колледжи, поступление",
       "inLanguage": "ru",
       "isAccessibleForFree": true,
-      "license": "./#/methodology",
+      "license": "https://comesee10.github.io/atlas-2030/methodology",
       "creator": {
         "@type": "Organization",
         "name": "Профессии·2030",
-        "url": "./#/about"
+        "url": "https://comesee10.github.io/atlas-2030/about"
       },
       "temporalCoverage": "2027-2030",
       "spatialCoverage": "Россия"
@@ -103,6 +106,18 @@
 </header>
 
 <main id="app" class="wrap" tabindex="-1"></main>
+<noscript>
+  <section class="wrap">
+    <h1>Профессии·2030 — атлас востребованных профессий</h1>
+    <p>Для интерактивного каталога нужен JavaScript. Откройте раздел:</p>
+    <nav aria-label="Разделы сайта">
+      <a href="/atlas-2030/quiz">Опросник</a> · <a href="/atlas-2030/professions">Профессии</a> ·
+      <a href="/atlas-2030/specialties">Специальности</a> · <a href="/atlas-2030/universities">Вузы</a> ·
+      <a href="/atlas-2030/colleges">Колледжи</a> · <a href="/atlas-2030/regions">Регионы</a> ·
+      <a href="/atlas-2030/about">О проекте</a>
+    </nav>
+  </section>
+</noscript>
 
 <footer class="ftr">
   <div class="wrap ftr-in">
@@ -148,10 +163,9 @@
 
 <script src="data.js?v=20261026-14"></script>
 <script src="catalog-expansion.js?v=20261030-2"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="leaflet.js"></script>
 <script src="app.js?v=20261026-14"></script>
 <link rel="stylesheet" href="enhancements.css?v=20261030-2">
 <script src="enhancements.js?v=20261030-2"></script>
-<script async src="https://scripts.simpleanalyticscdn.com/latest.js" data-collect-dnt="true"></script>
 </body>
 </html>

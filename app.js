@@ -48,8 +48,8 @@ toastEl.classList.add('show');
 clearTimeout(toastTimer);
 toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2800);
 }
-function copyLink() {
-var url = location.href;
+function copyLink(shareUrl) {
+var url = shareUrl || location.href;
 function ok() { toast('Ссылка скопирована'); }
 function fallback() {
 var ta = document.createElement('textarea');
@@ -316,7 +316,7 @@ var cmpLastFocus = null;
 var palLastFocus = null;
 try {
 JSON.parse(localStorage.getItem('atlas:compare') || '[]').forEach(function (s) {
-if (D[s]) compare.add(s);
+if (typeof s === 'string' && D[s] && compare.size < 3) compare.add(s);
 });
 } catch (e) {}
 function saveCompare() {
@@ -639,7 +639,7 @@ var on = r === '/' ? path === '/' : (path === r || path.indexOf(r + '/') === 0);
 if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
 });
 }
-var SITE_URL = window.location.origin + window.location.pathname;
+var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
 var PAGE_TITLES = {
 quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
@@ -647,7 +647,7 @@ about: 'О проекте', methodology: 'Методология'
 };
 function absUrl(u) {
 if (!u || u === '#/') return SITE_URL;
-return SITE_URL + u;
+return SITE_URL + String(u).replace(/^#?\//, '').replace(/^/, '');
 }
 function crumbItems(path) {
 if (path === '/') return null;
@@ -793,6 +793,23 @@ el.textContent = graph && graph.length
 : '';
 }
 function applySeo(path) {
+var canonical = document.querySelector('link[rel="canonical"]');
+var pageUrl = SITE_URL + (path === '/' ? '' : path.replace(/^\//, ''));
+if (canonical) canonical.href = pageUrl;
+var ogUrl = document.querySelector('meta[property="og:url"]');
+var q = parseHash().q;
+var shareUrl = pageUrl;
+if (path === '/quiz' && (q.has('e') || q.has('s') || q.has('b') || q.has('mlevel'))) shareUrl += '?' + q.toString();
+if (ogUrl) ogUrl.content = shareUrl;
+var report = path === '/quiz' && q.get('step') === '4';
+var socialTitle = report ? 'Мой результат опросника — Профессии·2030' : (path === '/quiz' ? 'Опросник: куда поступать — Профессии·2030' : document.title);
+var socialDescription = report
+? 'Мой результат подбора профессий и программ поступления. Пройди опросник и сравни свои варианты.'
+: (path === '/quiz' ? 'Подбери профессии и программы вузов по предметам ЕГЭ, интересам и ожидаемым баллам.' : (document.querySelector('meta[name="description"]') || {}).content || 'Атлас профессий, вузов и колледжей России.');
+[['og:title', socialTitle, 'property'], ['og:description', socialDescription, 'property'], ['twitter:title', socialTitle, 'name'], ['twitter:description', socialDescription, 'name']].forEach(function (item) {
+var meta = document.querySelector('meta[' + item[2] + '="' + item[0] + '"]');
+if (meta) meta.content = item[1];
+});
 var view = app.querySelector('.view');
 var crumbs = crumbItems(path);
 if (view && crumbs) {
@@ -803,7 +820,13 @@ view.insertAdjacentHTML('afterbegin', crumbHtml(crumbs));
 setJsonLd(jsonLdFor(path, crumbs));
 }
 function parseHash() {
-var raw = location.hash.replace(/^#/, '') || '/';
+var raw = location.hash.indexOf('#/') === 0 ? location.hash.slice(1) : '';
+if (!raw) {
+var basePath = '/atlas-2030';
+raw = location.pathname.indexOf(basePath) === 0 ? location.pathname.slice(basePath.length) : '/';
+raw += location.search;
+raw = raw || '/';
+}
 var qi = raw.indexOf('?');
 var path = qi < 0 ? raw : raw.slice(0, qi);
 var q = new URLSearchParams(qi < 0 ? '' : raw.slice(qi + 1));
@@ -813,10 +836,11 @@ return { path: path, q: q };
 }
 function syncUrl(path, params) {
 var s = params.toString();
-history.replaceState(null, '', '#' + path + (s ? '?' + s : ''));
+history.replaceState(null, '', '/atlas-2030' + (path === '/' ? '/' : path) + (s ? '?' + s : ''));
 }
 var ROUTES = [
 [/^\/$/, renderHome],
+[/^\/(?:map|compare)$/, renderAuxiliaryRoute],
 [/^\/quiz$/, renderQuiz],
 [/^\/quiz-oge$/, renderQuizOge],
 [/^\/professions$/, renderProfessions],
@@ -829,7 +853,15 @@ var ROUTES = [
 [/^\/about$/, renderAbout],
 [/^\/methodology$/, renderMethodology]
 ];
+function renderAuxiliaryRoute() {
+// The map and comparison views are supplied by enhancements.js after the base router runs.
+app.innerHTML = '<div class="view" aria-live="polite"></div>';
+}
 function route() {
+if (location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
+var legacyRoute = location.hash.slice(1);
+history.replaceState(null, '', '/atlas-2030' + legacyRoute);
+}
 var r = parseHash();
 if (r.path === '/siberia') {
 history.replaceState(null, '', '#/universities?district=' + encodeURIComponent('СФО'));
@@ -838,7 +870,7 @@ r = parseHash();
 var found = false;
 for (var i = 0; i < ROUTES.length; i++) {
 var m = r.path.match(ROUTES[i][0]);
-if (m) { found = true; ROUTES[i][1](m, r.q); break; }
+if (m) { found = true; try { ROUTES[i][1](m, r.q); } catch (e) { render404(r.path); } break; }
 }
 if (!found) render404(r.path);
 applySeo(r.path);
@@ -855,6 +887,7 @@ animateBars();
 animateCounters();
 updateCompare();
 updateProgress();
+document.dispatchEvent(new CustomEvent('atlas:route', { detail: { path: r.path } }));
 }
 function render404(path) {
 setTitle('Страница не найдена — Профессии·2030');
@@ -2224,7 +2257,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="lead">Открытые принципы отбора профессий, расчёта индекса спроса и сбора проходных баллов. Если цифра вызывает вопросы — здесь описано, откуда она взялась.</p>' +
 '</section>' +
 '<div class="prose" id="prose">' +
-(A.methodology && A.methodology.html ? A.methodology.html : '<p>Раздел в подготовке.</p>') +
+(A.methodology && A.methodology.html ? sanitizeRichHtml(A.methodology.html) : '<p>Раздел в подготовке.</p>') +
 '</div>' +
 '</div>';
 rewriteLinks(document.getElementById('prose'));
@@ -2262,9 +2295,14 @@ else if (href === '/about') a.setAttribute('href', '#/about');
 else if (href === '/methodology') a.setAttribute('href', '#/methodology');
 else if (href.indexOf('/professions/') === 0) a.setAttribute('href', '#/professions/' + href.split('/').filter(Boolean).pop());
 else if (href.indexOf('/colleges/') === 0) a.setAttribute('href', '#/colleges/' + href.split('/').filter(Boolean).pop());
+try {
+var targetUrl = new URL(a.href, location.href);
+if (targetUrl.origin !== location.origin) a.rel = 'noopener noreferrer';
+} catch (e) { a.removeAttribute('href'); }
 });
 }
 function prepareRich(root) {
+// Content is already reduced to the strict b/i/a allowlist by sanitizeRichHtml.
 rewriteLinks(root);
 root.querySelectorAll('li').forEach(function (li) {
 var k = li.children;
@@ -2290,6 +2328,40 @@ hint.textContent = 'Прокрутите таблицу вбок →';
 d.parentNode.insertBefore(hint, d);
 }
 });
+}
+function sanitizeRichHtml(input) {
+var template = document.createElement('template');
+template.innerHTML = String(input == null ? '' : input);
+var allowedTags = { B: true, I: true, A: true };
+function safeAnchorHref(value) {
+try {
+var url = new URL(value, location.href);
+return (url.protocol === 'http:' || url.protocol === 'https:') ? value : null;
+} catch (e) { return null; }
+}
+function copyNode(node, parent) {
+if (node.nodeType === 3) { parent.appendChild(document.createTextNode(node.nodeValue)); return; }
+if (node.nodeType !== 1) return;
+var tag = node.tagName.toUpperCase();
+if (!allowedTags[tag]) {
+Array.prototype.slice.call(node.childNodes).forEach(function (child) { copyNode(child, parent); });
+return;
+}
+var clean = document.createElement(tag.toLowerCase());
+if (tag === 'A') {
+var href = safeAnchorHref(node.getAttribute('href') || '');
+if (href) {
+clean.setAttribute('href', href);
+var parsed = new URL(href, location.href);
+if (parsed.origin !== location.origin) clean.setAttribute('rel', 'noopener noreferrer');
+}
+}
+Array.prototype.slice.call(node.childNodes).forEach(function (child) { copyNode(child, clean); });
+parent.appendChild(clean);
+}
+var output = document.createElement('div');
+Array.prototype.slice.call(template.content.childNodes).forEach(function (node) { copyNode(node, output); });
+return output.innerHTML;
 }
 function buildToc(root) {
 var toc = document.getElementById('toc');
@@ -2431,7 +2503,7 @@ return '<a href="#/professions/' + s.slug + '"><span>' + h(s.title) + '</span><s
 '</div>' +
 '</div>';
 var rich = document.getElementById('rich');
-rich.innerHTML = (d.body || '').replace(/<!--[\s\S]*?-->/g, '');
+rich.innerHTML = sanitizeRichHtml(d.body || '');
 prepareRich(rich);
 refreshStudyTable(rich, p.slug, p.title);
 buildToc(rich);
@@ -2477,7 +2549,7 @@ app.innerHTML = '<div class="view">' +
 '</div>' +
 '</div>';
 var rich = document.getElementById('rich');
-rich.innerHTML = (d.body || '').replace(/<!--[\s\S]*?-->/g, '');
+rich.innerHTML = sanitizeRichHtml(d.body || '');
 prepareRich(rich);
 buildToc(rich);
 }
@@ -2668,7 +2740,11 @@ return '<button class="exam" data-exam="' + s + '" aria-pressed="' + (on ? 'true
 }
 function bindReport(st) {
 var copy = document.getElementById('copyLink');
-if (copy) copy.addEventListener('click', copyLink);
+if (copy) copy.addEventListener('click', function () {
+var params = quizParams(st);
+params.set('step', '4');
+copyLink(SITE_URL + 'quiz?' + params.toString());
+});
 var pr = document.getElementById('printBtn');
 if (pr) pr.addEventListener('click', function () { window.print(); });
 var rs = document.getElementById('restart');
@@ -3124,7 +3200,27 @@ quizModeSwitch('oge') +
 paintQuizOge(st);
 }
 window.addEventListener('hashchange', route);
-if (!location.hash || location.hash === '#') {
+try {
+var pagesPath = sessionStorage.getItem('atlas:redirect');
+sessionStorage.removeItem('atlas:redirect');
+if (pagesPath && /^\/(map|compare|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(pagesPath)) {
+history.replaceState(null, '', '/atlas-2030' + pagesPath);
+} else if (!location.hash && location.pathname.indexOf('/atlas-2030/') === 0) {
+var directPath = location.pathname.slice('/atlas-2030'.length) || '/';
+if (/^\/(map|compare|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
+}
+} catch (e) {}
+document.addEventListener('click', function (e) {
+var a = e.target.closest && e.target.closest('a[href^="#/"]');
+if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
+var dest = a.getAttribute('href').slice(1);
+if (!/^\/(?:map|compare|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(dest) && dest !== '/') return;
+e.preventDefault();
+history.pushState(null, '', '/atlas-2030' + (dest === '/' ? '/' : dest));
+route(); window.scrollTo(0, 0);
+});
+window.addEventListener('popstate', route);
+if ((!location.hash || location.hash === '#') && (location.pathname === '/' || location.pathname === '/atlas-2030/' || location.pathname === '/atlas-2030')) {
 history.replaceState(null, '', '#/');
 }
 updateChoice();

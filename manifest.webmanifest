@@ -1,0 +1,15 @@
+{
+  "name": "Профессии·2030",
+  "short_name": "Профессии·2030",
+  "description": "Атлас востребованных профессий, вузов и образовательных маршрутов России.",
+  "start_url": "/atlas-2030/",
+  "scope": "/atlas-2030/",
+  "display": "standalone",
+  "background_color": "#100C1A",
+  "theme_color": "#100C1A",
+  "lang": "ru",
+  "icons": [
+    { "src": "icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
