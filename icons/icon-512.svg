@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Профессии 2030">
-  <rect width="512" height="512" rx="106" fill="#100C1A"/>
-  <rect x="96" y="296" width="64" height="120" rx="16" fill="#7C5CE0"/>
-  <rect x="200" y="224" width="64" height="192" rx="16" fill="#A78BFA"/>
-  <rect x="304" y="128" width="64" height="288" rx="16" fill="#E879F9"/>
-  <circle cx="416" cy="120" r="34" fill="#4ADE80"/>
-</svg>
