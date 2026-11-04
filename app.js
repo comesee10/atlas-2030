@@ -3952,11 +3952,12 @@ ctx.textBaseline = 'middle';
 ctx.fillText(l.text, l.left, l.top + lh / 2);
 });
 }
-renderBubbleList(items);
+renderBubbleList(items, narrow);
 }
-function renderBubbleList(items) {
+function renderBubbleList(items, narrow) {
 var host = document.getElementById('bubbleList');
 if (!host) return;
+host.classList.toggle('is-on', !!narrow);
 var picks = items.slice().sort(function (a, b) { return b.p.index - a.p.index; }).slice(0, 6);
 host.innerHTML = picks.map(function (x) {
 return '<a href="#/professions/' + x.p.slug + '">' +
