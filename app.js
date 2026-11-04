@@ -2389,8 +2389,7 @@ heatSection() +
 '<div class="hero-cta" style="margin:0"><a class="btn btn-primary btn-sm" href="#/quiz">Пройти опросник →</a><a class="btn btn-sm" href="#/specialties">Специальности</a></div>' +
 '</div>' +
 '</div>';
-bindChart(document.getElementById('heatmap'));
-drawHeatmap();
+renderHeatmap();
 }
 function renderAbout() {
 setTitle('О проекте и преимущества — Профессии·2030');
@@ -3424,7 +3423,7 @@ b.setAttribute('aria-label', THEME === 'light' ? 'Включить тёмную 
 }
 var meta = document.querySelector('meta[name="theme-color"]');
 if (meta) meta.setAttribute('content', THEME === 'light' ? '#f4fbf9' : '#091116');
-setTimeout(function () { drawHeatmap(); drawBubble(); }, 0);
+setTimeout(function () { renderHeatmap(); drawBubble(); }, 0);
 }
 function injectTools() {
 var actions = document.querySelector('.hdr-actions');
@@ -3736,7 +3735,6 @@ edges + nodes + '</svg></div>' + list +
 'Толщина и порядок связей не означают рейтинг.</p></section>';
 }
 /* ---------- тепловая карта округов × сфер ---------- */
-var HEAT_GEOM = null;
 function heatMatrix() {
 var m = DISTRICTS.map(function () { return SPHERES.map(function () { return 0; }); });
 U.forEach(function (u) {
@@ -3751,21 +3749,9 @@ for (var j = 0; j < SPHERES.length; j++) if (SPHERES[j].code === pp.sphereCode) 
 });
 return m;
 }
-function drawHeatmap() {
-var canvas = document.getElementById('heatmap');
-if (!canvas) return;
-var wrap = canvas.parentNode;
-var W = Math.max(300, Math.floor(wrap.clientWidth || 600));
-var rows = DISTRICTS.length, cols = SPHERES.length;
-var padL = 86, padT = 46, cellH = 42;
-var cellW = Math.max(34, (W - padL - 6) / cols);
-var H = padT + rows * cellH + 34;
-var dpr = Math.min(2, window.devicePixelRatio || 1);
-canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-canvas.style.height = H + 'px';
-var ctx = canvas.getContext('2d');
-ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-ctx.clearRect(0, 0, W, H);
+function renderHeatmap() {
+var host = document.getElementById('heatmap');
+if (!host) return;
 var m = heatMatrix();
 var max = 1;
 m.forEach(function (r) { r.forEach(function (v) { if (v > max) max = v; }); });
@@ -3778,41 +3764,31 @@ return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.sli
 }
 var b = rgb(base), hcol = rgb(hot);
 var ink = cssColor('--ink', '#f3fbfa');
-var ink3 = cssColor('--ink-3', '#839da1');
-ctx.font = '10px ui-monospace, monospace';
-ctx.textBaseline = 'middle';
-SPHERES.forEach(function (s, j) {
-ctx.fillStyle = ink3;
-ctx.textAlign = 'center';
-ctx.fillText(s.code, padL + j * cellW + cellW / 2, padT - 22);
-ctx.fillText(String(j + 1), padL + j * cellW + cellW / 2, padT - 8);
-});
-DISTRICTS.forEach(function (d, i) {
-var y = padT + i * cellH;
-ctx.fillStyle = ink3;
-ctx.textAlign = 'left';
-ctx.font = '10px ui-monospace, monospace';
-ctx.fillText(d.code, 2, y + cellH / 2);
-ctx.fillStyle = ink;
-ctx.font = '12px "Onest", system-ui, sans-serif';
-ctx.fillText(cut(d.short, 11), 32, y + cellH / 2);
-m[i].forEach(function (v, j) {
+function cellColor(v) {
 var t = v / max;
 var r = Math.round(b[0] + (hcol[0] - b[0]) * t);
 var g = Math.round(b[1] + (hcol[1] - b[1]) * t);
 var bl = Math.round(b[2] + (hcol[2] - b[2]) * t);
-ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + bl + ')';
-ctx.fillRect(padL + j * cellW + 1, y + 1, cellW - 2, cellH - 2);
-ctx.fillStyle = t > 0.55 ? '#06201d' : ink;
-ctx.font = '11px ui-monospace, monospace';
-ctx.textAlign = 'center';
-ctx.fillText(String(v), padL + j * cellW + cellW / 2, y + cellH / 2);
+var lum = (0.2126 * r + 0.7152 * g + 0.0722 * bl) / 255;
+return { bg: 'rgb(' + r + ',' + g + ',' + bl + ')', fg: lum > 0.5 ? '#06201d' : ink };
+}
+var html = '<table class="heat-table" aria-label="Число программ по федеральным округам и сферам">' +
+'<thead><tr><th class="heat-corner" scope="col"><span class="sr-only">Округ</span></th>';
+SPHERES.forEach(function (s, j) {
+html += '<th scope="col" title="' + h(s.code + ' · ' + s.name) + '"><b>' + h(s.code) + '</b><span>' + (j + 1) + '</span></th>';
 });
+html += '</tr></thead><tbody>';
+DISTRICTS.forEach(function (d, i) {
+html += '<tr><th scope="row"><b>' + h(d.code) + '</b><span>' + h(d.short) + '</span></th>';
+m[i].forEach(function (v, j) {
+var c = cellColor(v);
+var tip = d.code + ' · ' + d.short + ' — ' + SPHERES[j].code + ' · ' + SPHERES[j].name + ': ' + v + ' ' + plural(v, 'программа', 'программы', 'программ');
+html += '<td style="background:' + c.bg + ';color:' + c.fg + '" title="' + h(tip) + '">' + v + '</td>';
 });
-ctx.strokeStyle = 'rgba(131,157,161,.28)';
-ctx.lineWidth = 1;
-ctx.strokeRect(padL, padT, cols * cellW, rows * cellH);
-HEAT_GEOM = { padL: padL, padT: padT, cellW: cellW, cellH: cellH, W: W, H: H };
+html += '</tr>';
+});
+html += '</tbody></table>';
+host.innerHTML = html;
 }
 /* ---------- bubble-график: балл × рост × масштаб ---------- */
 var BUBBLE_GEOM = null;
@@ -3827,7 +3803,8 @@ var canvas = document.getElementById('bubbleChart');
 if (!canvas) return;
 var wrap = canvas.parentNode;
 var W = Math.max(300, Math.floor(wrap.clientWidth || 600));
-var H = W < 520 ? 340 : 430;
+var narrow = W < 560;
+var H = narrow ? 360 : 440;
 var dpr = Math.min(2, window.devicePixelRatio || 1);
 canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
 canvas.style.height = H + 'px';
@@ -3839,31 +3816,43 @@ var mb = minBudget(p.slug);
 return { p: p, mb: mb, n: (PROG[p.slug] || []).length };
 }).filter(function (x) { return x.mb && x.n; });
 if (!items.length) return;
-var padL = 52, padR = 16, padT = 20, padB = 44;
+var padL = 52, padR = narrow ? 12 : 18, padT = 22, padB = 44;
 var xs = items.map(function (x) { return x.mb; });
 var ys = items.map(function (x) { return x.p.growth; });
 var xmin = Math.min.apply(null, xs) - 4, xmax = Math.max.apply(null, xs) + 4;
-var ymin = 0, ymax = Math.max.apply(null, ys) + 8;
+var ymin = Math.min.apply(null, ys) - 6, ymax = Math.max.apply(null, ys) + 8;
 var plotW = W - padL - padR, plotH = H - padT - padB;
 function px(v) { return padL + (v - xmin) / (xmax - xmin) * plotW; }
 function py(v) { return padT + plotH - (v - ymin) / (ymax - ymin) * plotH; }
+function radius(n) { return Math.min(13, 3.2 + Math.sqrt(n) * 0.95); }
+function niceStep(raw) {
+var pow = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+var n = raw / pow;
+var step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+return step * pow;
+}
 var ink3 = cssColor('--ink-3', '#839da1');
 var ink = cssColor('--ink', '#f3fbfa');
-ctx.strokeStyle = 'rgba(131,157,161,.22)';
+var rule = cssColor('--rule-2', '#3a3049');
+ctx.strokeStyle = rule;
+ctx.globalAlpha = 0.55;
+ctx.lineWidth = 1;
 ctx.fillStyle = ink3;
 ctx.font = '10px ui-monospace, monospace';
 ctx.textAlign = 'right';
 ctx.textBaseline = 'middle';
-for (var gy = 0; gy <= 4; gy++) {
-var vv = ymin + (ymax - ymin) * gy / 4;
+var ystep = niceStep((ymax - ymin) / 4);
+for (var vv = Math.floor(ymin / ystep) * ystep; vv <= ymax; vv += ystep) {
+if (vv < ymin) continue;
 var yy = py(vv);
 ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W - padR, yy); ctx.stroke();
 ctx.fillText(Math.round(vv), padL - 8, yy);
 }
+ctx.globalAlpha = 1;
 ctx.textAlign = 'center';
 ctx.textBaseline = 'top';
-for (var gx = 0; gx <= 4; gx++) {
-var xv = xmin + (xmax - xmin) * gx / 4;
+var xstep = niceStep((xmax - xmin) / 4);
+for (var xv = Math.ceil(xmin / xstep) * xstep; xv <= xmax; xv += xstep) {
 ctx.fillText(Math.round(xv), px(xv), H - padB + 8);
 }
 ctx.fillStyle = ink3;
@@ -3879,27 +3868,101 @@ ctx.restore();
 var sorted = items.slice().sort(function (a, b) { return a.n - b.n; });
 BUBBLE_GEOM = { padL: padL, padT: padT, plotW: plotW, plotH: plotH, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, items: [] };
 sorted.forEach(function (x) {
-var r = 4 + Math.sqrt(x.n) * 1.15;
+var r = radius(x.n);
 var cx = px(x.mb), cy = py(x.p.growth);
 ctx.beginPath();
 ctx.arc(cx, cy, r, 0, Math.PI * 2);
-ctx.fillStyle = sphereColor(x.p.sphereCode) + '66';
+ctx.fillStyle = sphereColor(x.p.sphereCode) + '55';
 ctx.fill();
 ctx.strokeStyle = sphereColor(x.p.sphereCode);
-ctx.lineWidth = 1.4;
+ctx.lineWidth = 1.2;
 ctx.stroke();
 BUBBLE_GEOM.items.push({ x: cx, y: cy, r: r, p: x.p, mb: x.mb, n: x.n });
 });
-var labels = items.slice().sort(function (a, b) { return b.p.index - a.p.index; }).slice(0, 6);
-ctx.font = '10px "Onest", system-ui, sans-serif';
+if (!narrow) {
+var font = '11px "Onest", system-ui, sans-serif';
+ctx.font = font;
+var lh = 13, padX = 5, padY = 3;
+var circles = BUBBLE_GEOM.items;
+var placed = [];
+var picks = items.slice().sort(function (a, b) { return b.p.index - a.p.index; });
+picks.forEach(function (x) {
+if (placed.length >= 6) return;
+var cx = px(x.mb), cy = py(x.p.growth), r = radius(x.n);
+var tw = ctx.measureText(x.p.title).width;
+var cands = [];
+[8, 20, 36].forEach(function (off) {
+cands.push({ left: cx + r + off, top: cy - lh / 2 });
+cands.push({ left: cx - r - off - tw, top: cy - lh / 2 });
+cands.push({ left: cx - tw / 2, top: cy - r - off - lh });
+cands.push({ left: cx - tw / 2, top: cy + r + off });
+cands.push({ left: cx + r * 0.7 + off * 0.4, top: cy - r - off - lh });
+cands.push({ left: cx - r * 0.7 - off * 0.4 - tw, top: cy - r - off - lh });
+cands.push({ left: cx + r * 0.7 + off * 0.4, top: cy + r + off });
+cands.push({ left: cx - r * 0.7 - off * 0.4 - tw, top: cy + r + off });
+});
+for (var ci = 0; ci < cands.length; ci++) {
+var c = cands[ci];
+var box = { x1: c.left - padX, y1: c.top - padY, x2: c.left + tw + padX, y2: c.top + lh + padY };
+if (box.x1 < padL + 1 || box.x2 > W - padR - 1 || box.y1 < padT + 1 || box.y2 > H - padB - 1) continue;
+var clash = false;
+for (var pi = 0; pi < placed.length && !clash; pi++) {
+var pb = placed[pi];
+if (box.x1 < pb.x2 + 3 && box.x2 > pb.x1 - 3 && box.y1 < pb.y2 + 3 && box.y2 > pb.y1 - 3) clash = true;
+}
+for (var qi = 0; qi < circles.length && !clash; qi++) {
+var cc = circles[qi];
+if (cc.p === x.p) continue;
+if (box.x1 < cc.x + cc.r + 2 && box.x2 > cc.x - cc.r - 2 && box.y1 < cc.y + cc.r + 2 && box.y2 > cc.y - cc.r - 2) clash = true;
+}
+if (clash) continue;
+placed.push({ x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2, left: c.left, top: c.top, tw: tw, cx: cx, cy: cy, r: r, text: x.p.title });
+break;
+}
+});
+var isLight = document.documentElement.classList.contains('theme-light');
+var labelBg = isLight ? 'rgba(255,255,255,.9)' : 'rgba(12,20,26,.84)';
+placed.forEach(function (l) {
+var lcx = l.left + l.tw / 2, lcy = l.top + lh / 2;
+var dx = lcx - l.cx, dy = lcy - l.cy, dist = Math.hypot(dx, dy) || 1;
+var ex = l.cx + dx / dist * (l.r + 1.5), ey = l.cy + dy / dist * (l.r + 1.5);
+ctx.beginPath();
+ctx.moveTo(ex, ey);
+ctx.lineTo(lcx, lcy);
+ctx.strokeStyle = ink3;
+ctx.globalAlpha = 0.6;
+ctx.lineWidth = 1;
+ctx.stroke();
+ctx.globalAlpha = 1;
+});
+placed.forEach(function (l) {
+var bx = l.left - padX, by = l.top - padY, bw = l.tw + padX * 2, bh = lh + padY * 2;
+ctx.fillStyle = labelBg;
+if (ctx.roundRect) {
+ctx.beginPath();
+ctx.roundRect(bx, by, bw, bh, 3);
+ctx.fill();
+} else {
+ctx.fillRect(bx, by, bw, bh);
+}
 ctx.fillStyle = ink;
+ctx.font = font;
 ctx.textAlign = 'left';
 ctx.textBaseline = 'middle';
-labels.forEach(function (x) {
-var cx = px(x.mb), cy = py(x.p.growth);
-var r = 4 + Math.sqrt(x.n) * 1.15;
-ctx.fillText(cut(x.p.title, 18), cx + r + 4, cy);
+ctx.fillText(l.text, l.left, l.top + lh / 2);
 });
+}
+renderBubbleList(items);
+}
+function renderBubbleList(items) {
+var host = document.getElementById('bubbleList');
+if (!host) return;
+var picks = items.slice().sort(function (a, b) { return b.p.index - a.p.index; }).slice(0, 6);
+host.innerHTML = picks.map(function (x) {
+return '<a href="#/professions/' + x.p.slug + '">' +
+'<span class="bl-name">' + h(x.p.title) + '</span>' +
+'<span class="bl-meta">индекс ' + x.p.index + ' · +' + x.p.growth + '% · ≈' + x.mb + '</span></a>';
+}).join('');
 }
 function chartTip(canvas, ev) {
 var tip = canvas.parentNode.querySelector('.chart-tip');
@@ -3908,16 +3971,7 @@ var rect = canvas.getBoundingClientRect();
 var mx = (ev.clientX - rect.left) * (canvas.width / rect.width) / Math.min(2, window.devicePixelRatio || 1);
 var my = (ev.clientY - rect.top) * (canvas.height / rect.height) / Math.min(2, window.devicePixelRatio || 1);
 var html = '';
-if (canvas.id === 'heatmap' && HEAT_GEOM) {
-var g = HEAT_GEOM;
-var j = Math.floor((mx - g.padL) / g.cellW);
-var i = Math.floor((my - g.padT) / g.cellH);
-if (i >= 0 && i < DISTRICTS.length && j >= 0 && j < SPHERES.length) {
-var v = heatMatrix()[i][j];
-html = '<b>' + h(DISTRICTS[i].code + ' · ' + DISTRICTS[i].short) + '</b><br>' +
-h(SPHERES[j].code + ' · ' + SPHERES[j].name) + ': <b>' + v + '</b> ' + plural(v, 'программа', 'программы', 'программ');
-}
-} else if (canvas.id === 'bubbleChart' && BUBBLE_GEOM) {
+if (canvas.id === 'bubbleChart' && BUBBLE_GEOM) {
 var best = null, bd = 1e9;
 BUBBLE_GEOM.items.forEach(function (it) {
 var d = Math.hypot(mx - it.x, my - it.y);
@@ -3955,19 +4009,19 @@ return '<section class="enh-section"><div class="sec-head" style="margin-top:0">
 '<div class="panel" style="padding:16px"><div class="chart-canvas-wrap"><canvas id="bubbleChart" aria-label="Bubble-график профессий: минимальный балл, рост вакансий и число программ"></canvas><div class="chart-tip" hidden></div></div>' +
 '<div class="chart-legend">' + SPHERES.map(function (s) {
 return '<span><i style="background:' + sphereColor(s.code) + '"></i>' + h(s.code + ' · ' + s.name) + '</span>';
-}).join('') + '<span>Размер круга — число программ</span></div></div>' +
+}).join('') + '<span>Размер круга — число программ</span></div>' +
+'<div class="bubble-list" id="bubbleList"></div></div>' +
 '<p class="source-note">По горизонтали — минимальный проходной балл на бюджет по программам профессии, по вертикали — рост вакансий к 2030 году. ' +
-'Показаны профессии, для которых в атласе есть программы и баллы.</p></section>';
+'Показаны профессии, для которых в атласе есть программы и баллы. На телефоне подписи вынесены в список под графиком.</p></section>';
 }
 function heatSection() {
 return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Аналитика</p>' +
 '<h2 class="sec">Тепловая карта: округа и сферы</h2></div><a class="sec-link" href="#/admission">Бюджетные места →</a></div>' +
-'<div class="panel" style="padding:16px"><div class="chart-canvas-wrap"><canvas id="heatmap" aria-label="Тепловая карта числа программ по федеральным округам и сферам"></canvas><div class="chart-tip" hidden></div></div>' +
+'<div class="panel" style="padding:16px"><div class="heat-scroll" id="heatmap" tabindex="0" role="region" aria-label="Тепловая карта: округа и сферы"></div>' +
 '<div class="chart-legend">' + SPHERES.map(function (s, i) {
 return '<span><b class="mono">' + (i + 1) + '</b> ' + h(s.code + ' · ' + s.name) + '</span>';
 }).join('') + '</div></div>' +
-'<p class="source-note">Ячейка показывает число программ атласа в округе для соответствующей сферы. ' +
-'Чем светлее ячейка, тем больше предложений. Наведите курсор, чтобы увидеть точное значение.</p></section>';
+'<p class="source-note">Число в ячейке — сколько программ атласа есть в округе по этой сфере. Чем темнее ячейка, тем больше предложений. Колонки 1–6 соответствуют сферам из легенды; на телефоне таблица прокручивается по горизонтали, названия округов остаются на месте.</p></section>';
 }
 /* ---------- инициализация ---------- */
 injectTools();
@@ -3976,7 +4030,7 @@ updateFooterCounts();
 var resizeTimer2 = 0;
 window.addEventListener('resize', function () {
 clearTimeout(resizeTimer2);
-resizeTimer2 = setTimeout(function () { placeTools(); drawHeatmap(); drawBubble(); }, 140);
+resizeTimer2 = setTimeout(function () { placeTools(); drawBubble(); }, 140);
 });
 if ('serviceWorker' in navigator && !window.__ATLAS_STANDALONE__ && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
 window.addEventListener('load', function () {
