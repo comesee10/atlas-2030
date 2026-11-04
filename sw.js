@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v6';
+const VERSION = 'atlas-2030-v7';
 const SHELL = [
   './',
   './index.html',
@@ -62,14 +62,14 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(req, { ignoreSearch: true }).then((hit) => {
+    caches.match(req).then((hit) => {
       const network = fetch(req).then((res) => {
         if (res && res.ok) {
           const copy = res.clone();
           caches.open(VERSION).then((cache) => cache.put(req, copy));
         }
         return res;
-      }).catch(() => hit);
+      }).catch(() => hit || caches.match(req, { ignoreSearch: true }));
       return hit || network;
     })
   );
