@@ -1204,6 +1204,22 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .chart-tip{position:absolute;z-index:5;pointer-events:none;max-width:240px;padding:8px 10px;border:1px solid var(--rule-2);border-radius:8px;background:rgba(9,17,22,.96);color:var(--ink);font-size:12px;line-height:1.4;box-shadow:0 14px 30px rgba(0,0,0,.45)}
 .chart-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:11.5px;color:var(--ink-3)}
 .chart-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.heat-scroll{--heat-bg:#12242c;position:relative;width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.heat-table{border-collapse:separate;border-spacing:2px;width:100%;min-width:540px;table-layout:fixed;font-variant-numeric:tabular-nums}
+.heat-table thead th{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--ink-3);padding:0 0 6px;text-align:center;white-space:nowrap}
+.heat-table thead th b{display:block;font-weight:500}
+.heat-table thead th span{display:block;margin-top:2px;font-size:9.5px;color:var(--ink-4)}
+.heat-table thead .heat-corner{width:156px;position:sticky;left:0;z-index:3;background:var(--heat-bg)}
+.heat-table tbody th{position:sticky;left:0;z-index:2;background:var(--heat-bg);text-align:left;padding:0 14px 0 4px;white-space:nowrap;height:42px;font-weight:400;border-radius:3px}
+.heat-table tbody th b{display:inline-block;min-width:40px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--ink-3)}
+.heat-table tbody th span{font-size:12.5px;color:var(--ink)}
+.heat-table td{height:42px;text-align:center;border-radius:3px;font-family:var(--mono);font-size:11.5px}
+.theme-light .heat-scroll{--heat-bg:#fff}
+.bubble-list{display:none;margin-top:14px;border-top:1px solid var(--rule)}
+.bubble-list a{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 2px;border-bottom:1px solid var(--rule);font-size:13px;color:var(--ink)}
+.bubble-list .bl-name{font-size:13px;color:var(--ink);min-width:0}
+.bubble-list .bl-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+@media (max-width:560px){.bubble-list{display:block}.bubble-list a{flex-direction:column;align-items:flex-start;gap:3px;padding-right:4px}}
 .prof-graph{margin-top:16px;border:1px solid var(--rule);border-radius:14px;background:linear-gradient(150deg,rgba(16,29,38,.7),rgba(9,17,22,.4));padding:10px;overflow-x:auto}
 .prof-graph svg{display:block;width:100%;min-width:720px;height:auto}
 .graph-node rect{fill:rgba(16,29,38,.96);stroke:rgba(94,234,212,.35)}
