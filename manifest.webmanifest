@@ -1,15 +1,35 @@
 {
-  "name": "Профессии·2030",
+  "name": "Профессии·2030 — атлас востребованных профессий",
   "short_name": "Профессии·2030",
-  "description": "Атлас востребованных профессий, вузов и образовательных маршрутов России.",
+  "description": "Атлас профессий 2027–2030: вузы, колледжи, специальности, бюджетные места и проходные баллы.",
+  "id": "/atlas-2030/",
   "start_url": "/atlas-2030/",
   "scope": "/atlas-2030/",
   "display": "standalone",
-  "background_color": "#100C1A",
-  "theme_color": "#100C1A",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#091116",
+  "theme_color": "#091116",
   "lang": "ru",
+  "dir": "ltr",
+  "categories": ["education", "reference", "productivity"],
   "icons": [
-    { "src": "icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any maskable" },
-    { "src": "icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Бюджетные места",
+      "short_name": "Приём",
+      "url": "/atlas-2030/#/admission",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Подобрать профессию",
+      "short_name": "Опросник",
+      "url": "/atlas-2030/#/quiz",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
   ]
 }
