@@ -3997,9 +3997,32 @@ tip.style.top = top + 'px';
 tip.hidden = true;
 }
 }
+function chartHit(canvas, ev) {
+if (canvas.id !== 'bubbleChart' || !BUBBLE_GEOM) return null;
+var rect = canvas.getBoundingClientRect();
+var mx = (ev.clientX - rect.left) * (canvas.width / rect.width) / Math.min(2, window.devicePixelRatio || 1);
+var my = (ev.clientY - rect.top) * (canvas.height / rect.height) / Math.min(2, window.devicePixelRatio || 1);
+var best = null, bd = 1e9;
+BUBBLE_GEOM.items.forEach(function (it) {
+var d = Math.hypot(mx - it.x, my - it.y);
+if (d < it.r + 6 && d < bd) { bd = d; best = it; }
+});
+return best;
+}
 function bindChart(canvas) {
-canvas.addEventListener('mousemove', function (e) { chartTip(canvas, e); });
+canvas.addEventListener('mousemove', function (e) {
+chartTip(canvas, e);
+canvas.style.cursor = chartHit(canvas, e) ? 'pointer' : 'default';
+});
+canvas.addEventListener('click', function (e) {
+var hit = chartHit(canvas, e);
+if (!hit) return;
+var tip = canvas.parentNode.querySelector('.chart-tip');
+if (tip) tip.hidden = true;
+location.hash = '#/professions/' + hit.p.slug;
+});
 canvas.addEventListener('mouseleave', function () {
+canvas.style.cursor = 'default';
 var tip = canvas.parentNode.querySelector('.chart-tip');
 if (tip) tip.hidden = true;
 });
@@ -4013,7 +4036,7 @@ return '<span><i style="background:' + sphereColor(s.code) + '"></i>' + h(s.code
 }).join('') + '<span>Размер круга — число программ</span></div>' +
 '<div class="bubble-list" id="bubbleList"></div></div>' +
 '<p class="source-note">По горизонтали — минимальный проходной балл на бюджет по программам профессии, по вертикали — рост вакансий к 2030 году. ' +
-'Показаны профессии, для которых в атласе есть программы и баллы. На телефоне подписи вынесены в список под графиком.</p></section>';
+'Показаны профессии, для которых в атласе есть программы и баллы. Нажмите на круг, чтобы открыть профессию. На телефоне подписи вынесены в список под графиком.</p></section>';
 }
 function heatSection() {
 return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Аналитика</p>' +
