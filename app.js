@@ -2499,7 +2499,12 @@ function prepareRich(root) {
 rewriteLinks(root);
 root.querySelectorAll('li').forEach(function (li) {
 var k = li.children;
-if (k.length === 3 && k[0].tagName === 'P' && k[1].tagName === 'P' && k[2].tagName === 'P') li.classList.add('career');
+if (k.length === 3 && k[0].tagName === 'P' && k[1].tagName === 'P' && k[2].tagName === 'P') {
+li.classList.add('career');
+var pay = k[2].textContent.trim();
+if (/^\d+$/.test(pay)) k[2].textContent = pay + ' тыс. ₽/мес';
+else if (/тыс\.\s*₽$/.test(pay)) k[2].textContent = pay + '/мес';
+}
 if (k.length === 3 && k[0].tagName === 'SPAN' && k[1].tagName === 'SPAN' && k[2].tagName === 'P') li.classList.add('timeline');
 if (k[0] && k[0].tagName === 'SPAN' && k[0].querySelector('b')) li.classList.add('row');
 var f = li.firstChild;
