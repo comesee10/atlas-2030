@@ -1,5 +1,14 @@
 (function () {
 'use strict';
+/* База для абсолютных ссылок: запоминаем адрес app.js до того, как роутер
+   заменит адрес страницы на deep-link. Иначе относительный sw.js резолвится
+   от /professions/... и регистрация падает с 404. */
+var SCRIPT_BASE = (function () {
+try {
+if (document.currentScript && document.currentScript.src) return new URL('.', document.currentScript.src).href;
+} catch (e) {}
+return null;
+})();
 var A = window.ATLAS;
 var app = document.getElementById('app');
 if (!A || !A.professions) {
@@ -3971,7 +3980,8 @@ resizeTimer2 = setTimeout(function () { placeTools(); drawHeatmap(); drawBubble(
 });
 if ('serviceWorker' in navigator && !window.__ATLAS_STANDALONE__ && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
 window.addEventListener('load', function () {
-navigator.serviceWorker.register('sw.js').catch(function () {});
+var swUrl = SCRIPT_BASE ? SCRIPT_BASE + 'sw.js' : 'sw.js';
+navigator.serviceWorker.register(swUrl).catch(function () {});
 });
 }
 window.addEventListener('hashchange', route);
