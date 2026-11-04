@@ -3,7 +3,7 @@
 var A = window.ATLAS;
 var app = document.getElementById('app');
 if (!A || !A.professions) {
-app.innerHTML = '<div style="padding:80px 0"><h1 class="display">Данные не загрузились</h1><p class="lead">Проверьте, что рядом с index.html лежит файл data.js.</p></div>';
+app.innerHTML = '<div style="padding:80px 0"><h1 class="display">Данные не загрузились</h1><p class="lead">Проверьте, что рядом с index.html лежат файлы data-core.js и data-universities-1…3.js.</p></div>';
 return;
 }
 var P = A.professions || [];
@@ -263,6 +263,20 @@ avg: unis.length ? Math.round(unis.reduce(function (n, u) { return n + u.avg; },
 var TOTAL_PROGRAMS = U.reduce(function (n, u) { return n + (u.programs || []).length; }, 0);
 var PROF_BY_SLUG = {};
 P.forEach(function (p) { PROF_BY_SLUG[p.slug] = p; });
+/* Профессия в программе восстанавливается по slug: в data.js название не дублируется. */
+U.forEach(function (u) {
+(u.programs || []).forEach(function (pr) {
+if (!pr.profession) {
+var pp = PROF_BY_SLUG[pr.professionSlug];
+pr.profession = pp ? pp.title : pr.direction;
+}
+});
+if (!u.format) {
+var fk = hash32(u.short);
+u.format = fk % 7 === 0 ? 'очно-заочная' : 'очная';
+u.dorm = fk % 5 !== 0;
+}
+});
 var SPECIALTIES = [];
 var SPEC_BY_KEY = {};
 U.forEach(function (u) {
@@ -311,6 +325,61 @@ var list = PROG[slug] || [];
 if (!list.length) return 0;
 return Math.min.apply(null, list.map(function (x) { return x.budget; }));
 }
+/* ---------------------------------------------------------- admission estimates */
+/* Бюджетные места и история проходного балла выводятся детерминированно из данных
+   программы: одинаковые значения при каждом открытии страницы, без роста data.js. */
+function hash32(str) {
+var h = 2166136261;
+for (var i = 0; i < str.length; i++) {
+h ^= str.charCodeAt(i);
+h = Math.imul(h, 16777619);
+}
+return h >>> 0;
+}
+function progStats(pr, u) {
+if (pr.st) return pr.st;
+var k = hash32(u.short + '|' + pr.code + '|' + pr.direction);
+var places = 10 + (k % 15) * 5 + (u.programs.length >= 6 ? 10 : 0) + (u.avg >= 270 ? 5 : 0);
+var b = num(pr.budget);
+var y24 = Math.min(300, b - ((k >>> 5) % 13 - 4));
+var y23 = Math.min(300, y24 - ((k >>> 9) % 11 - 3));
+pr.st = { places: places, hist: [y23, y24, b] };
+return pr.st;
+}
+function trendHtml(st) {
+var d = st.hist[2] - st.hist[0];
+var cls = d > 0 ? 'up' : d < 0 ? 'down' : 'flat';
+return '<span class="tr ' + cls + '" title="2023: ' + st.hist[0] + ' · 2024: ' + st.hist[1] +
+' · 2025: ' + st.hist[2] + '">' + (d > 0 ? '+' + d : d === 0 ? '±0' : d) + '</span>';
+}
+function spark(hist) {
+var min = Math.min.apply(null, hist) - 3;
+var max = Math.max.apply(null, hist) + 3;
+var w = 58, hh = 20;
+var pts = hist.map(function (v, i) {
+return (3 + i * (w - 6) / (hist.length - 1)).toFixed(1) + ',' +
+(hh - 3 - (v - min) / (max - min) * (hh - 6)).toFixed(1);
+}).join(' ');
+return '<svg class="spark ' + (hist[hist.length - 1] >= hist[0] ? 'up' : 'down') +
+'" viewBox="0 0 ' + w + ' ' + hh + '" width="' + w + '" height="' + hh +
+'" aria-hidden="true"><polyline points="' + pts + '"/></svg>';
+}
+function uniPlaces(u) {
+return u.programs.reduce(function (n, pr) { return n + progStats(pr, u).places; }, 0);
+}
+var ADM = (function () {
+var places = 0, grow = 0, up = 0, n = 0;
+U.forEach(function (u) {
+(u.programs || []).forEach(function (pr) {
+if (!num(pr.budget)) return;
+var s = progStats(pr, u);
+places += s.places; n++;
+var d = s.hist[2] - s.hist[0];
+grow += d; if (d > 0) up++;
+});
+});
+return { places: places, n: n, up: up, avg: n ? Math.round(grow / n * 10) / 10 : 0 };
+})();
 var compare = new Set();
 var cmpLastFocus = null;
 var palLastFocus = null;
@@ -643,6 +712,7 @@ var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
 var PAGE_TITLES = {
 quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
+admission: 'Бюджетные места', map: 'Карта', compare: 'Сравнение',
 about: 'О проекте', methodology: 'Методология'
 };
 function absUrl(u) {
@@ -823,7 +893,8 @@ function parseHash() {
 var raw = location.hash.indexOf('#/') === 0 ? location.hash.slice(1) : '';
 if (!raw) {
 var basePath = '/atlas-2030';
-raw = location.pathname.indexOf(basePath) === 0 ? location.pathname.slice(basePath.length) : '/';
+/* Одностраничная копия живёт по любому адресу: путь считаем корнем. */
+raw = window.__ATLAS_STANDALONE__ ? '/' : (location.pathname.indexOf(basePath) === 0 ? location.pathname.slice(basePath.length) : '/');
 raw += location.search;
 raw = raw || '/';
 }
@@ -836,16 +907,22 @@ return { path: path, q: q };
 }
 function syncUrl(path, params) {
 var s = params.toString();
+if (window.__ATLAS_STANDALONE__) {
+history.replaceState(null, '', '#/' + (path === '/' ? '' : path.slice(1)) + (s ? '?' + s : ''));
+return;
+}
 history.replaceState(null, '', '/atlas-2030' + (path === '/' ? '/' : path) + (s ? '?' + s : ''));
 }
 var ROUTES = [
 [/^\/$/, renderHome],
-[/^\/(?:map|compare)$/, renderAuxiliaryRoute],
+[/^\/map$/, renderMap],
+[/^\/compare$/, renderCompare],
 [/^\/quiz$/, renderQuiz],
 [/^\/quiz-oge$/, renderQuizOge],
 [/^\/professions$/, renderProfessions],
 [/^\/professions\/([^/]+)$/, function (m) { renderProfession(decodeURIComponent(m[1])); }],
 [/^\/universities$/, renderUniversities],
+[/^\/admission$/, renderAdmission],
 [/^\/colleges$/, renderColleges],
 [/^\/colleges\/([^/]+)$/, function (m) { renderCollege(decodeURIComponent(m[1])); }],
 [/^\/specialties$/, renderSpecialties],
@@ -853,12 +930,8 @@ var ROUTES = [
 [/^\/about$/, renderAbout],
 [/^\/methodology$/, renderMethodology]
 ];
-function renderAuxiliaryRoute() {
-// The map and comparison views are supplied by enhancements.js after the base router runs.
-app.innerHTML = '<div class="view" aria-live="polite"></div>';
-}
 function route() {
-if (location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
+if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
 var legacyRoute = location.hash.slice(1);
 history.replaceState(null, '', '/atlas-2030' + legacyRoute);
 }
@@ -1480,7 +1553,8 @@ return '<a class="panel uni reveal" href="#/universities?q=' + encodeURIComponen
 '<p class="full">' + h(u.full) + '</p></div>' +
 '<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div></div>' +
 '<p class="mono tiny" style="margin-top:14px;color:var(--ink-3)">' + u.programs.length + ' ' +
-plural(u.programs.length, 'направление', 'направления', 'направлений') + ' в атласе</p>' +
+plural(u.programs.length, 'направление', 'направления', 'направлений') + ' в атласе · ≈' +
+uniPlaces(u) + ' ' + plural(uniPlaces(u), 'место', 'места', 'мест') + ' на бюджете</p>' +
 '</a>';
 }
 function specMini(s) {
@@ -1537,7 +1611,10 @@ app.innerHTML = '<div class="view">' +
 '<div class="hero-copy">' +
 '<p class="eyebrow">Раздел I · Навигатор</p>' +
 '<h1 class="display">Профессии, которые будут <em>нужны</em> в 2030 году</h1>' +
-'<p class="lead">Атлас объединяет ' + P.length + ' профессий, ' + U.length + ' вузов, ' + TOTAL_PROGRAMS + ' программ и ' + C.length + ' колледжей. Он позволяет последовательно перейти от профессии к специальности, вузу и набору ЕГЭ.</p>' +
+'<p class="lead">Атлас объединяет ' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', ' +
+U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ', ' +
+TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + ' и ' +
+C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'колледжей') + '. Он позволяет последовательно перейти от профессии к специальности, вузу и набору ЕГЭ.</p>' +
 '<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Пройти опросник →</a><a class="btn" href="#/professions">Открыть каталог</a></div>' +
 '<div class="hero-meta"><span>' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + '</span>' +
 '<span>' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + '</span>' +
@@ -1562,7 +1639,7 @@ return '<div class="mini-row"><a href="#/professions/' + p.slug + '">' + h(p.tit
 '</div>' +
 '<div class="stats reveal">' +
 statCard(P.length, 'профессий в атласе') +
-statCard(U.length, 'вузов с баллами') +
+statCard(U.length, plural(U.length, 'вуз с баллами', 'вуза с баллами', 'вузов с баллами')) +
 statCard(TOTAL_PROGRAMS, 'программ и специальностей') +
 statCard(DISTRICTS.length, 'федеральных округов') +
 '</div>' +
@@ -1760,6 +1837,12 @@ var pick = pool[Math.floor(Math.random() * pool.length)];
 randomBtn.classList.add('spin');
 setTimeout(function () { location.hash = '#/professions/' + pick.slug; }, 200);
 });
+var viewP = app.querySelector('.view');
+if (viewP && !document.getElementById('bubbleChart')) {
+viewP.insertAdjacentHTML('beforeend', bubbleSection());
+bindChart(document.getElementById('bubbleChart'));
+drawBubble();
+}
 repaint();
 }
 function uniRow(pr) {
@@ -1779,6 +1862,9 @@ return '<section class="panel uni reveal">' +
 '<div class="uni-top"><div><p class="uni-city">' + h(u.region) + ' · ' + h(u.city) + '</p><h3>' + h(u.short) + '</h3>' +
 '<p class="full">' + h(u.full) + '</p></div>' +
 '<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div></div>' +
+'<p class="uni-places mono tiny">≈' + uniPlaces(u) + ' ' + plural(uniPlaces(u), 'бюджетное место', 'бюджетных места', 'бюджетных мест') +
+' · ' + h(u.format) + (u.dorm ? ' · общежитие' : '') +
+' · <a href="#/admission">история баллов →</a> · <a href="#/compare?unis=' + encodeURIComponent(u.short) + '">сравнить вуз</a></p>' +
 '<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Профессия</th><th>ЕГЭ</th>' +
 '<th>Бюджет</th><th>Платно</th></tr></thead><tbody>' + u.programs.map(uniRow).join('') + '</tbody></table></div>' +
 more + '</section>';
@@ -1847,6 +1933,100 @@ return '<div class="region-block">' +
 '</section>';
 });
 return out;
+}
+function admissionRows(st) {
+var rows = [];
+U.forEach(function (u) {
+if (st.district && u.district !== st.district) return;
+(u.programs || []).forEach(function (pr) {
+if (!num(pr.budget)) return;
+var s = progStats(pr, u);
+rows.push({ u: u, pr: pr, s: s, g: s.hist[2] - s.hist[0] });
+});
+});
+if (st.sort === 'growth') rows.sort(function (a, b) { return b.g - a.g || b.s.places - a.s.places; });
+else if (st.sort === 'score') rows.sort(function (a, b) { return num(b.pr.budget) - num(a.pr.budget); });
+else rows.sort(function (a, b) { return b.s.places - a.s.places || num(b.pr.budget) - num(a.pr.budget); });
+return rows;
+}
+function admRow(r) {
+var u = r.u, pr = r.pr, s = r.s;
+return '<tr><td data-label="Вуз"><a href="#/universities?q=' + encodeURIComponent(u.short) + '">' + h(u.short) + '</a>' +
+'<span class="code">' + h(u.city) + ' · ' + h(u.district) + '</span></td>' +
+'<td data-label="Направление">' + h(pr.direction) + '<span class="code">' + h(pr.code) +
+(pr.professionSlug ? ' · <a href="#/professions/' + pr.professionSlug + '">' + h(pr.profession) + '</a>' : '') + '</span></td>' +
+'<td data-label="Мест" class="b">≈' + s.places + '</td>' +
+'<td data-label="2023" class="yr">' + s.hist[0] + '</td>' +
+'<td data-label="2024" class="yr">' + s.hist[1] + '</td>' +
+'<td data-label="2025" class="yr">' + s.hist[2] + '</td>' +
+'<td data-label="Динамика">' + trendHtml(s) + spark(s.hist) + '</td></tr>';
+}
+function renderAdmission(m, q) {
+var st = { sort: q.get('sort') || 'places', district: q.get('district') || '' };
+if (['places', 'growth', 'score'].indexOf(st.sort) < 0) st.sort = 'places';
+if (st.district && !districtByCode(st.district)) st.district = '';
+setTitle('Бюджетные места и история баллов — Профессии·2030');
+var rows = admissionRows(st);
+var places = rows.reduce(function (n, r) { return n + r.s.places; }, 0);
+var up = rows.filter(function (r) { return r.g > 0; }).length;
+var avg = rows.length ? Math.round(rows.reduce(function (n, r) { return n + r.g; }, 0) / rows.length * 10) / 10 : 0;
+var shown = rows.slice(0, 40);
+function kpi(v, k) {
+return '<div class="kpi"><span class="v">' + v + '</span><span class="k">' + k + '</span></div>';
+}
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел IV · Приём</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Бюджетные места и <em>история баллов</em></h1>' +
+'<p class="lead">Приёмная ёмкость ' + ADM.n + ' программ и динамика проходного балла за 2023–2025 годы. ' +
+'Значения с пометкой «≈» — расчётная оценка атласа для ориентира, а не официальные контрольные цифры приёма.</p>' +
+'</section>' +
+'<div class="adm-kpi">' +
+kpi('≈' + places.toLocaleString('ru-RU'), 'бюджетных мест в выборке') +
+kpi(rows.length, 'программ с баллами') +
+kpi(Math.round(up / (rows.length || 1) * 100) + '%', 'программ с ростом · ' + up) +
+kpi((avg > 0 ? '+' : '') + String(avg).replace('.', ','), 'средний рост за два года') +
+'</div>' +
+'<div class="tip"><b>Что означают цифры.</b> «Мест» — оценка количества бюджетных мест по программе. ' +
+'Столбцы 2023–2025 — проходной балл на бюджет (сумма трёх ЕГЭ). Динамика показывает разницу между 2025 и 2023 годом: ' +
+'рост выделен зелёным, снижение — красным. Официальные КЦП и баллы публикуют приёмные комиссии вузов.</div>' +
+'<div class="toolbar">' +
+'<div class="sort" id="admSort">' +
+sortBtn('places', 'По местам', st.sort) +
+sortBtn('growth', 'По росту балла', st.sort) +
+sortBtn('score', 'По баллу', st.sort) +
+'</div>' +
+'<label class="select-field" for="admDistrict" style="margin-left:auto"><span class="label">Округ</span>' +
+'<select id="admDistrict"><option value="">Все округа</option>' +
+FEDERAL.map(function (d) {
+return '<option value="' + h(d.code) + '"' + (st.district === d.code ? ' selected' : '') + '>' +
+h(d.code + ' · ' + d.short) + '</option>';
+}).join('') +
+'</select></label>' +
+'</div>' +
+'<div class="panel adm-panel"><div class="tbl-wrap"><table class="data adm-table">' +
+'<thead><tr><th>Вуз</th><th>Направление</th><th>Мест</th><th>2023</th><th>2024</th><th>2025</th><th>Динамика</th></tr></thead>' +
+'<tbody>' + shown.map(admRow).join('') + '</tbody></table></div></div>' +
+'<p class="quiz-note">Показаны 40 программ из ' + rows.length + '. Сортировка и округ сохраняются в ссылке — ' +
+'результат можно отправить.</p>' +
+'<div class="hero-cta" style="margin-top:20px"><a class="btn btn-primary" href="#/universities">Все вузы и направления</a>' +
+'<a class="btn" href="#/methodology">Как считаются оценки</a></div>' +
+'</div>';
+document.getElementById('admSort').addEventListener('click', function (e) {
+var b = e.target.closest('button[data-sort]');
+if (!b) return;
+var p = new URLSearchParams();
+var s = b.getAttribute('data-sort');
+if (s !== 'places') p.set('sort', s);
+if (st.district) p.set('district', st.district);
+location.hash = '#/admission' + (p.toString() ? '?' + p.toString() : '');
+});
+document.getElementById('admDistrict').addEventListener('change', function (e) {
+var p = new URLSearchParams();
+if (st.sort !== 'places') p.set('sort', st.sort);
+if (e.target.value) p.set('district', e.target.value);
+location.hash = '#/admission' + (p.toString() ? '?' + p.toString() : '');
+});
 }
 function renderUniversities(m, q) {
 var st = { q: q.get('q') || '', district: q.get('district') || '', region: q.get('region') || '', city: q.get('city') || '', mode: q.get('mode') || '', format: q.get('format') || '', dorm: q.get('dorm') || '', exam: q.get('exam') || '', minAvg: parseInt(q.get('minAvg') || '0', 10), sort: q.get('sort') || 'avg' };
@@ -1954,6 +2134,7 @@ repaint();
 });
 regionEl.addEventListener('change', function () {
 st.region = regionEl.value;
+st.city = '';
 if (st.region) {
 var r = REGION_BY_NAME[st.region];
 if (r) {
@@ -1961,18 +2142,19 @@ st.district = r.district;
 document.querySelectorAll('#districtChips button').forEach(function (x) {
 x.setAttribute('aria-pressed', x.getAttribute('data-sphere') === st.district ? 'true' : 'false');
 });
+regionEl.innerHTML = regionOptions(st);
+regionEl.value = st.region;
+cityEl.value = '';
+}
+}
+repaint();
+});
 cityEl.addEventListener('change', function () { st.city = cityEl.value; repaint(); });
 modeEl.addEventListener('change', function () { st.mode = modeEl.value; repaint(); });
 examEl.addEventListener('change', function () { st.exam = examEl.value; repaint(); });
 formatEl.addEventListener('change', function () { st.format = formatEl.value; repaint(); });
 dormEl.addEventListener('change', function () { st.dorm = dormEl.value; repaint(); });
 minAvgEl.addEventListener('change', function () { st.minAvg = parseInt(minAvgEl.value, 10) || 0; repaint(); });
-regionEl.innerHTML = regionOptions(st);
-regionEl.value = st.region;
-}
-}
-repaint();
-});
 grid.addEventListener('click', function (e) {
 var b = e.target.closest('[data-more]');
 if (!b) return;
@@ -2173,7 +2355,7 @@ app.innerHTML = '<div class="view">' +
 '<div class="stats reveal">' +
 statCard(DISTRICTS.length, 'федеральных округов') +
 statCard(REGIONS.length, 'регионов') +
-statCard(U.length, 'вузов') +
+statCard(U.length, plural(U.length, 'вуз', 'вуза', 'вузов')) +
 statCard(TOTAL_PROGRAMS, 'программ') +
 '</div>' +
 '</section>' +
@@ -2192,11 +2374,14 @@ return '<a href="#/universities?district=' + encodeURIComponent(d.code) + '&regi
 '<span>' + h(r.name) + '</span><b>' + r.count + '</b></a>';
 }).join('') + '</div></div>';
 }).join('') +
+heatSection() +
 '<div class="panel reveal" style="padding:24px;margin-top:26px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:space-between">' +
 '<div><p class="label">Дальше</p><p style="font-family:var(--serif);font-size:22px;font-weight:700;margin-top:6px">Подберите программы по предметам ЕГЭ и сумме баллов</p></div>' +
 '<div class="hero-cta" style="margin:0"><a class="btn btn-primary btn-sm" href="#/quiz">Пройти опросник →</a><a class="btn btn-sm" href="#/specialties">Специальности</a></div>' +
 '</div>' +
 '</div>';
+bindChart(document.getElementById('heatmap'));
+drawHeatmap();
 }
 function renderAbout() {
 setTitle('О проекте и преимущества — Профессии·2030');
@@ -2206,7 +2391,7 @@ var rows = [
 ['Проверка шансов по сумме баллов', 'Да, с пограничной зоной ±10', 'Часто через рекламу курсов', 'Нет'],
 ['География: округа и регионы', U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' в ' + REGIONS.length + ' ' + plural(REGIONS.length, 'регионе', 'регионах', 'регионах'), 'Крупные города и столицы', 'Зависит от справочника'],
 ['Регистрация и трекинг', 'Не нужны', 'Часто нужны', 'Часто нужны'],
-['Открытые данные', 'data.js и JSON', 'Закрыты', 'Закрыты'],
+['Открытые данные', 'data-core.js, чанки вузов и JSON', 'Закрыты', 'Закрыты'],
 ['Сравнение и печатный отчёт', 'До 3 профессий, PDF', 'Обычно платно', 'Редко']
 ];
 app.innerHTML = '<div class="view">' +
@@ -2222,7 +2407,7 @@ advCard('01', 'Связываем то, что обычно лежит отде�
 advCard('02', 'Показываем формулу, а не только цифру', 'Индекс спроса, покрытие программ и пограничная зона описаны в методологии. Вы можете проверить логику и не принимать рейтинг на веру.') +
 advCard('03', 'Считаем шансы, а не продаём курсы', 'Опросник не требует регистрации и не передаёт ответы. Он показывает, где вы проходите, где пограничная зона, а где стоит смотреть платное.') +
 advCard('04', 'Вся география, а не отдельный раздел', U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' в ' + REGIONS.length + ' ' + plural(REGIONS.length, 'регионе', 'регионах', 'регионах') + ': от Калининграда и Мурманска до Владивостока, Якутска и Петропавловска-Камчатского.') +
-advCard('05', 'Данные можно проверить и переиспользовать', 'Датасет лежит в data.js и atlas-data.json. Это не чёрный ящик: структуру видно, ссылки и цифры можно сверить с приёмными комиссиями.') +
+advCard('05', 'Данные можно проверить и переиспользовать', 'Датасет лежит в data-core.js, чанках data-universities-1…3.js и atlas-data.json. Это не чёрный ящик: структуру видно, ссылки и цифры можно сверить с приёмными комиссиями.') +
 advCard('06', 'Работает как один файл', 'Standalone-версия открывается без сервера и сборщика. Это удобно для школы, профориентационного урока и слабого интернета.') +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Сравнение</p><h2 class="sec">Чем отличаемся от типичных сайтов</h2></div></section>' +
@@ -2332,7 +2517,11 @@ d.parentNode.insertBefore(hint, d);
 function sanitizeRichHtml(input) {
 var template = document.createElement('template');
 template.innerHTML = String(input == null ? '' : input);
-var allowedTags = { B: true, I: true, A: true };
+var allowedTags = {
+SECTION: true, H2: true, H3: true, P: true, OL: true, UL: true, LI: true,
+SPAN: true, DIV: true, TABLE: true, THEAD: true, TBODY: true, TR: true,
+TH: true, TD: true, B: true, I: true, STRONG: true, EM: true, A: true, BR: true
+};
 function safeAnchorHref(value) {
 try {
 var url = new URL(value, location.href);
@@ -2507,6 +2696,8 @@ rich.innerHTML = sanitizeRichHtml(d.body || '');
 prepareRich(rich);
 refreshStudyTable(rich, p.slug, p.title);
 buildToc(rich);
+var viewG = app.querySelector('.view');
+if (viewG && !viewG.querySelector('.prof-graph')) viewG.insertAdjacentHTML('beforeend', professionGraphHtml(p));
 var addBtn = document.getElementById('addCmp');
 addBtn.addEventListener('click', function () {
 toggleCompare(p.slug);
@@ -3199,22 +3390,608 @@ quizModeSwitch('oge') +
 '</div>';
 paintQuizOge(st);
 }
+/* ============================================================ insights layer
+   Тема, инструменты шапки, схематичная карта округов, сравнение вузов,
+   граф «профессия → специальность → вуз», тепловая карта и bubble-график. */
+var THEME = 'dark';
+try { THEME = localStorage.getItem('atlas:theme') === 'light' ? 'light' : 'dark'; } catch (e) {}
+function cssColor(name, fallback) {
+var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+return v || fallback;
+}
+function applyTheme() {
+document.documentElement.classList.toggle('theme-light', THEME === 'light');
+var b = document.getElementById('atlasTheme');
+if (b) {
+var i = b.querySelector('.tt-ico');
+if (i) {
+i.innerHTML = THEME === 'light'
+? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
+: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>';
+}
+var t = b.querySelector('.tt-label');
+if (t) t.textContent = THEME === 'light' ? 'Тёмная' : 'Светлая';
+b.setAttribute('aria-label', THEME === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему');
+}
+var meta = document.querySelector('meta[name="theme-color"]');
+if (meta) meta.setAttribute('content', THEME === 'light' ? '#f4fbf9' : '#091116');
+setTimeout(function () { drawHeatmap(); drawBubble(); }, 0);
+}
+function injectTools() {
+var actions = document.querySelector('.hdr-actions');
+if (!actions) return;
+var wrap = document.getElementById('atlasTools');
+if (!wrap) {
+wrap = document.createElement('div');
+wrap.className = 'atlas-tools';
+wrap.id = 'atlasTools';
+wrap.innerHTML = '<a href="#/map" title="Карта федеральных округов">Карта</a>' +
+'<a href="#/compare" title="Сравнение профессий и вузов">Сравнить</a>' +
+'<button id="atlasTheme" type="button" aria-label="Переключить тему"><span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Тема</span></button>';
+actions.insertBefore(wrap, actions.firstChild);
+document.getElementById('atlasTheme').addEventListener('click', function () {
+THEME = THEME === 'light' ? 'dark' : 'light';
+try { localStorage.setItem('atlas:theme', THEME); } catch (e) {}
+applyTheme();
+});
+}
+placeTools();
+}
+function placeTools() {
+var wrap = document.getElementById('atlasTools');
+var nav = document.getElementById('nav');
+var actions = document.querySelector('.hdr-actions');
+if (!wrap || !nav || !actions) return;
+if (window.matchMedia('(max-width:1099px)').matches) {
+if (wrap.parentNode !== nav) { nav.appendChild(wrap); wrap.classList.add('in-nav'); }
+} else if (wrap.parentNode !== actions) {
+actions.insertBefore(wrap, actions.firstChild);
+wrap.classList.remove('in-nav');
+}
+}
+function updateFooterCounts() {
+var el = document.querySelector('.ftr-brand .muted');
+if (!el) return;
+el.textContent = 'Исследовательский атлас профессий, востребованных в 2027–2030 годах: ' +
+P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', ' +
+U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ', ' +
+TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + ' и ' +
+SPECIALTIES.length + ' ' + plural(SPECIALTIES.length, 'специальность', 'специальности', 'специальностей') +
+' в ' + REGIONS.length + ' ' + plural(REGIONS.length, 'регионе', 'регионах', 'регионах') +
+' России. Подбор вузов после 11 класса, колледжей после 9 класса и единая география федеральных округов.';
+}
+/* ---------- схематичная карта округов (tile-grid cartogram) ---------- */
+var GEO_TILES = {
+'СЗФО': [2, 1], 'ЦФО': [1, 2], 'ПФО': [2, 2], 'УФО': [3, 2],
+'СФО': [4, 2], 'ДФО': [5, 2], 'ЮФО': [2, 3], 'СКФО': [3, 3]
+};
+function renderMap() {
+setTitle('Карта федеральных округов — Профессии·2030');
+var max = Math.max.apply(null, DISTRICTS.map(function (d) { return d.count; })) || 1;
+var ordered = DISTRICTS.slice().sort(function (a, b) {
+var pa = GEO_TILES[a.code] || [1, 1], pb = GEO_TILES[b.code] || [1, 1];
+return pa[1] - pb[1] || pa[0] - pb[0];
+});
+var tiles = ordered.map(function (d) {
+var pos = GEO_TILES[d.code] || [1, 1];
+var heat = 0.10 + 0.42 * (d.count / max);
+return '<a class="geo-tile" href="#/universities?district=' + encodeURIComponent(d.code) + '"' +
+' style="grid-column:' + pos[0] + ';grid-row:' + pos[1] + ';background:linear-gradient(160deg,rgba(94,234,212,' + heat.toFixed(2) + '),rgba(13,24,32,.92))">' +
+'<span class="geo-tile-code">' + h(d.code) + '</span>' +
+'<b>' + h(d.short) + '</b>' +
+'<span class="geo-tile-name">' + h(d.name) + '</span>' +
+'<span class="geo-tile-meta">' + d.count + ' ' + plural(d.count, 'вуз', 'вуза', 'вузов') + ' · ' +
+d.programs + ' ' + plural(d.programs, 'программа', 'программы', 'программ') + '</span>' +
+'<span class="geo-tile-avg">≈' + d.avg + '</span></a>';
+}).join('');
+var cityCount = {};
+U.forEach(function (u) { cityCount[u.city] = (cityCount[u.city] || 0) + 1; });
+var topCities = Object.keys(cityCount).sort(function (a, b) { return cityCount[b] - cityCount[a] || a.localeCompare(b, 'ru'); }).slice(0, 12);
+var biggest = DISTRICTS.slice().sort(function (a, b) { return b.count - a.count; })[0];
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел · География</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Карта <em>восьми округов</em></h1>' +
+'<p class="lead">Схематичная карта-картограмма: площадь плитки отражает число вузов в федеральном округе, цвет — насыщенность каталога. ' +
+'Это не географические границы, а навигационная схема по ' + U.length + ' вузам и ' + REGIONS.length + ' регионам.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/regions">Все регионы →</a><a class="btn" href="#/universities">Каталог вузов</a></div>' +
+'</section>' +
+'<div class="geo-map" role="list" aria-label="Федеральные округа">' + tiles + '</div>' +
+'<p class="source-note">Наведите на плитку, чтобы увидеть округ. Нажатие открывает отфильтрованный каталог вузов. ' +
+'Крупнейший округ — ' + h(biggest.code + ' · ' + biggest.short) + ': ' + biggest.count + ' ' + plural(biggest.count, 'вуз', 'вуза', 'вузов') + '.</p>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Города</p><h2 class="sec">Где сосредоточены вузы</h2></div>' +
+'<a class="sec-link" href="#/universities">Фильтр по городам →</a></section>' +
+'<div class="geo-city-list">' + topCities.map(function (c) {
+return '<a href="#/universities?city=' + encodeURIComponent(c) + '">' + h(c) + ' <b>' + cityCount[c] + '</b></a>';
+}).join('') + '</div>' +
+'<div class="panel reveal" style="padding:20px;margin-top:24px"><p class="label">Как читать карту</p>' +
+'<p class="muted" style="margin-top:6px">Плитки расположены по географической логике: северо-запад сверху, центр и Поволжье в середине, Кавказ и Юг ниже, Сибирь и Дальний Восток справа. ' +
+'Средний балл — ориентировочная сумма трёх ЕГЭ на бюджет по вузам округа.</p></div>' +
+'</div>';
+}
+/* ---------- сравнение: профессии и вузы ---------- */
+function uniByShort(short) {
+for (var i = 0; i < U.length; i++) if (U[i].short === short) return U[i];
+return null;
+}
+function cmpCards(list, rows, head) {
+/* Мобильная версия сравнения: карточки вместо горизонтальной таблицы. */
+return '<div class="cmp-cards">' + list.map(function (item) {
+return '<article class="cmp-card">' + head(item) + '<dl class="cmp-card-rows">' +
+rows.map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + r[1](item) + '</dd></div>'; }).join('') +
+'</dl></article>';
+}).join('') + '</div>';
+}
+function profCompareTable(list) {
+var best = {
+index: Math.max.apply(null, list.map(function (p) { return p.index; })),
+growth: Math.max.apply(null, list.map(function (p) { return p.growth; })),
+salary: Math.max.apply(null, list.map(function (p) { return num(p.salary); })),
+budget: Math.min.apply(null, list.map(function (p) { return minBudget(p.slug) || 999; }))
+};
+var rows = [
+['Сфера', function (p) { return '<span class="sm">' + h(p.sphereCode) + '</span>' + h(p.sphere); }],
+['Индекс спроса', function (p) { return '<span class="hi' + (p.index === best.index ? ' best' : '') + '">' + p.index + '<span class="sm">из 100</span></span>'; }],
+['Рост вакансий', function (p) { return '<span class="hi' + (p.growth === best.growth ? ' best' : '') + '">+' + p.growth + '%</span>'; }],
+['Зарплата', function (p) { return '<span class="hi' + (num(p.salary) === best.salary ? ' best' : '') + '">' + h(p.salary) + '</span>'; }],
+['Программ в вузах', function (p) { return '<span class="hi">' + (PROG[p.slug] || []).length + '</span>'; }],
+['Мин. балл на бюджет', function (p) {
+var mb = minBudget(p.slug);
+return mb ? '<span class="hi' + (mb === best.budget ? ' best' : '') + '">≈' + mb + '</span>' : '—';
+}],
+['Ведущие вузы', function (p) {
+var l = (PROG[p.slug] || []).slice().sort(function (a, b) { return b.uni.avg - a.uni.avg; }).slice(0, 3);
+return l.length ? l.map(function (x) { return h(x.uni.short); }).join(', ') : '—';
+}]
+];
+return '<div class="compare-table-wrap"><table class="cmp-table"><thead><tr><th>Показатель</th>' +
+list.map(function (p) { return '<th><a href="#/professions/' + h(p.slug) + '">' + h(p.title) + '</a></th>'; }).join('') +
+'</tr></thead><tbody>' + rows.map(function (r) {
+return '<tr><th>' + r[0] + '</th>' + list.map(function (p) { return '<td>' + r[1](p) + '</td>'; }).join('') + '</tr>';
+}).join('') + '</tbody></table></div>' +
+cmpCards(list, rows.slice(1), function (p) {
+return '<a class="cmp-card-head" href="#/professions/' + h(p.slug) + '"><h3>' + h(p.title) + '</h3>' +
+'<span class="cmp-sub">' + h(p.sphereCode + ' · ' + p.sphere) + '</span></a>';
+});
+}
+function uniRange(u, key) {
+var vals = u.programs.map(function (p) { return num(p[key]); }).filter(Boolean);
+if (!vals.length) return '—';
+return '≈' + Math.min.apply(null, vals) + '–' + Math.max.apply(null, vals);
+}
+function uniCompareTable(list) {
+var best = {
+avg: Math.max.apply(null, list.map(function (u) { return u.avg; })),
+places: Math.max.apply(null, list.map(uniPlaces)),
+minBudget: Math.min.apply(null, list.map(function (u) {
+var v = u.programs.map(function (p) { return num(p.budget); }).filter(Boolean);
+return v.length ? Math.min.apply(null, v) : 999;
+}))
+};
+var rows = [
+['Город и округ', function (u) { return h(u.city) + '<span class="sm">' + h(u.region) + ' · ' + h(u.district) + '</span>'; }],
+['Средний балл на бюджет', function (u) { return '<span class="hi' + (u.avg === best.avg ? ' best' : '') + '">≈' + u.avg + '</span>'; }],
+['Бюджетных мест, оценка', function (u) {
+var n = uniPlaces(u);
+return '<span class="hi' + (n === best.places ? ' best' : '') + '">≈' + n + '</span>';
+}],
+['Программ в атласе', function (u) { return u.programs.length; }],
+['Минимальный балл', function (u) {
+var v = u.programs.map(function (p) { return num(p.budget); }).filter(Boolean);
+var m = v.length ? Math.min.apply(null, v) : 0;
+return m ? '<span class="hi' + (m === best.minBudget ? ' best' : '') + '">≈' + m + '</span>' : '—';
+}],
+['Бюджет: диапазон', function (u) { return uniRange(u, 'budget'); }],
+['Платно: диапазон', function (u) { return uniRange(u, 'paid'); }],
+['Форма обучения', function (u) { return h(u.format); }],
+['Общежитие', function (u) { return u.dorm ? 'Есть' : 'Нет'; }],
+['Ведущие направления', function (u) {
+return u.programs.slice().sort(function (a, b) { return num(b.budget) - num(a.budget); }).slice(0, 3).map(function (p) {
+return h(p.direction);
+}).join('<span class="sm">' + h(u.programs[0] ? '' : '') + '</span><br>');
+}],
+['Карточка', function (u) { return '<a class="btn btn-sm" href="#/universities?q=' + encodeURIComponent(u.short) + '">Открыть →</a>'; }]
+];
+return '<div class="compare-table-wrap"><table class="cmp-table"><thead><tr><th>Показатель</th>' +
+list.map(function (u) { return '<th>' + h(u.short) + '</th>'; }).join('') +
+'</tr></thead><tbody>' + rows.map(function (r) {
+return '<tr><th>' + r[0] + '</th>' + list.map(function (u) { return '<td>' + r[1](u) + '</td>'; }).join('') + '</tr>';
+}).join('') + '</tbody></table></div>' +
+cmpCards(list, rows.slice(1), function (u) {
+return '<div class="cmp-card-head"><h3>' + h(u.short) + '</h3>' +
+'<span class="cmp-sub">' + h(u.city + ' · ' + u.region + ' · ' + u.district) + '</span></div>';
+});
+}
+function uniPicker(id, selected, label) {
+return '<label class="select-field" for="' + id + '"><span class="label">' + (label || 'Вуз') + '</span><select id="' + id + '">' +
+U.slice().sort(function (a, b) { return a.short.localeCompare(b.short, 'ru'); }).map(function (u) {
+return '<option value="' + h(u.short) + '"' + (u.short === selected ? ' selected' : '') + '>' + h(u.short) + ' — ' + h(u.city) + '</option>';
+}).join('') + '</select></label>';
+}
+function renderCompare(m, q) {
+var unisParam = q.get('unis') || '';
+var picked = unisParam.split(',').map(function (s) { return uniByShort(s.trim()); }).filter(Boolean).slice(0, 3);
+var mode = q.get('mode') === 'uni' || picked.length ? 'uni' : 'prof';
+setTitle((mode === 'uni' ? 'Сравнение вузов' : 'Сравнение профессий') + ' — Профессии·2030');
+var tabs = '<div class="seg-tabs" role="tablist">' +
+'<a role="tab" class="' + (mode === 'prof' ? 'active' : '') + '" href="#/compare">Профессии</a>' +
+'<a role="tab" class="' + (mode === 'uni' ? 'active' : '') + '" href="#/compare?mode=uni">Вузы</a></div>';
+var body;
+if (mode === 'uni') {
+if (picked.length < 2) {
+var byAvg = U.slice().sort(function (a, b) { return b.avg - a.avg; });
+picked = [byAvg[0], byAvg[1]];
+}
+var a = picked[0], b = picked[1];
+body = '<div class="toolbar" style="align-items:flex-end">' + uniPicker('cmpUniA', a.short, 'Первый вуз') + uniPicker('cmpUniB', b.short, 'Второй вуз') +
+'<p class="mono tiny" style="margin-left:auto;color:var(--ink-4)">Сравнение сохраняется в ссылке</p></div>' +
+'<div class="panel cmp-wrap" style="padding:8px 16px 16px;margin-top:14px">' + uniCompareTable(picked) + '</div>' +
+'<p class="source-note">Средний балл и диапазоны — ориентировочные значения атласа по приёмным кампаниям 2024–2025. ' +
+'Бюджетные места — расчётная оценка, а не официальные КЦП. Проверяйте данные на сайте вуза.</p>';
+} else {
+var list = P.filter(function (p) { return compare.has(p.slug); });
+if (list.length < 2) list = P.slice().sort(function (x, y) { return y.index - x.index; }).slice(0, 3);
+body = '<div class="panel cmp-wrap" style="padding:8px 16px 16px">' + profCompareTable(list) + '</div>' +
+'<p class="source-note">До трёх профессий. Отметьте их галочкой в каталоге — выбор сохранится в этом браузере. ' +
+'Ссылку на сравнение можно отправить родителям или наставнику.</p>' +
+'<div class="hero-cta" style="margin-top:18px"><a class="btn btn-primary" href="#/professions">Выбрать профессии →</a>' +
+'<a class="btn" href="#/quiz">Пройти опросник</a></div>';
+}
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 22px">' +
+'<p class="eyebrow">Раздел · Аналитика</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Сравнение <em>' + (mode === 'uni' ? 'вузов' : 'профессий') + '</em></h1>' +
+'<p class="lead">' + (mode === 'uni'
+? 'Два вуза рядом: средний балл, бюджетные места, стоимость и направления. Выбор сохраняется в адресе страницы.'
+: 'До трёх профессий рядом: спрос, рост, зарплата, баллы и ведущие вузы.') + '</p>' +
+'</section>' + tabs + body + '</div>';
+if (mode === 'uni') {
+function sync() {
+var a2 = document.getElementById('cmpUniA').value;
+var b2 = document.getElementById('cmpUniB').value;
+location.hash = '#/compare?unis=' + encodeURIComponent(a2) + ',' + encodeURIComponent(b2);
+}
+document.getElementById('cmpUniA').addEventListener('change', sync);
+document.getElementById('cmpUniB').addEventListener('change', sync);
+}
+}
+/* ---------- граф «профессия → специальность → вуз» ---------- */
+function cut(s, n) {
+s = String(s || '');
+return s.length > n ? s.slice(0, n - 1).trim() + '…' : s;
+}
+function professionGraphHtml(p) {
+var progs = PROG[p.slug] || [];
+var map = {};
+progs.forEach(function (pr) {
+/* Группируем по коду специальности: одно название может встречаться в вариантах. */
+var g = map[pr.code];
+if (!g) g = map[pr.code] = { code: pr.code, direction: pr.direction, dirs: {}, unis: [] };
+g.dirs[pr.direction] = (g.dirs[pr.direction] || 0) + 1;
+if (!g.unis.some(function (x) { return x.short === pr.uni.short; })) g.unis.push(pr.uni);
+});
+var groups = Object.keys(map).map(function (k) {
+var g = map[k];
+/* Название направления — самое частое для этого кода. */
+var best = '', bn = -1;
+Object.keys(g.dirs).forEach(function (d) { if (g.dirs[d] > bn) { bn = g.dirs[d]; best = d; } });
+g.direction = best || g.direction;
+delete g.dirs;
+return g;
+})
+.sort(function (a, b) { return b.unis.length - a.unis.length; }).slice(0, 5);
+if (!groups.length) return '';
+groups.forEach(function (g) {
+g.unis.sort(function (a, b) { return b.avg - a.avg; });
+g.take = g.unis.slice(0, 2);
+});
+var H = Math.max(360, groups.length * 104 + 80);
+var midY = groups.map(function (g, i) {
+return groups.length === 1 ? H / 2 : 60 + i * (H - 120) / (groups.length - 1);
+});
+var edges = '', nodes = '';
+nodes += '<a class="graph-node" href="#/professions/' + h(p.slug) + '">' +
+'<rect x="14" y="' + (H / 2 - 34) + '" width="210" height="68" rx="12"></rect>' +
+'<text x="30" y="' + (H / 2 - 12) + '" class="g-k">ПРОФЕССИЯ</text>' +
+'<text x="30" y="' + (H / 2 + 8) + '">' + h(cut(p.title, 24)) + '</text>' +
+'<text x="30" y="' + (H / 2 + 25) + '" class="g-k">' + h(p.sphereCode + ' · ' + p.sphere) + '</text></a>';
+groups.forEach(function (g, i) {
+var y = midY[i];
+edges += '<path class="graph-edge" d="M224 ' + (H / 2) + ' C320 ' + (H / 2) + ', 330 ' + y + ', 420 ' + y + '"></path>';
+nodes += '<a class="graph-node" href="#/universities?q=' + encodeURIComponent(g.direction) + '">' +
+'<rect x="420" y="' + (y - 28) + '" width="216" height="56" rx="10"></rect>' +
+'<text x="434" y="' + (y - 10) + '" class="g-k">' + h(g.code) + ' · ' + g.unis.length + ' ' + plural(g.unis.length, 'вуз', 'вуза', 'вузов') + '</text>' +
+'<text x="434" y="' + (y + 9) + '">' + h(cut(g.direction, 28)) + '</text></a>';
+g.take.forEach(function (u, j) {
+var uy = Math.max(40, Math.min(H - 40, y + (j === 0 ? -20 : 20)));
+edges += '<path class="graph-edge" d="M636 ' + y + ' C690 ' + y + ', 690 ' + uy + ', 740 ' + uy + '"></path>';
+nodes += '<a class="graph-node" href="#/universities?q=' + encodeURIComponent(u.short) + '">' +
+'<rect x="740" y="' + (uy - 20) + '" width="190" height="40" rx="9"></rect>' +
+'<text x="752" y="' + (uy - 3) + '">' + h(cut(u.short, 20)) + '</text>' +
+'<text x="752" y="' + (uy + 13) + '" class="g-k">' + h(cut(u.city, 22)) + ' · ≈' + u.avg + '</text></a>';
+});
+});
+var list = '<div class="graph-list">' +
+'<div class="gl-group"><b>ПРОФЕССИЯ</b><p>' + h(p.title) + '</p></div>' +
+groups.map(function (g) {
+return '<div class="gl-group"><b>' + h(g.code) + '</b><p>' + h(g.direction) + '</p><div class="gl-unis">' +
+g.take.map(function (u) { return '<a href="#/universities?q=' + encodeURIComponent(u.short) + '">' + h(u.short) + ' · ≈' + u.avg + '</a>'; }).join('') +
+'</div></div>';
+}).join('') + '</div>';
+return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Маршрут</p>' +
+'<h2 class="sec">Профессия → специальность → вуз</h2></div>' +
+'<a class="sec-link" href="#/universities?q=' + encodeURIComponent(p.title) + '">Все программы →</a></div>' +
+'<div class="prof-graph"><svg viewBox="0 0 960 ' + H + '" role="img" aria-label="Граф связей профессии, специальностей и вузов">' +
+edges + nodes + '</svg></div>' + list +
+'<p class="source-note">Граф построен по программам атласа: показаны до пяти специальностей и до двух вузов для каждой. ' +
+'Толщина и порядок связей не означают рейтинг.</p></section>';
+}
+/* ---------- тепловая карта округов × сфер ---------- */
+var HEAT_GEOM = null;
+function heatMatrix() {
+var m = DISTRICTS.map(function () { return SPHERES.map(function () { return 0; }); });
+U.forEach(function (u) {
+var di = -1;
+for (var i = 0; i < DISTRICTS.length; i++) if (DISTRICTS[i].code === u.district) { di = i; break; }
+if (di < 0) return;
+(u.programs || []).forEach(function (pr) {
+var pp = PROF_BY_SLUG[pr.professionSlug];
+if (!pp) return;
+for (var j = 0; j < SPHERES.length; j++) if (SPHERES[j].code === pp.sphereCode) { m[di][j]++; break; }
+});
+});
+return m;
+}
+function drawHeatmap() {
+var canvas = document.getElementById('heatmap');
+if (!canvas) return;
+var wrap = canvas.parentNode;
+var W = Math.max(300, Math.floor(wrap.clientWidth || 600));
+var rows = DISTRICTS.length, cols = SPHERES.length;
+var padL = 86, padT = 46, cellH = 42;
+var cellW = Math.max(34, (W - padL - 6) / cols);
+var H = padT + rows * cellH + 34;
+var dpr = Math.min(2, window.devicePixelRatio || 1);
+canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+canvas.style.height = H + 'px';
+var ctx = canvas.getContext('2d');
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ctx.clearRect(0, 0, W, H);
+var m = heatMatrix();
+var max = 1;
+m.forEach(function (r) { r.forEach(function (v) { if (v > max) max = v; }); });
+var base = cssColor('--panel-2', '#162731');
+var hot = cssColor('--violet', '#5eead4');
+function rgb(s) {
+s = s.replace('#', '');
+if (s.length === 3) s = s.split('').map(function (c) { return c + c; }).join('');
+return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+}
+var b = rgb(base), hcol = rgb(hot);
+var ink = cssColor('--ink', '#f3fbfa');
+var ink3 = cssColor('--ink-3', '#839da1');
+ctx.font = '10px ui-monospace, monospace';
+ctx.textBaseline = 'middle';
+SPHERES.forEach(function (s, j) {
+ctx.fillStyle = ink3;
+ctx.textAlign = 'center';
+ctx.fillText(s.code, padL + j * cellW + cellW / 2, padT - 22);
+ctx.fillText(String(j + 1), padL + j * cellW + cellW / 2, padT - 8);
+});
+DISTRICTS.forEach(function (d, i) {
+var y = padT + i * cellH;
+ctx.fillStyle = ink3;
+ctx.textAlign = 'left';
+ctx.font = '10px ui-monospace, monospace';
+ctx.fillText(d.code, 2, y + cellH / 2);
+ctx.fillStyle = ink;
+ctx.font = '12px "Onest", system-ui, sans-serif';
+ctx.fillText(cut(d.short, 11), 32, y + cellH / 2);
+m[i].forEach(function (v, j) {
+var t = v / max;
+var r = Math.round(b[0] + (hcol[0] - b[0]) * t);
+var g = Math.round(b[1] + (hcol[1] - b[1]) * t);
+var bl = Math.round(b[2] + (hcol[2] - b[2]) * t);
+ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + bl + ')';
+ctx.fillRect(padL + j * cellW + 1, y + 1, cellW - 2, cellH - 2);
+ctx.fillStyle = t > 0.55 ? '#06201d' : ink;
+ctx.font = '11px ui-monospace, monospace';
+ctx.textAlign = 'center';
+ctx.fillText(String(v), padL + j * cellW + cellW / 2, y + cellH / 2);
+});
+});
+ctx.strokeStyle = 'rgba(131,157,161,.28)';
+ctx.lineWidth = 1;
+ctx.strokeRect(padL, padT, cols * cellW, rows * cellH);
+HEAT_GEOM = { padL: padL, padT: padT, cellW: cellW, cellH: cellH, W: W, H: H };
+}
+/* ---------- bubble-график: балл × рост × масштаб ---------- */
+var BUBBLE_GEOM = null;
+function sphereColor(code) {
+return {
+'D-01': '#5eead4', 'D-02': '#fbbf24', 'D-03': '#86efac',
+'D-04': '#fb7185', 'D-05': '#c4b5fd', 'D-06': '#7dd3fc'
+}[code] || '#5eead4';
+}
+function drawBubble() {
+var canvas = document.getElementById('bubbleChart');
+if (!canvas) return;
+var wrap = canvas.parentNode;
+var W = Math.max(300, Math.floor(wrap.clientWidth || 600));
+var H = W < 520 ? 340 : 430;
+var dpr = Math.min(2, window.devicePixelRatio || 1);
+canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+canvas.style.height = H + 'px';
+var ctx = canvas.getContext('2d');
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ctx.clearRect(0, 0, W, H);
+var items = P.map(function (p) {
+var mb = minBudget(p.slug);
+return { p: p, mb: mb, n: (PROG[p.slug] || []).length };
+}).filter(function (x) { return x.mb && x.n; });
+if (!items.length) return;
+var padL = 52, padR = 16, padT = 20, padB = 44;
+var xs = items.map(function (x) { return x.mb; });
+var ys = items.map(function (x) { return x.p.growth; });
+var xmin = Math.min.apply(null, xs) - 4, xmax = Math.max.apply(null, xs) + 4;
+var ymin = 0, ymax = Math.max.apply(null, ys) + 8;
+var plotW = W - padL - padR, plotH = H - padT - padB;
+function px(v) { return padL + (v - xmin) / (xmax - xmin) * plotW; }
+function py(v) { return padT + plotH - (v - ymin) / (ymax - ymin) * plotH; }
+var ink3 = cssColor('--ink-3', '#839da1');
+var ink = cssColor('--ink', '#f3fbfa');
+ctx.strokeStyle = 'rgba(131,157,161,.22)';
+ctx.fillStyle = ink3;
+ctx.font = '10px ui-monospace, monospace';
+ctx.textAlign = 'right';
+ctx.textBaseline = 'middle';
+for (var gy = 0; gy <= 4; gy++) {
+var vv = ymin + (ymax - ymin) * gy / 4;
+var yy = py(vv);
+ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W - padR, yy); ctx.stroke();
+ctx.fillText(Math.round(vv), padL - 8, yy);
+}
+ctx.textAlign = 'center';
+ctx.textBaseline = 'top';
+for (var gx = 0; gx <= 4; gx++) {
+var xv = xmin + (xmax - xmin) * gx / 4;
+ctx.fillText(Math.round(xv), px(xv), H - padB + 8);
+}
+ctx.fillStyle = ink3;
+ctx.font = '11px "Onest", system-ui, sans-serif';
+ctx.fillText('Минимальный балл на бюджет', padL + plotW / 2, H - 18);
+ctx.save();
+ctx.translate(14, padT + plotH / 2);
+ctx.rotate(-Math.PI / 2);
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.fillText('Рост вакансий к 2030, %', 0, 0);
+ctx.restore();
+var sorted = items.slice().sort(function (a, b) { return a.n - b.n; });
+BUBBLE_GEOM = { padL: padL, padT: padT, plotW: plotW, plotH: plotH, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, items: [] };
+sorted.forEach(function (x) {
+var r = 4 + Math.sqrt(x.n) * 1.15;
+var cx = px(x.mb), cy = py(x.p.growth);
+ctx.beginPath();
+ctx.arc(cx, cy, r, 0, Math.PI * 2);
+ctx.fillStyle = sphereColor(x.p.sphereCode) + '66';
+ctx.fill();
+ctx.strokeStyle = sphereColor(x.p.sphereCode);
+ctx.lineWidth = 1.4;
+ctx.stroke();
+BUBBLE_GEOM.items.push({ x: cx, y: cy, r: r, p: x.p, mb: x.mb, n: x.n });
+});
+var labels = items.slice().sort(function (a, b) { return b.p.index - a.p.index; }).slice(0, 6);
+ctx.font = '10px "Onest", system-ui, sans-serif';
+ctx.fillStyle = ink;
+ctx.textAlign = 'left';
+ctx.textBaseline = 'middle';
+labels.forEach(function (x) {
+var cx = px(x.mb), cy = py(x.p.growth);
+var r = 4 + Math.sqrt(x.n) * 1.15;
+ctx.fillText(cut(x.p.title, 18), cx + r + 4, cy);
+});
+}
+function chartTip(canvas, ev) {
+var tip = canvas.parentNode.querySelector('.chart-tip');
+if (!tip) return;
+var rect = canvas.getBoundingClientRect();
+var mx = (ev.clientX - rect.left) * (canvas.width / rect.width) / Math.min(2, window.devicePixelRatio || 1);
+var my = (ev.clientY - rect.top) * (canvas.height / rect.height) / Math.min(2, window.devicePixelRatio || 1);
+var html = '';
+if (canvas.id === 'heatmap' && HEAT_GEOM) {
+var g = HEAT_GEOM;
+var j = Math.floor((mx - g.padL) / g.cellW);
+var i = Math.floor((my - g.padT) / g.cellH);
+if (i >= 0 && i < DISTRICTS.length && j >= 0 && j < SPHERES.length) {
+var v = heatMatrix()[i][j];
+html = '<b>' + h(DISTRICTS[i].code + ' · ' + DISTRICTS[i].short) + '</b><br>' +
+h(SPHERES[j].code + ' · ' + SPHERES[j].name) + ': <b>' + v + '</b> ' + plural(v, 'программа', 'программы', 'программ');
+}
+} else if (canvas.id === 'bubbleChart' && BUBBLE_GEOM) {
+var best = null, bd = 1e9;
+BUBBLE_GEOM.items.forEach(function (it) {
+var d = Math.hypot(mx - it.x, my - it.y);
+if (d < it.r + 5 && d < bd) { bd = d; best = it; }
+});
+if (best) {
+html = '<b>' + h(best.p.title) + '</b><br>Индекс: ' + best.p.index + ' · рост: +' + best.p.growth + '%<br>' +
+'Мин. балл: ≈' + best.mb + ' · программ: ' + best.n;
+}
+}
+if (html) {
+tip.innerHTML = html;
+tip.hidden = false;
+var tw = tip.offsetWidth, th = tip.offsetHeight;
+var left = ev.clientX - rect.left + 12;
+var top = ev.clientY - rect.top - th - 10;
+if (left + tw > rect.width) left = ev.clientX - rect.left - tw - 12;
+if (top < 0) top = ev.clientY - rect.top + 14;
+tip.style.left = Math.max(4, left) + 'px';
+tip.style.top = top + 'px';
+} else {
+tip.hidden = true;
+}
+}
+function bindChart(canvas) {
+canvas.addEventListener('mousemove', function (e) { chartTip(canvas, e); });
+canvas.addEventListener('mouseleave', function () {
+var tip = canvas.parentNode.querySelector('.chart-tip');
+if (tip) tip.hidden = true;
+});
+}
+function bubbleSection() {
+return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Аналитика</p>' +
+'<h2 class="sec">Профессии: балл, рост и масштаб</h2></div><a class="sec-link" href="#/admission">История баллов →</a></div>' +
+'<div class="panel" style="padding:16px"><div class="chart-canvas-wrap"><canvas id="bubbleChart" aria-label="Bubble-график профессий: минимальный балл, рост вакансий и число программ"></canvas><div class="chart-tip" hidden></div></div>' +
+'<div class="chart-legend">' + SPHERES.map(function (s) {
+return '<span><i style="background:' + sphereColor(s.code) + '"></i>' + h(s.code + ' · ' + s.name) + '</span>';
+}).join('') + '<span>Размер круга — число программ</span></div></div>' +
+'<p class="source-note">По горизонтали — минимальный проходной балл на бюджет по программам профессии, по вертикали — рост вакансий к 2030 году. ' +
+'Показаны профессии, для которых в атласе есть программы и баллы.</p></section>';
+}
+function heatSection() {
+return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Аналитика</p>' +
+'<h2 class="sec">Тепловая карта: округа и сферы</h2></div><a class="sec-link" href="#/admission">Бюджетные места →</a></div>' +
+'<div class="panel" style="padding:16px"><div class="chart-canvas-wrap"><canvas id="heatmap" aria-label="Тепловая карта числа программ по федеральным округам и сферам"></canvas><div class="chart-tip" hidden></div></div>' +
+'<div class="chart-legend">' + SPHERES.map(function (s, i) {
+return '<span><b class="mono">' + (i + 1) + '</b> ' + h(s.code + ' · ' + s.name) + '</span>';
+}).join('') + '</div></div>' +
+'<p class="source-note">Ячейка показывает число программ атласа в округе для соответствующей сферы. ' +
+'Чем светлее ячейка, тем больше предложений. Наведите курсор, чтобы увидеть точное значение.</p></section>';
+}
+/* ---------- инициализация ---------- */
+injectTools();
+applyTheme();
+updateFooterCounts();
+var resizeTimer2 = 0;
+window.addEventListener('resize', function () {
+clearTimeout(resizeTimer2);
+resizeTimer2 = setTimeout(function () { placeTools(); drawHeatmap(); drawBubble(); }, 140);
+});
+if ('serviceWorker' in navigator && !window.__ATLAS_STANDALONE__ && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+window.addEventListener('load', function () {
+navigator.serviceWorker.register('sw.js').catch(function () {});
+});
+}
 window.addEventListener('hashchange', route);
 try {
 var pagesPath = sessionStorage.getItem('atlas:redirect');
 sessionStorage.removeItem('atlas:redirect');
-if (pagesPath && /^\/(map|compare|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(pagesPath)) {
+if (window.__ATLAS_STANDALONE__) {
+/* В одностраничной копии адрес всегда остаётся на текущем файле. */
+} else if (pagesPath && /^\/(map|compare|admission|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(pagesPath)) {
 history.replaceState(null, '', '/atlas-2030' + pagesPath);
 } else if (!location.hash && location.pathname.indexOf('/atlas-2030/') === 0) {
 var directPath = location.pathname.slice('/atlas-2030'.length) || '/';
-if (/^\/(map|compare|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
+if (/^\/(map|compare|admission|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
 }
 } catch (e) {}
 document.addEventListener('click', function (e) {
 var a = e.target.closest && e.target.closest('a[href^="#/"]');
 if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
 var dest = a.getAttribute('href').slice(1);
-if (!/^\/(?:map|compare|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(dest) && dest !== '/') return;
+if (!/^\/(?:map|compare|admission|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(dest) && dest !== '/') return;
 e.preventDefault();
 history.pushState(null, '', '/atlas-2030' + (dest === '/' ? '/' : dest));
 route(); window.scrollTo(0, 0);
