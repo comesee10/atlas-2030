@@ -400,6 +400,53 @@ if (typeof s === 'string' && D[s] && compare.size < 3) compare.add(s);
 function saveCompare() {
 try { localStorage.setItem('atlas:compare', JSON.stringify(Array.from(compare))); } catch (e) {}
 }
+/* Избранное не ограничено тремя позициями и хранится отдельно от сравнения. */
+var favorites = [];
+try {
+JSON.parse(localStorage.getItem('atlas:favorites') || '[]').forEach(function (s) {
+if (typeof s === 'string' && PROF_BY_SLUG[s] && favorites.indexOf(s) < 0) favorites.push(s);
+});
+} catch (e) {}
+function saveFavorites() {
+try { localStorage.setItem('atlas:favorites', JSON.stringify(favorites)); } catch (e) {}
+}
+function isFavorite(slug) { return favorites.indexOf(slug) >= 0; }
+function updateFavoritesUI() {
+var n = favorites.length;
+var counter = document.getElementById('favN');
+if (counter) { counter.hidden = n === 0; counter.textContent = n; }
+var openBtn = document.getElementById('openFav');
+if (openBtn) {
+openBtn.setAttribute('aria-label', n ? 'Избранное: ' + n + ' ' + plural(n, 'профессия', 'профессии', 'профессий') : 'Избранное');
+openBtn.classList.toggle('has', n > 0);
+}
+document.querySelectorAll('[data-fav]').forEach(function (b) {
+var on = isFavorite(b.getAttribute('data-fav'));
+var title = b.getAttribute('data-title') || '';
+b.setAttribute('aria-pressed', on ? 'true' : 'false');
+b.classList.toggle('is-on', on);
+b.setAttribute('aria-label', (on ? 'Убрать из избранного: ' : 'Добавить в избранное: ') + title);
+b.setAttribute('title', on ? 'В избранном' : 'В избранное');
+var txt = b.querySelector('.fav-txt');
+if (txt) txt.textContent = on ? 'В избранном' : 'В избранное';
+});
+}
+function toggleFavorite(slug) {
+if (!PROF_BY_SLUG[slug]) return;
+var i = favorites.indexOf(slug);
+if (i >= 0) { favorites.splice(i, 1); toast('Убрано из избранного'); }
+else { favorites.push(slug); toast('Добавлено в избранное'); }
+saveFavorites();
+updateFavoritesUI();
+if (parseHash().path === '/favorites') renderFavorites();
+}
+document.addEventListener('click', function (e) {
+var b = e.target.closest && e.target.closest('[data-fav]');
+if (!b) return;
+e.preventDefault();
+e.stopPropagation();
+toggleFavorite(b.getAttribute('data-fav'));
+});
 var cmpBar = document.createElement('div');
 cmpBar.className = 'cmp-bar';
 cmpBar.innerHTML = '<span class="n"><b id="cmpN">0</b> выбрано</span>' +
@@ -710,6 +757,8 @@ navEl.classList.remove('open');
 if (burger) { burger.setAttribute('aria-expanded', 'false'); burger.setAttribute('aria-label', 'Открыть меню'); }
 }
 navEl.addEventListener('click', function (e) { if (e.target.closest('a')) closeNav(); });
+var openFavBtn = document.getElementById('openFav');
+if (openFavBtn) openFavBtn.addEventListener('click', function () { location.hash = '#/favorites'; });
 function setNav(path) {
 document.querySelectorAll('.nav a[data-route]').forEach(function (a) {
 var r = a.getAttribute('data-route');
@@ -721,8 +770,8 @@ var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
 var PAGE_TITLES = {
 quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
-admission: 'Бюджетные места', map: 'Карта', compare: 'Сравнение',
-about: 'О проекте', methodology: 'Методология'
+admission: 'Бюджетные места', calendar: 'Календарь приёма', favorites: 'Избранное',
+map: 'Карта', compare: 'Сравнение', about: 'О проекте', methodology: 'Методология'
 };
 function absUrl(u) {
 if (!u || u === '#/') return SITE_URL;
@@ -841,6 +890,15 @@ SPECIALTIES.length + ' специальностей с кодами, набор�
 g.push(datasetLd('Регионы и вузы — Профессии·2030',
 REGIONS.length + ' регионов и ' + DISTRICTS.length + ' федеральных округов с вузами, программами и баллами.',
 'регионы России, федеральные округа, вузы по регионам'));
+} else if (path === '/calendar') {
+g.push({
+'@type': 'WebPage',
+name: 'Календарь приёмной кампании 2027 — Профессии·2030',
+description: 'Ориентировочные этапы поступления в вуз после 11 класса и в колледж после 9 класса: подготовка, экзамены, подача документов и зачисление.',
+url: absUrl('#/calendar'),
+inLanguage: 'ru',
+isAccessibleForFree: true
+});
 } else if (path === '/quiz') {
 g.push({
 '@type': 'Course',
@@ -932,6 +990,8 @@ var ROUTES = [
 [/^\/professions\/([^/]+)$/, function (m) { renderProfession(decodeURIComponent(m[1])); }],
 [/^\/universities$/, renderUniversities],
 [/^\/admission$/, renderAdmission],
+[/^\/calendar$/, renderCalendar],
+[/^\/favorites$/, renderFavorites],
 [/^\/colleges$/, renderColleges],
 [/^\/colleges\/([^/]+)$/, function (m) { renderCollege(decodeURIComponent(m[1])); }],
 [/^\/specialties$/, renderSpecialties],
@@ -940,7 +1000,7 @@ var ROUTES = [
 [/^\/methodology$/, renderMethodology]
 ];
 function route() {
-if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
+if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
 var legacyRoute = location.hash.slice(1);
 history.replaceState(null, '', '/atlas-2030' + legacyRoute);
 }
@@ -1548,13 +1608,19 @@ palClose();
 function statCard(v, k) {
 return '<div class="stat"><div class="v" data-count="' + v + '">' + v + '</div><div class="k">' + k + '</div></div>';
 }
+var FAV_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.9z"/></svg>';
+function favButton(p, cls) {
+var on = isFavorite(p.slug);
+return '<button class="fav-btn' + (cls ? ' ' + cls : '') + '" type="button" data-fav="' + h(p.slug) + '" data-title="' + h(p.title) + '" aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + (on ? 'Убрать из избранного: ' : 'Добавить в избранное: ') + h(p.title) + '" title="' + (on ? 'В избранном' : 'В избранное') + '">' + FAV_ICON + '</button>';
+}
 function fcard(p) {
-return '<a class="panel fcard reveal" href="#/professions/' + p.slug + '">' +
+return '<div class="fcard-wrap reveal">' +
+'<a class="panel fcard" href="#/professions/' + p.slug + '">' +
 '<div class="top"><span class="code">' + h(p.sphereCode) + ' · ' + h(p.sphere) + '</span><span class="idx">' + p.index + '</span></div>' +
 '<h3>' + h(p.title) + '</h3>' +
 '<p>' + h(p.desc) + '</p>' +
 '<div class="bot"><span class="g">+' + p.growth + '% к 2030</span><span>' + h(p.salary) + '</span></div>' +
-'</a>';
+'</a>' + favButton(p) + '</div>';
 }
 function uniMini(u) {
 return '<a class="panel uni reveal" href="#/universities?q=' + encodeURIComponent(u.short) + '">' +
@@ -1720,9 +1786,10 @@ return '<li class="prof-row">' +
 '<div class="metrics"><span class="idx" title="Индекс спроса">' + p.index + '</span>' +
 '<span class="gr" title="Рост вакансий к 2030">+' + p.growth + '%</span>' +
 '<span class="sal">' + h(p.salary) + '</span></div></div>' +
+'<div class="row-acts">' + favButton(p, 'fav-row') +
 '<button class="cmp" data-slug="' + p.slug + '" aria-pressed="false" aria-label="Сравнить: ' + h(p.title) + '" title="Добавить к сравнению">' +
 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>' +
-'</button></li>';
+'</button></div></li>';
 }
 function parseExamParam(str) {
 if (!str) return [];
@@ -2035,6 +2102,186 @@ var p = new URLSearchParams();
 if (st.sort !== 'places') p.set('sort', st.sort);
 if (e.target.value) p.set('district', e.target.value);
 location.hash = '#/admission' + (p.toString() ? '?' + p.toString() : '');
+});
+}
+function renderCalendar(m, q) {
+var level = q.get('level') === '9' ? '9' : '11';
+setTitle('Календарь приёмной кампании — Профессии·2030');
+var CAL_11 = [
+{ ym: '2026-09', month: 'Сентябрь 2026', items: [
+'Определить обязательные и профильные предметы ЕГЭ, сверить их с перечнем вступительных испытаний на сайтах вузов.',
+'Составить предварительный список из 5–7 вузов и 2–3 направлений в каждом.'
+] },
+{ ym: '2026-10', month: 'Октябрь 2026', items: [
+'Посетить дни открытых дверей и уточнить правила приёма, сроки и порядок учёта индивидуальных достижений.',
+'Начать подготовку к профильным экзаменам по выбранным направлениям.'
+] },
+{ ym: '2026-11', month: 'Ноябрь 2026', items: [
+'Написать итоговое сочинение в основной срок; уточнить, учитывает ли его выбранный вуз.',
+'Пройти первые пробные экзамены и зафиксировать дефицит баллов.'
+] },
+{ ym: '2026-12', month: 'Декабрь 2026', items: [
+'Получить допуск к ЕГЭ по итогам итогового сочинения.',
+'Проверить сроки регистрации на ЕГЭ: обычно заявление подают до 1 февраля, точную дату уточнять в школе.'
+] },
+{ ym: '2027-01', month: 'Январь 2027', items: [
+'Подать заявление на ЕГЭ с окончательным набором предметов.',
+'Сверить перечень экзаменов для каждого направления и при необходимости добавить профильную математику.'
+] },
+{ ym: '2027-02', month: 'Февраль 2027', items: [
+'Завершить выбор вузов и направлений.',
+'Сравнить проходные баллы 2024–2025 годов и оценить шансы на бюджет.'
+] },
+{ ym: '2027-03', month: 'Март 2027', items: [
+'Пройти пробные экзамены по всем выбранным предметам.',
+'Уточнить особые права, олимпиады и порядок учёта индивидуальных достижений.'
+] },
+{ ym: '2027-04', month: 'Апрель 2027', items: [
+'Проверить расписание ЕГЭ и правила подачи документов в каждом вузе.',
+'Подготовить копии документов и портфолио.'
+] },
+{ ym: '2027-05', month: 'Май 2027', items: [
+'Завершить подготовку и уточнить даты начала приёма документов.',
+'Проверить работу личных кабинетов приёмных комиссий.'
+] },
+{ ym: '2027-06', month: 'Июнь 2027', items: [
+'Сдать ЕГЭ и получить результаты.',
+'Подать документы в выбранные вузы; традиционно приём стартует с 20 июня, точные даты устанавливает вуз.'
+] },
+{ ym: '2027-07', month: 'Июль 2027', items: [
+'Следить за конкурсными списками и сроками согласия на зачисление.',
+'При необходимости пройти дополнительные вступительные испытания.'
+] },
+{ ym: '2027-08', month: 'Август 2027', items: [
+'Дождаться приказа о зачислении и проверить его на сайте вуза.',
+'При наличии мест участвовать в дополнительном наборе; подготовить документы к началу учёбы.'
+] }
+];
+var CAL_9 = [
+{ ym: '2026-09', month: 'Сентябрь 2026', items: [
+'Выбрать направление СПО и проверить перечень специальностей в колледжах.',
+'Уточнить, какие предметы ОГЭ и средний балл аттестата нужны для поступления.'
+] },
+{ ym: '2026-10', month: 'Октябрь 2026', items: [
+'Посетить дни открытых дверей колледжей.',
+'Сравнить условия приёма, наличие общежития и сроки обучения.'
+] },
+{ ym: '2026-11', month: 'Ноябрь 2026', items: [
+'Начать подготовку к ОГЭ по обязательным и профильным предметам.',
+'Уточнить, учитывает ли колледж портфолио и индивидуальные достижения.'
+] },
+{ ym: '2026-12', month: 'Декабрь 2026', items: [
+'Проверить правила приёма и перечень документов на сайтах колледжей.',
+'Собрать документы о достижениях, если они учитываются.'
+] },
+{ ym: '2027-01', month: 'Январь 2027', items: [
+'Зарегистрироваться на ОГЭ; точные сроки уточнять в школе.',
+'Определить 3–5 колледжей и специальностей для подачи документов.'
+] },
+{ ym: '2027-02', month: 'Февраль 2027', items: [
+'Сравнить средние баллы аттестата и конкурсные списки прошлых лет.',
+'Уточнить, есть ли вступительные испытания или собеседование.'
+] },
+{ ym: '2027-03', month: 'Март 2027', items: [
+'Пройти пробные ОГЭ и проверить готовность по профильным предметам.',
+'Уточнить порядок подачи документов и график работы приёмной комиссии.'
+] },
+{ ym: '2027-04', month: 'Апрель 2027', items: [
+'Подготовить паспорт, аттестат, результаты ОГЭ и копии документов.',
+'Проверить требования к медицинским справкам и портфолио.'
+] },
+{ ym: '2027-05', month: 'Май 2027', items: [
+'Сдать ОГЭ и получить результаты.',
+'Уточнить даты начала приёма и способы подачи документов.'
+] },
+{ ym: '2027-06', month: 'Июнь 2027', items: [
+'Подать документы в выбранные колледжи; традиционно приём стартует с 20 июня, точные даты устанавливает колледж.',
+'Сохранить номера заявлений и подтверждения отправки документов.'
+] },
+{ ym: '2027-07', month: 'Июль 2027', items: [
+'Следить за конкурсными списками и сроками подтверждения согласия.',
+'При необходимости пройти собеседование или дополнительное испытание.'
+] },
+{ ym: '2027-08', month: 'Август 2027', items: [
+'Дождаться приказа о зачислении.',
+'При наличии мест участвовать в дополнительном наборе; подготовить документы к учёбе.'
+] }
+];
+var data = level === '9' ? CAL_9 : CAL_11;
+var now = new Date();
+function pad2(n) { return n < 10 ? '0' + n : String(n); }
+var nowYm = now.getFullYear() + '-' + pad2(now.getMonth() + 1);
+var cards = data.map(function (x, i) {
+var isNow = x.ym === nowYm;
+return '<article class="cal-card' + (isNow ? ' is-now' : '') + '">' +
+'<div class="cal-top"><span class="cal-num">' + pad2(i + 1) + '</span><span class="cal-month">' + h(x.month) + '</span>' +
+(isNow ? '<span class="cal-now">сейчас</span>' : '') + '</div>' +
+'<ul>' + x.items.map(function (t) { return '<li>' + h(t) + '</li>'; }).join('') + '</ul></article>';
+}).join('');
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел V · Приём</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Календарь <em>приёмной кампании</em></h1>' +
+'<p class="lead">Ориентировочная последовательность действий для поступления в 2027 году. Точные даты, перечень документов и правила устанавливает вуз или колледж — проверяйте их на сайте приёмной комиссии.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Подобрать программы</a>' +
+'<a class="btn" href="#/admission">Бюджетные места</a>' +
+'<a class="btn" href="#/universities">Вузы и баллы</a></div>' +
+'</section>' +
+'<div class="cal-tabs" role="group" aria-label="Уровень поступления">' +
+'<button type="button" data-cal-tab="11" aria-pressed="' + (level === '11' ? 'true' : 'false') + '">После 11 класса</button>' +
+'<button type="button" data-cal-tab="9" aria-pressed="' + (level === '9' ? 'true' : 'false') + '">После 9 класса</button>' +
+'</div>' +
+'<div class="tip"><b>Как пользоваться календарём.</b> Этапы расположены по месяцам учебного года. Даты в разных вузах могут отличаться: сверяйте их с правилами приёма и не ориентируйтесь только на этот список.</div>' +
+'<div class="cal-grid">' + cards + '</div>' +
+'<section class="cal-extra">' +
+'<div class="panel cal-panel"><p class="label">Что подготовить заранее</p><ul class="cal-check">' +
+'<li>Паспорт и СНИЛС, аттестат или его копию.</li>' +
+'<li>Результаты ЕГЭ или ОГЭ, документы о льготах и индивидуальных достижениях.</li>' +
+'<li>Список вузов или колледжей с направлениями и условиями приёма.</li>' +
+'<li>Логины и пароли от личных кабинетов приёмных комиссий.</li>' +
+'</ul></div>' +
+'<div class="panel cal-panel"><p class="label">Как не пропустить срок</p><ul class="cal-check">' +
+'<li>Сверяйте даты на сайте каждого вуза или колледжа, а не только в справочниках.</li>' +
+'<li>Проверяйте часовой пояс и время закрытия приёма документов.</li>' +
+'<li>Сохраняйте подтверждения отправки документов и номера заявлений.</li>' +
+'<li>Уточняйте в приёмной комиссии спорные формулировки и особые права.</li>' +
+'</ul></div>' +
+'</section>' +
+'<p class="mono tiny" style="margin-top:18px;color:var(--ink-4)">Календарь носит ориентировочный характер и не заменяет правила приёма. Актуальные сроки публикуют приёмные комиссии.</p>' +
+'</div>';
+document.querySelectorAll('[data-cal-tab]').forEach(function (b) {
+b.addEventListener('click', function () {
+var next = b.getAttribute('data-cal-tab');
+if (next === level) return;
+location.hash = '#/calendar' + (next === '9' ? '?level=9' : '');
+});
+});
+}
+function renderFavorites() {
+setTitle('Избранное — Профессии·2030');
+var list = favorites.map(function (slug) { return PROF_BY_SLUG[slug]; }).filter(Boolean);
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел · Избранное</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Избранные <em>профессии</em></h1>' +
+'<p class="lead">Профессии, отмеченные звёздочкой. Список хранится только в этом браузере и не ограничен по количеству; сравнение по-прежнему вмещает до трёх позиций.</p>' +
+(list.length ? '<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Открыть каталог</a>' +
+'<button class="btn btn-sm" type="button" id="favClear">Очистить избранное</button></div>' : '') +
+'</section>' +
+(list.length
+? '<div class="fgrid fav-grid">' + list.map(fcard).join('') + '</div>' +
+'<p class="mono tiny" style="margin-top:16px;color:var(--ink-4)">' + list.length + ' ' +
+plural(list.length, 'профессия', 'профессии', 'профессий') + ' в избранном. Отметки сохраняются после перезагрузки страницы.</p>'
+: '<div class="empty"><b>Пока пусто</b>Добавляйте профессии звёздочкой в каталоге или на странице профессии. <a href="#/professions">Перейти в каталог</a></div>') +
+'</div>';
+var clear = document.getElementById('favClear');
+if (clear) clear.addEventListener('click', function () {
+if (!favorites.length) return;
+favorites.length = 0;
+saveFavorites();
+updateFavoritesUI();
+renderFavorites();
+toast('Избранное очищено');
 });
 }
 function renderUniversities(m, q) {
@@ -2494,6 +2741,46 @@ if (targetUrl.origin !== location.origin) a.rel = 'noopener noreferrer';
 } catch (e) { a.removeAttribute('href'); }
 });
 }
+function salaryChartHtml(list) {
+var rows = [];
+Array.prototype.forEach.call(list.children, function (li) {
+if (li.tagName !== 'LI' || !li.classList.contains('career')) return;
+var ps = Array.prototype.filter.call(li.children, function (x) { return x.tagName === 'P'; });
+if (ps.length < 3) return;
+var stage = ps[0].textContent.trim();
+var role = ps[1].textContent.trim();
+var pay = ps[2].textContent.trim();
+var nums = pay.match(/\d+/g);
+if (!nums || !nums.length) return;
+var vals = nums.map(function (n) { return parseInt(n, 10); }).filter(function (n) { return n > 0; });
+if (!vals.length) return;
+rows.push({
+stage: stage,
+role: role,
+pay: pay,
+min: Math.min.apply(null, vals),
+max: Math.max.apply(null, vals)
+});
+});
+if (rows.length < 2) return '';
+var top = Math.max.apply(null, rows.map(function (r) { return r.max; }));
+top = Math.max(50, Math.ceil(top / 50) * 50);
+var bars = rows.map(function (r) {
+var left = r.min / top * 100;
+var width = Math.max((r.max - r.min) / top * 100, 1.5);
+var label = r.pay.replace('/мес', '').replace(/\s*тыс\.\s*₽/, '');
+return '<div class="salary-row">' +
+'<div class="salary-meta"><span class="salary-stage">' + h(r.stage) + '</span><span class="salary-role">' + h(r.role) + '</span></div>' +
+'<div class="salary-track" aria-hidden="true"><span class="salary-fill" style="left:' + left.toFixed(1) + '%;width:' + width.toFixed(1) + '%"></span></div>' +
+'<span class="salary-val">' + h(label) + '</span></div>';
+}).join('');
+var aria = rows.map(function (r) { return r.stage + ': ' + r.role + ', ' + r.pay; }).join('. ');
+return '<div class="salary-chart" role="img" aria-label="' + h('Зарплаты по этапам карьеры. ' + aria) + '">' +
+'<div class="salary-head"><p class="label">Зарплата по этапам карьеры</p><span class="mono tiny">0–' + top + ' тыс. ₽/мес</span></div>' +
+'<div class="salary-rows">' + bars + '</div>' +
+'<p class="salary-note">Ориентировочные диапазоны из описания профессии. Фактическая зарплата зависит от региона, компании и опыта.</p>' +
+'</div>';
+}
 function prepareRich(root) {
 // Content is already reduced to the strict b/i/a allowlist by sanitizeRichHtml.
 rewriteLinks(root);
@@ -2512,6 +2799,12 @@ if (f && f.nodeType === 3) f.nodeValue = f.nodeValue.replace(/^\s*—\s*/, '');
 li.querySelectorAll('a').forEach(function (a) {
 if (a.querySelector('p')) a.classList.add('stack');
 });
+});
+root.querySelectorAll('ol').forEach(function (ol) {
+if (ol.nextElementSibling && ol.nextElementSibling.classList.contains('salary-chart')) return;
+if (!ol.querySelector('li.career')) return;
+var chart = salaryChartHtml(ol);
+if (chart) ol.insertAdjacentHTML('afterend', chart);
 });
 root.querySelectorAll('section').forEach(function (sec) {
 var divs = Array.prototype.filter.call(sec.children, function (x) { return x.tagName === 'DIV'; });
@@ -2671,6 +2964,7 @@ if (c) cityCount[c] = (cityCount[c] || 0) + 1;
 var topCities = Object.keys(cityCount).sort(function (a, b) { return cityCount[b] - cityCount[a]; }).slice(0, 5);
 var similar = (d.similar || []).filter(function (s) { return D[s.slug]; }).slice(0, 5);
 var inCmp = compare.has(p.slug);
+var inFav = isFavorite(p.slug);
 app.innerHTML = '<div class="view">' +
 '<header class="detail-head">' +
 '<p class="eyebrow" style="margin-top:18px">' + h(p.sphereCode) + ' · ' + h(p.sphere) + '</p>' +
@@ -2680,6 +2974,8 @@ app.innerHTML = '<div class="view">' +
 '<a class="btn btn-primary btn-sm" href="#/quiz">Проверить шансы</a>' +
 '<a class="btn btn-sm" href="#/professions?sphere=' + h(p.sphereCode) + '">Ещё в этой сфере</a>' +
 '<button class="btn btn-sm" id="addCmp" aria-pressed="' + (inCmp ? 'true' : 'false') + '">' + (inCmp ? 'В сравнении ✓' : 'Добавить к сравнению') + '</button>' +
+'<button class="btn btn-sm fav-detail" type="button" data-fav="' + h(p.slug) + '" data-title="' + h(p.title) + '" aria-pressed="' + (inFav ? 'true' : 'false') + '">' +
+FAV_ICON + '<span class="fav-txt">' + (inFav ? 'В избранном' : 'В избранное') + '</span></button>' +
 '</div>' +
 '</header>' +
 '<div class="detail-body">' +
@@ -4073,18 +4369,18 @@ var pagesPath = sessionStorage.getItem('atlas:redirect');
 sessionStorage.removeItem('atlas:redirect');
 if (window.__ATLAS_STANDALONE__) {
 /* В одностраничной копии адрес всегда остаётся на текущем файле. */
-} else if (pagesPath && /^\/(map|compare|admission|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(pagesPath)) {
+} else if (pagesPath && /^\/(map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(pagesPath)) {
 history.replaceState(null, '', '/atlas-2030' + pagesPath);
 } else if (!location.hash && location.pathname.indexOf('/atlas-2030/') === 0) {
 var directPath = location.pathname.slice('/atlas-2030'.length) || '/';
-if (/^\/(map|compare|admission|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
+if (/^\/(map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
 }
 } catch (e) {}
 document.addEventListener('click', function (e) {
 var a = e.target.closest && e.target.closest('a[href^="#/"]');
 if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
 var dest = a.getAttribute('href').slice(1);
-if (!/^\/(?:map|compare|admission|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(dest) && dest !== '/') return;
+if (!/^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(dest) && dest !== '/') return;
 e.preventDefault();
 history.pushState(null, '', '/atlas-2030' + (dest === '/' ? '/' : dest));
 route(); window.scrollTo(0, 0);
@@ -4094,5 +4390,6 @@ if ((!location.hash || location.hash === '#') && (location.pathname === '/' || l
 history.replaceState(null, '', '#/');
 }
 updateChoice();
+updateFavoritesUI();
 route();
 })();
