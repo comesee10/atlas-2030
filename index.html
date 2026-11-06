@@ -33,7 +33,7 @@
 <meta name="twitter:title" content="Профессии·2030 — атлас востребованных профессий">
 <meta name="twitter:description" content="Опросник, профессии, вузы и колледжи России с маршрутами поступления.">
 <meta name="twitter:image" content="https://comesee10.github.io/atlas-2030/og.png">
-<link rel="stylesheet" href="styles.css?v=20261104-7">
+<link rel="stylesheet" href="styles.css?v=20261104-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none';">
 <script type="application/ld+json">
 {
@@ -91,10 +91,15 @@
       <a href="#/specialties" data-route="/specialties">Специальности</a>
       <a href="#/universities" data-route="/universities">Вузы</a>
       <a href="#/colleges" data-route="/colleges">Колледжи</a>
+      <a href="#/calendar" data-route="/calendar">Календарь</a>
       <a href="#/regions" data-route="/regions">Регионы</a>
     </nav>
 
     <div class="hdr-actions">
+      <button class="search-btn fav-open" id="openFav" aria-label="Избранное" title="Избранное">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.9z"/></svg>
+        <span class="fav-count" id="favN" hidden>0</span>
+      </button>
       <button class="search-btn choice-btn" id="openChoice" aria-label="Мой выбор" title="Мой выбор" aria-haspopup="dialog">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
         <span>Мой выбор</span>
@@ -141,6 +146,8 @@
       <a href="#/specialties">Специальности</a>
       <a href="#/universities">Вузы</a>
       <a href="#/admission">Бюджетные места</a>
+      <a href="#/calendar">Календарь приёма</a>
+      <a href="#/favorites">Избранное</a>
       <a href="#/map">Карта округов</a>
       <a href="#/compare">Сравнение</a>
       <a href="#/colleges">Колледжи</a>
@@ -176,6 +183,6 @@
 <script defer src="data-universities-2.js?v=20261104-1"></script>
 <script defer src="data-universities-3.js?v=20261104-1"></script>
 <script defer src="catalog-expansion.js?v=20261104-1"></script>
-<script defer src="app.js?v=20261104-7"></script>
+<script defer src="app.js?v=20261104-8"></script>
 </body>
 </html>
