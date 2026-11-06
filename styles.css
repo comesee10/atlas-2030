@@ -78,7 +78,7 @@ border-bottom:1px solid var(--rule);
 .hdr-in{display:flex;align-items:center;gap:18px;height:64px}
 .brand{display:flex;align-items:baseline;gap:10px;flex-shrink:0}
 .brand-name{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:-.01em}
-.brand-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.brand-sub{display:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
 .nav{display:flex;gap:0;margin-left:auto}
 .nav a{
 padding:9px 9px;font-size:13px;color:var(--ink-2);border-radius:6px;
@@ -87,7 +87,7 @@ white-space:nowrap;
 }
 .nav a:hover{color:var(--ink);background:rgba(167,139,250,.09)}
 .nav a[aria-current="page"]{color:var(--violet);background:rgba(167,139,250,.12)}
-.hdr-actions{display:flex;align-items:center;gap:8px;margin-left:8px}
+.hdr-actions{display:flex;align-items:center;gap:8px;margin-left:8px;flex-shrink:0}
 .search-btn{
 display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 11px;
 border:1px solid var(--rule-2);border-radius:7px;color:var(--ink-3);font-size:13px;
@@ -525,8 +525,9 @@ transform:skewX(-18deg);pointer-events:none;
 /* Compact header for narrow desktops: labels of search/choice collapse to icons. */
 @media (max-width:1400px) and (min-width:1100px){
 .brand-sub{display:none}
-.nav a{padding:9px 8px;font-size:13px}
-.hdr-actions{gap:6px}
+.hdr-in{gap:14px}
+.nav a{padding:9px 7px;font-size:13px}
+.hdr-actions{gap:4px}
 }
 @media (max-width:1240px) and (min-width:1100px){
 .search-btn span,.search-btn kbd{display:none}
@@ -1197,8 +1198,11 @@ table.adm-table td:nth-child(7){display:flex;align-items:center;gap:10px}
 table.adm-table td .code{font-size:10px;line-height:1.4}
 }
 /* ---- Insights: cartogram, charts, graph, compare tabs ---- */
-.atlas-tools{display:flex;align-items:center;gap:6px;margin-left:8px}
-.atlas-tools a,.atlas-tools button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 9px;border:1px solid var(--rule-2);border-radius:6px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3);background:transparent;cursor:pointer;text-decoration:none}
+.atlas-tools{display:flex;align-items:center;gap:6px;margin-left:8px;flex-shrink:0}
+.atlas-tools a,.atlas-tools button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 9px;border:1px solid var(--rule-2);border-radius:6px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3);background:transparent;cursor:pointer;text-decoration:none;flex:0 0 auto}
+.atlas-tools button{width:34px;min-width:34px;padding:0;justify-content:center}
+.atlas-tools .tt-ico{display:inline-flex;align-items:center;justify-content:center;flex:none;width:14px;height:14px}
+.atlas-tools .tt-ico svg{display:block;flex:none;width:14px;height:14px}
 .atlas-tools a:hover,.atlas-tools button:hover{border-color:var(--violet);color:var(--ink);background:rgba(94,234,212,.08)}
 .uni-places{margin-top:10px;color:var(--ink-3);line-height:1.5}
 .uni-places a{color:var(--violet)}
@@ -1281,7 +1285,7 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 body{overflow-x:clip}
 .atlas-tools .tt-label{display:none}
 .atlas-tools.in-nav{display:flex;flex-wrap:wrap;gap:8px;width:100%;margin:10px 0 0;padding:10px 8px 0;border-top:1px solid rgba(44,36,56,.5)}
-.atlas-tools.in-nav a,.atlas-tools.in-nav button{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 12px;font-size:11px;letter-spacing:.04em}
+.atlas-tools.in-nav a,.atlas-tools.in-nav button{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;width:auto;min-width:0;padding:0 12px;font-size:11px;letter-spacing:.04em}
 .atlas-tools.in-nav .tt-label{display:inline}
 .uni-brand{min-width:0;flex:1 1 220px;flex-wrap:wrap}
 .uni-brand h3,.uni .full{min-width:0;overflow-wrap:anywhere}

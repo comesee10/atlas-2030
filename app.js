@@ -2283,6 +2283,9 @@ updateFavoritesUI();
 renderFavorites();
 toast('Избранное очищено');
 });
+/* Прямой перерендер после удаления звезды не проходит через route(),
+   поэтому заново подключаем появление карточек .reveal. */
+initReveal();
 }
 function renderUniversities(m, q) {
 var st = { q: q.get('q') || '', district: q.get('district') || '', region: q.get('region') || '', city: q.get('city') || '', mode: q.get('mode') || '', format: q.get('format') || '', dorm: q.get('dorm') || '', exam: q.get('exam') || '', minAvg: parseInt(q.get('minAvg') || '0', 10), sort: q.get('sort') || 'avg' };
