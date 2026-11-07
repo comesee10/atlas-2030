@@ -113,6 +113,52 @@ var SPHERE_DESC = {
 'D-05': 'Люди, право, экономика',
 'D-06': 'Тексты, медиа, перевод'
 };
+/* ---------- фотобанк сфер ----------
+   Фотографии лежат рядом с сайтом и подключаются только в полной версии:
+   в standalone-файле их нет, поэтому там остаётся градиентная заливка. */
+var ASSET_BASE = SCRIPT_BASE || '/atlas-2030/';
+var PHOTOS_ON = !window.__ATLAS_STANDALONE__ && !!SCRIPT_BASE;
+var PHOTO_CREDITS = {
+  'D-01': { by: 'NASA Scientific Visualization Studio', lic: 'Public domain', src: 'https://commons.wikimedia.org/wiki/File:Creating_Black_Hole_Jets_With_a_NASA_Supercomputer_(SVS14217).png' },
+  'D-02': { by: 'Siyuwj', lic: 'CC BY-SA 3.0', src: 'https://commons.wikimedia.org/wiki/File:Geely_assembly_line_in_Beilun,_Ningbo.JPG' },
+  'D-03': { by: 'Shixart1985', lic: 'CC BY 2.0', src: 'https://commons.wikimedia.org/wiki/File:Lab_technitian_looking_through_the_microscope_while_adjusting_coarse_knob.jpg' },
+  'D-04': { by: 'Chrishna', lic: 'CC BY 2.0', src: 'https://commons.wikimedia.org/wiki/File:Wind_turbines_-_Flickr_-_the_russians_are_here.jpg' },
+  'D-05': { by: 'EU2017EE Estonian Presidency', lic: 'CC BY 2.0', src: 'https://commons.wikimedia.org/wiki/File:Informal_meeting_of_environment_ministers._Round_table_Archie_Young_and_Norbert_Kurilla_(35743458402).jpg' },
+  'D-06': { by: 'The Smiler (band)', lic: 'CC BY 2.0', src: 'https://commons.wikimedia.org/wiki/File:TheSmiler2014-158--Fri-Bruk--Foto_Michaela_Klouda_(Urban_Sound_Studios,_taken_on_2014-02-16_13.46.48._uploaded_by_The_Smiler_(band)_@_Flickr_12741125195).jpg' }
+};
+function sphereKey(code) { return String(code || '').toLowerCase().replace(/-/g, ''); }
+function spherePhoto(code, size) {
+  if (!PHOTOS_ON) return '';
+  return ASSET_BASE + 'photos/sphere-' + sphereKey(code) + (size ? '-' + size : '') + '.webp';
+}
+function photoCredit(code) {
+  var c = PHOTO_CREDITS[code];
+  if (!c) return '';
+  return '<a class="photo-credit" href="' + h(c.src) + '" target="_blank" rel="noopener">Фото: ' + h(c.by) + ' · ' + h(c.lic) + ' · Wikimedia Commons</a>';
+}
+/* Карточка сферы с фотографией: фото лежит фоном, текст — поверх затемнения. */
+function sphereCard(code, href, extraClass) {
+  var img = spherePhoto(code, '800');
+  var s = SPHERES.filter(function (x) { return x.code === code; })[0] || { name: SPHERE_DESC[code] || '', count: 0 };
+  return '<a class="sph-card' + (img ? ' has-photo' : '') + (extraClass ? ' ' + extraClass : '') + '" href="' + href + '"' +
+    (img ? ' style="--ph:url(' + img + ')"' : '') + '>' +
+    '<span class="sph-ph" aria-hidden="true"></span>' +
+    '<span class="sph-body">' +
+    '<span class="c">' + h(code) + '</span>' +
+    '<span class="sph-text">' +
+    '<span class="n">' + h(s.name) + '</span>' +
+    '<span class="m">' + s.count + ' ' + plural(s.count, 'профессия', 'профессии', 'профессий') + '</span>' +
+    '</span></span></a>';
+}
+function photoFigure(code, alt) {
+  var big = spherePhoto(code, '1600');
+  if (!big) return '';
+  var small = spherePhoto(code, '800');
+  return '<figure class="photo-fig">' +
+    '<img src="' + h(big) + '" srcset="' + h(small) + ' 800w, ' + h(big) + ' 1600w" sizes="(max-width:760px) 92vw, 1152px" ' +
+    'alt="' + h(alt || ('Профессии в сфере «' + (SPHERE_DESC[code] || '') + '»')) + '" loading="lazy" decoding="async">' +
+    '<figcaption>' + photoCredit(code) + '</figcaption></figure>';
+}
 var PROG = {};
 U.forEach(function (u) {
 (u.programs || []).forEach(function (pr) {
@@ -678,6 +724,7 @@ choiceModal.innerHTML = '<div class="palette-backdrop" data-choice-close></div>'
 '<div class="cmp-head"><p>Мой выбор</p><button class="cmp-close" data-choice-close>esc</button></div>' +
 '<div class="choice-body" id="choiceBody"></div>' +
 '<div class="cmp-foot"><span class="mono tiny">Хранится только в этом браузере</span>' +
+'<a class="btn btn-sm" href="#/compare">Открыть сравнение</a>' +
 '<button class="btn btn-sm" data-choice-close>Закрыть</button></div></div>';
 document.body.appendChild(choiceModal);
 function refreshChoice() {
@@ -714,6 +761,7 @@ if (choiceModal.hidden) openChoice(); else closeChoice();
 }
 choiceModal.addEventListener('click', function (e) {
 if (e.target.closest('[data-choice-close]')) { closeChoice(); return; }
+if (e.target.closest('a[href^="#/"]')) { closeChoice(); return; }
 var del = e.target.closest('[data-choice-del]');
 if (del) { toggleCompare(del.getAttribute('data-choice-del')); refreshChoice(); return; }
 if (e.target.closest('[data-choice-clear]')) {
@@ -1721,7 +1769,12 @@ statCard(DISTRICTS.length, 'федеральных округов') +
 '</section>' +
 // Дата — вне .hero-home: у секции overflow:hidden, и transform reveal
 // уводил текст за границу обрезки (IntersectionObserver не срабатывал).
-'<p class="data-date reveal">Данные и баллы актуальны на октябрь 2026 · проходные баллы: приёмные кампании 2024–2025</p>' +
+'<p class="data-date reveal">Данные собраны 26 октября 2026 · проходные баллы — приёмные кампании 2024–2025 · даты кампании 2026–2027 уточняйте в вузе</p>' +
+    '<section class="sec-head reveal"><div><p class="eyebrow">Структура</p><h2 class="sec">Шесть сфер атласа</h2></div>' +
+    '<a class="sec-link" href="#/professions">Каталог профессий →</a></section>' +
+    '<div class="sph-grid reveal">' + SPHERES.map(function (s) {
+      return sphereCard(s.code, '#/professions?sphere=' + s.code);
+    }).join('') + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Спрос</p><h2 class="sec">Ведущие профессии по индексу спроса</h2></div>' +
 '<a class="sec-link" href="#/professions?sort=index">Весь рейтинг →</a></section>' +
 '<div class="panel chart reveal"><div class="chart-head"><p class="label">Индекс спроса · 0–100 <button class="index-hint" aria-label="Что такое индекс спроса" title="Что такое индекс спроса">?</button></p>' +
@@ -1844,6 +1897,9 @@ sortBtn('alpha', 'По алфавиту', st.sort) +
 sphereChip('', 'Все сферы', st.sphere) +
 SPHERES.map(function (s) { return sphereChip(s.code, s.code + ' · ' + s.name, st.sphere); }).join('') +
 '</div>' +
+'<div class="sph-row">' + SPHERES.map(function (s) {
+  return sphereCard(s.code, '#/professions?sphere=' + s.code, 'sph-sm');
+}).join('') + '</div>' +
 (st.exams.length
 ? '<div class="myfilter" id="myFilter"><span>Фильтр «Мой выбор» · ЕГЭ: ' + h(st.exams.join(' · ')) +
 (st.sphere ? ' · ' + h(st.sphere) : '') + '</span>' +
@@ -2302,6 +2358,8 @@ app.innerHTML = '<div class="view">' +
 '<p class="eyebrow">Раздел IV · После 11 класса</p>' +
 '<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Вузы <em>по регионам</em></h1>' +
 '<p class="lead">' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' в ' + REGIONS.length + ' ' + plural(REGIONS.length, 'регионе', 'регионах', 'регионах') + ' и ' + DISTRICTS.length + ' федеральных округах. Направления, наборы ЕГЭ и ориентировочные баллы на бюджет и платное обучение. Сумма трёх экзаменов, максимум 300.</p>' +
+'<p class="source-note">Каталог — выборка вузов с открытыми данными о программах и баллах, а не полный список вузов страны. ' +
+'Условия, льготы и даты приёма всегда уточняйте на сайте вуза.</p>' +
 '</section>' +
 '<div class="toolbar">' +
 '<label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
@@ -2684,7 +2742,15 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div><h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Личного кабинета</h3><p class="muted">Мы не храним ответы и не ведём заявки. Это осознанный выбор: меньше данных — меньше рисков.</p></div>' +
 '<div><h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Гарантии поступления</h3><p class="muted">Баллы ориентировочные. Решение принимает приёмная комиссия, а конкурс меняется каждый год.</p></div>' +
 '<div><h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Полной замены приёмной комиссии</h3><p class="muted">Атлас помогает сузить выбор и задать вопросы. Финальную проверку всегда делайте на сайте вуза.</p></div>' +
+'<div><h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Полного списка вузов страны</h3><p class="muted">В каталоге ' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' с открытыми данными о баллах и программах. Это осознанная выборка, а не исчерпывающий реестр: состав и годы кампаний указаны в методологии.</p></div>' +
 '</div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
+'<ul class="changelog reveal">' +
+'<li><span class="mono">7 ноября 2026</span><div><b>Объёмная 3D-карта России.</b> В разделе «Карта» — силуэт страны с метками городов, где есть вузы: высота метки отражает число вузов, цвет — федеральный округ. Карта поворачивается, масштабируется и открывает город в каталоге.</div></li>' +
+'<li><span class="mono">7 ноября 2026</span><div><b>Фотобанк сфер.</b> Двенадцать фотографий с Wikimedia Commons: производство, лаборатория, энергетика, медиа. На страницах профессий появился баннер сферы с указанием автора и лицензии.</div></li>' +
+'<li><span class="mono">6 ноября 2026</span><div><b>Календарь приёмной кампании и избранное.</b> Помесячный календарь после 11 и после 9 класса, а также список избранных профессий, который хранится в браузере.</div></li>' +
+'<li><span class="mono">5 ноября 2026</span><div><b>График зарплаты по этапам карьеры.</b> Диапазоны оплаты по ступеням обучения и работы — прямо на странице профессии.</div></li>' +
+'</ul>' +
 '<div class="panel reveal" style="padding:24px;margin-top:22px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:space-between">' +
 '<div><p class="label">Проверить</p><p style="font-family:var(--serif);font-size:22px;font-weight:700;margin-top:6px">Методология, данные и границы применимости</p></div>' +
 '<div class="hero-cta" style="margin:0"><a class="btn btn-primary btn-sm" href="#/methodology">Методология →</a><a class="btn btn-sm" href="#/specialties">Специальности</a></div>' +
@@ -2702,6 +2768,13 @@ app.innerHTML = '<div class="view">' +
 '<div class="prose" id="prose">' +
 (A.methodology && A.methodology.html ? sanitizeRichHtml(A.methodology.html) : '<p>Раздел в подготовке.</p>') +
 '</div>' +
+'<div class="panel reveal" style="padding:22px;margin-top:24px"><p class="label">Границы данных</p>' +
+'<p class="muted" style="margin-top:8px">Каталог вузов — выборка из ' + U.length + ' ' + plural(U.length, 'вуза', 'вуза', 'вузов') + ' с открытыми данными о программах, наборах ЕГЭ и проходных баллах; ' +
+'колледжей в атласе ' + C.length + ', это демонстрационный набор, а не полный перечень. ' +
+'Баллы приведены к приёмным кампаниям 2024–2025 годов и служат ориентиром: реальные значения меняются ежегодно, ' +
+'а даты кампании 2026–2027 нужно уточнять на сайте вуза или колледжа.</p>' +
+'<p class="muted" style="margin-top:10px">Карта России построена по открытым геоданным и в равновеликой конической проекции Альберса; ' +
+'координаты городов приведены к десятым долям градуса. Фотографии сфер — Wikimedia Commons, автор и лицензия указаны под каждым снимком.</p></div>' +
 '</div>';
 rewriteLinks(document.getElementById('prose'));
 var prose = document.getElementById('prose');
@@ -2980,6 +3053,7 @@ app.innerHTML = '<div class="view">' +
 '<button class="btn btn-sm fav-detail" type="button" data-fav="' + h(p.slug) + '" data-title="' + h(p.title) + '" aria-pressed="' + (inFav ? 'true' : 'false') + '">' +
 FAV_ICON + '<span class="fav-txt">' + (inFav ? 'В избранном' : 'В избранное') + '</span></button>' +
 '</div>' +
+photoFigure(p.sphereCode) +
 '</header>' +
 '<div class="detail-body">' +
 '<div><div class="toc" id="toc" aria-label="Содержание"></div><div class="rich" id="rich"></div></div>' +
@@ -3006,6 +3080,7 @@ return '<a href="#/professions/' + s.slug + '"><span>' + h(s.title) + '</span><s
 var rich = document.getElementById('rich');
 rich.innerHTML = sanitizeRichHtml(d.body || '');
 prepareRich(rich);
+initPhotoParallax();
 refreshStudyTable(rich, p.slug, p.title);
 buildToc(rich);
 var viewG = app.querySelector('.view');
@@ -3712,7 +3787,15 @@ var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 return v || fallback;
 }
 function applyTheme() {
+var swapTheme = function () {
 document.documentElement.classList.toggle('theme-light', THEME === 'light');
+};
+if (document.startViewTransition && !noMotion) {
+var vt;
+try { vt = document.startViewTransition(swapTheme); } catch (e) { vt = null; swapTheme(); }
+if (vt && vt.finished) vt.finished.catch(function () {});
+if (vt && vt.ready) vt.ready.catch(function () {});
+} else swapTheme();
 var b = document.getElementById('atlasTheme');
 if (b) {
 var i = b.querySelector('.tt-ico');
@@ -3738,7 +3821,6 @@ wrap = document.createElement('div');
 wrap.className = 'atlas-tools';
 wrap.id = 'atlasTools';
 wrap.innerHTML = '<a href="#/map" title="Объёмная карта России с вузами">Карта</a>' +
-'<a href="#/compare" title="Сравнение профессий и вузов">Сравнить</a>' +
 '<button id="atlasTheme" type="button" aria-label="Переключить тему"><span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Тема</span></button>';
 actions.insertBefore(wrap, actions.firstChild);
 document.getElementById('atlasTheme').addEventListener('click', function () {
@@ -4125,6 +4207,46 @@ function mapHitTest(x, y) {
   });
   return best;
 }
+/* Плавный разворот карты к городу и только потом переход в каталог. */
+function flyToCity(c) {
+var st = mapState;
+if (!st) { location.hash = '#/universities?city=' + encodeURIComponent(c.city); return; }
+st.auto = false;
+if (st.updateSpin) st.updateSpin();
+var target = Math.atan2(c.x, c.y);
+var d = target - st.yaw;
+while (d > Math.PI) d -= Math.PI * 2;
+while (d < -Math.PI) d += Math.PI * 2;
+var y0 = st.yaw, p0 = st.pitch, z0 = st.zoom;
+var y1 = st.yaw + d, p1 = 0.72, z1 = 2.1;
+var t0 = performance.now(), dur = noMotion ? 1 : 760;
+function step(now) {
+var t = Math.min(1, (now - t0) / dur);
+var e = 1 - Math.pow(1 - t, 3);
+st.yaw = y0 + (y1 - y0) * e;
+st.pitch = p0 + (p1 - p0) * e;
+st.zoom = z0 + (z1 - z0) * e;
+drawRussia();
+if (t < 1) { requestAnimationFrame(step); return; }
+location.hash = '#/universities?city=' + encodeURIComponent(c.city);
+}
+requestAnimationFrame(step);
+}
+/* Мягкий параллакс фотографии на странице профессии. */
+function initPhotoParallax() {
+var fig = app.querySelector('.photo-fig');
+if (!fig || noMotion) return;
+var img = fig.querySelector('img');
+if (!img) return;
+function onScroll() {
+if (!fig.isConnected) { window.removeEventListener('scroll', onScroll); return; }
+var r = fig.getBoundingClientRect();
+var mid = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
+img.style.transform = 'scale(1.06) translateY(' + (mid * -14).toFixed(1) + 'px)';
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+}
 function mapShowTip(c, x, y) {
   var st = mapState;
   if (!st || !st.tip) return;
@@ -4212,7 +4334,7 @@ function initRussiaMap() {
     if (st.moved < 6) {
       var r = cv.getBoundingClientRect();
       var c = mapHitTest(e.clientX - r.left, e.clientY - r.top);
-      if (c) location.hash = '#/universities?city=' + encodeURIComponent(c.city);
+      if (c) flyToCity(c);
     }
   }
   cv.addEventListener('pointerup', endDrag);
@@ -4255,7 +4377,8 @@ function initRussiaMap() {
       spin.setAttribute('title', st.auto ? 'Остановить вращение' : 'Продолжить вращение');
       spin.classList.toggle('on', st.auto);
     }
-    if (state) state.textContent = st.auto ? 'Вращение включено' : 'Карта остановлена';
+    st.updateSpin = updateSpinUI;
+  if (state) state.textContent = st.auto ? 'Вращение включено' : 'Карта остановлена';
     if (state) state.classList.toggle('off', !st.auto);
   }
   if (zin) zin.addEventListener('click', function () { st.zoom = Math.min(2.4, st.zoom * 1.18); drawRussia(); });
@@ -4913,7 +5036,13 @@ var swUrl = SCRIPT_BASE ? SCRIPT_BASE + 'sw.js' : 'sw.js';
 navigator.serviceWorker.register(swUrl).catch(function () {});
 });
 }
-window.addEventListener('hashchange', route);
+/* Переход между разделами: новая страница мягко проявляется.
+   Реализовано через CSS-анимацию .view — она работает везде и не требует
+   поддержки View Transitions API. */
+function routeAnimated() {
+  route();
+}
+window.addEventListener('hashchange', routeAnimated);
 try {
 var pagesPath = sessionStorage.getItem('atlas:redirect');
 sessionStorage.removeItem('atlas:redirect');

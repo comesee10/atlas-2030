@@ -1,0 +1,110 @@
+{
+ "D-01": {
+  "cover": {
+   "file": "photos/sphere-d01.webp",
+   "title": "Creating Black Hole Jets With a NASA Supercomputer (SVS14217)",
+   "author": "NASA's Scientific Visualization Studio - Ryan Tanner, Francis Reddy, Scott Wiessinger, Amogh Thakkar, Kim Weaver, Sophia",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Creating_Black_Hole_Jets_With_a_NASA_Supercomputer_(SVS14217).png"
+  },
+  "alt": {
+   "file": "photos/sphere-d01-alt.webp",
+   "title": "Racks Amravati Data Center",
+   "author": "PiDatacenters",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Racks_Amravati_Data_Center.jpg"
+  }
+ },
+ "D-02": {
+  "cover": {
+   "file": "photos/sphere-d02.webp",
+   "title": "Geely assembly line in Beilun, Ningbo",
+   "author": "Siyuwj",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Geely_assembly_line_in_Beilun,_Ningbo.JPG"
+  },
+  "alt": {
+   "file": "photos/sphere-d02-alt.webp",
+   "title": "2018 Schweißer - Fritzmeier Group",
+   "author": "Fritzmeier Gruppe",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:2018_Schwei%C3%9Fer_-_Fritzmeier_Group.jpg"
+  }
+ },
+ "D-03": {
+  "cover": {
+   "file": "photos/sphere-d03.webp",
+   "title": "Lab technitian looking through the microscope while adjusting coarse knob",
+   "author": "Shixart1985",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Lab_technitian_looking_through_the_microscope_while_adjusting_coarse_knob.jpg"
+  },
+  "alt": {
+   "file": "photos/sphere-d03-alt.webp",
+   "title": "Researchers in laboratory",
+   "author": "Rhoda Baer (Photographer)",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Researchers_in_laboratory.jpg"
+  }
+ },
+ "D-04": {
+  "cover": {
+   "file": "photos/sphere-d04.webp",
+   "title": "Wind turbines - Flickr - the russians are here",
+   "author": "Chrishna",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Wind_turbines_-_Flickr_-_the_russians_are_here.jpg"
+  },
+  "alt": {
+   "file": "photos/sphere-d04-alt.webp",
+   "title": "Country's largest solar power plant inaugurated",
+   "author": "Ronitsunny",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Country%27s_largest_solar_power_plant_inaugurated.png"
+  }
+ },
+ "D-05": {
+  "cover": {
+   "file": "photos/sphere-d05.webp",
+   "title": "Informal meeting of environment ministers. Round table Archie Young and Norbert Kurilla (35743458402)",
+   "author": "EU2017EE Estonian Presidency",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Informal_meeting_of_environment_ministers._Round_table_Archie_Young_and_Norbert_Kurilla_(35743458402).jpg"
+  },
+  "alt": {
+   "file": "photos/sphere-d05-alt.webp",
+   "title": "Desks in an open office space (Unsplash)",
+   "author": "Crew crew",
+   "license": "CC0",
+   "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Desks_in_an_open_office_space_(Unsplash).jpg"
+  }
+ },
+ "D-06": {
+  "cover": {
+   "file": "photos/sphere-d06.webp",
+   "title": "TheSmiler2014-158--Fri-Bruk--Foto Michaela Klouda (Urban Sound Studios, taken on 2014-02-16 13.46.48. uploaded by The Smiler (band) @ Flickr 12741125195)",
+   "author": "The Smiler (band)",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:TheSmiler2014-158--Fri-Bruk--Foto_Michaela_Klouda_(Urban_Sound_Studios,_taken_on_2014-02-16_13.46.48._uploaded_by_The_Smiler_(band)_@_Flickr_12741125195).jpg"
+  },
+  "alt": {
+   "file": "photos/sphere-d06-alt.webp",
+   "title": "Tom-at-Desk",
+   "author": "Tom Harpel from Seattle, Washington, United States",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Tom-at-Desk.jpg"
+  }
+ }
+}

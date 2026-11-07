@@ -1,7 +1,7 @@
 ﻿/* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v17';
+const VERSION = 'atlas-2030-v18';
 const SHELL = [
   './',
   './index.html',
@@ -22,7 +22,13 @@ const SHELL = [
   './fonts/onest-latin.woff2',
   './fonts/lora-cyrillic.woff2',
   './fonts/lora-latin.woff2',
-  './offline.html'
+  './offline.html',
+  './photos/sphere-d01-800.webp',
+  './photos/sphere-d02-800.webp',
+  './photos/sphere-d03-800.webp',
+  './photos/sphere-d04-800.webp',
+  './photos/sphere-d05-800.webp',
+  './photos/sphere-d06-800.webp'
 ];
 
 self.addEventListener('install', (event) => {
