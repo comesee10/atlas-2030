@@ -3881,7 +3881,8 @@ function mapCities() {
     var c = byCity[key];
     var ll = CITY_LL[c.city];
     if (!ll) continue;
-    var p = RUS_GEO.project(ll[0], ll[1]);
+    /* CITY_LL хранит [широта, долгота], проекция ждёт [долгота, широта]. */
+    var p = RUS_GEO.project(ll[1], ll[0]);
     c.x = p[0];
     c.y = p[1];
     c.avg = Math.round(c.avgSum / c.count);
