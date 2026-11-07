@@ -177,9 +177,11 @@ function photoFigure(code, alt) {
   var big = spherePhoto(code, '1600');
   if (!big) return '';
   var small = spherePhoto(code, '800');
-  return '<figure class="photo-fig">' +
-    '<img src="' + h(big) + '" srcset="' + h(small) + ' 800w, ' + h(big) + ' 1600w" sizes="(max-width:760px) 92vw, 1152px" ' +
+  return '<figure class="photo-fig cover">' +
+    '<div class="cover-img"><img src="' + h(big) + '" srcset="' + h(small) + ' 800w, ' + h(big) + ' 1600w" sizes="(max-width:760px) 92vw, 1152px" ' +
     'alt="' + h(alt || ('Профессии в сфере «' + (SPHERE_DESC[code] || '') + '»')) + '" loading="lazy" decoding="async">' +
+    '<div class="cover-ov"><span class="cover-code">' + h(code) + '</span>' +
+    '<span class="cover-name">' + h(SPHERE_DESC[code] || '') + '</span></div></div>' +
     '<figcaption>' + photoCredit(code) + '</figcaption></figure>';
 }
 var PROG = {};
@@ -3006,6 +3008,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<ul class="changelog reveal">' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Проще навигация и режимы.</b> В шапке осталось четыре раздела, остальное собрано в меню «Ещё», а на телефоне появилась нижняя навигация с подписями. Переключатель «Я ученик / Я учитель или родитель» меняет подачу главной и добавляет методические действия. Поиск понимает обычные фразы: «после 9 класса», «биология», «Москва бюджет». Возврат из профессии восстанавливает фильтры и место в списке, а термины объясняются прямо на странице.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Живые графики и чтение по разделам.</b> Тепловая карта получила фильтры по округу и сфере с плавной перестройкой шкалы, bubble-график обновляется вместе с каталогом. На странице профессии появилось закреплённое содержание с индикатором прокрутки, а при загрузке — скелетоны и мягкое появление блоков.</div></li>' +
+'<li><span class="mono">7 ноября 2026</span><div><b>Журнальная страница профессии.</b> Крупная серифная шапка, строка ключевых фактов — зарплата, число вузов и минимальный балл — и обложка сферы с подписью. Паспорт профессии стал спокойной колонкой без лишней рамки, текст разборов набран с воздухом.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Объёмная 3D-карта России.</b> В разделе «Карта» — силуэт страны с метками городов, где есть вузы: высота метки отражает число вузов, цвет — федеральный округ. Карта поворачивается, масштабируется и открывает город в каталоге.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Фотобанк сфер.</b> Двенадцать фотографий с Wikimedia Commons: производство, лаборатория, энергетика, медиа. На страницах профессий появился баннер сферы с указанием автора и лицензии.</div></li>' +
 '<li><span class="mono">6 ноября 2026</span><div><b>Календарь приёмной кампании и избранное.</b> Помесячный календарь после 11 и после 9 класса, а также список избранных профессий, который хранится в браузере.</div></li>' +
@@ -3325,6 +3328,10 @@ var c = pr.uni && pr.uni.city;
 if (c) cityCount[c] = (cityCount[c] || 0) + 1;
 });
 var topCities = Object.keys(cityCount).sort(function (a, b) { return cityCount[b] - cityCount[a]; }).slice(0, 5);
+var cityTotal = Object.keys(cityCount).length;
+var uniSet = {};
+progs.forEach(function (pr) { if (pr.uni && pr.uni.short) uniSet[pr.uni.short] = 1; });
+var uniCount = Object.keys(uniSet).length;
 var similar = (d.similar || []).filter(function (s) { return D[s.slug]; }).slice(0, 5);
 var inCmp = compare.has(p.slug);
 var inFav = isFavorite(p.slug);
@@ -3334,6 +3341,12 @@ app.innerHTML = '<div class="view">' +
 '<p class="eyebrow" style="margin-top:18px">' + h(p.sphereCode) + ' · ' + h(p.sphere) + '</p>' +
 '<h1>' + h(p.title) + '</h1>' +
 '<p class="lead">' + h(p.desc) + '</p>' +
+'<div class="fact-strip">' +
+'<div><span class="k">Зарплата</span><span class="v">' + h(p.salary) + '</span></div>' +
+'<div><span class="k">Где учат</span><span class="v">' + uniCount + ' ' + plural(uniCount, 'вуз', 'вуза', 'вузов') + '</span></div>' +
+'<div><span class="k">Городов</span><span class="v">' + cityTotal + '</span></div>' +
+'<div><span class="k">Мин. балл</span><span class="v">' + (mb ? '≈' + mb : '—') + '</span></div>' +
+'</div>' +
 '<div class="hero-cta">' +
 '<a class="btn btn-primary btn-sm" href="#/quiz">Проверить шансы</a>' +
 '<a class="btn btn-sm" href="#/professions?sphere=' + h(p.sphereCode) + '">Ещё в этой сфере</a>' +
@@ -3345,7 +3358,7 @@ photoFigure(p.sphereCode) +
 '</header>' +
 '<div class="detail-body">' +
 '<div><div class="toc" id="toc" aria-label="Содержание"></div><div class="rich" id="rich"></div></div>' +
-'<aside class="passport panel">' +
+'<aside class="passport">' +
 '<p class="label">Паспорт профессии</p>' +
 '<div class="pp-row"><p class="pp-k">' + gloss('index', 'Индекс спроса') + '</p><p class="pp-v">' + p.index + '<small>/100</small></p>' +
 '<div class="pp-bar"><i data-w="' + p.index + '"></i></div></div>' +
@@ -3407,7 +3420,7 @@ app.innerHTML = '<div class="view">' +
 '</header>' +
 '<div class="detail-body">' +
 '<div><div class="toc" id="toc" aria-label="Содержание"></div><div class="rich" id="rich"></div></div>' +
-'<aside class="passport panel">' +
+'<aside class="passport">' +
 '<p class="label">Паспорт специальности</p>' + rows +
 '<div class="pp-row"><p class="pp-k">Колледжей в атласе</p><p class="pp-v" style="font-size:22px">' + c.count + '</p></div>' +
 '<div class="pp-row"><p class="pp-k">' + gloss('attest', 'Средний балл аттестата') + '</p><p class="pp-v" style="font-size:22px">от ' + h(c.price) + '</p></div>' +
