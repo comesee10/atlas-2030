@@ -1209,18 +1209,34 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .seg-tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--rule);border-radius:10px;background:rgba(16,29,38,.6);margin:6px 0 20px}
 .seg-tabs a{height:34px;padding:0 14px;display:inline-flex;align-items:center;border-radius:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .seg-tabs a.active{background:rgba(94,234,212,.14);color:var(--violet)}
-.geo-map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(104px,auto));gap:10px;margin-top:8px}
-.geo-tile{position:relative;display:flex;flex-direction:column;gap:4px;padding:14px;border:1px solid rgba(94,234,212,.22);border-radius:12px;min-width:0;transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
-.geo-tile:hover{transform:translateY(-3px);border-color:var(--violet);box-shadow:0 18px 36px -26px rgba(20,184,166,.8)}
-.geo-tile-code{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--violet)}
-.geo-tile b{font-family:var(--serif);font-size:17px;line-height:1.15}
-.geo-tile-name{font-size:10.5px;line-height:1.3;color:var(--ink-3)}
-.geo-tile-meta{font-family:var(--mono);font-size:9.5px;color:var(--ink-2);margin-top:auto}
-.geo-tile-avg{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1}
 .geo-city-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .geo-city-list a{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 11px;border:1px solid var(--rule);border-radius:8px;font-size:12px;color:var(--ink-2)}
 .geo-city-list a:hover{border-color:var(--violet);color:var(--ink)}
 .geo-city-list b{font-family:var(--mono);font-size:10px;color:var(--violet)}
+/* ---- объёмная 3D-карта России ---- */
+.rus-wrap{margin-top:26px}
+.rus-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.rus-chips{flex:1 1 320px;min-width:0}
+.rus-chip{display:inline-flex;align-items:center;gap:7px}
+.rus-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(94,234,212,.12)}
+.rus-ctrl{display:flex;gap:6px;flex:0 0 auto}
+.rus-ctrl button{width:36px;height:36px;border:1px solid var(--rule-2);border-radius:9px;background:transparent;color:var(--ink-2);font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s var(--ease),color .2s,background .2s}
+.rus-ctrl button:hover{border-color:var(--violet);color:var(--ink);background:rgba(94,234,212,.08)}
+.rus-ctrl button.on{border-color:var(--violet);color:var(--violet);background:rgba(94,234,212,.12)}
+.rus-stage{position:relative;border:1px solid rgba(94,234,212,.18);border-radius:16px;overflow:hidden;background:radial-gradient(900px 420px at 50% 8%,rgba(20,184,166,.12),transparent 70%),linear-gradient(180deg,rgba(13,24,32,.92),rgba(6,13,18,.97));box-shadow:0 32px 70px -44px rgba(0,0,0,.92)}
+.rus-stage canvas{display:block;width:100%;height:clamp(360px,50vw,580px);touch-action:none;cursor:grab}
+.rus-stage canvas.grabbing{cursor:grabbing}
+.rus-stage canvas:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.rus-tip{position:absolute;z-index:6;pointer-events:none;max-width:min(280px,74vw);padding:9px 11px;border:1px solid rgba(94,234,212,.34);border-radius:10px;background:rgba(9,17,22,.95);box-shadow:0 20px 44px -20px rgba(0,0,0,.95);display:grid;gap:2px}
+.rus-tip b{font-family:var(--serif);font-size:15px;color:var(--ink)}
+.rus-tip span{font-family:var(--mono);font-size:10.5px;color:var(--violet)}
+.rus-tip em{font-style:normal;font-size:11px;color:var(--ink-3)}
+.rus-hint{position:absolute;left:14px;bottom:11px;margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.03em;color:var(--ink-4);pointer-events:none}
+.rus-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:13px}
+.rus-leg{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.theme-light .rus-stage{background:radial-gradient(900px 420px at 50% 8%,rgba(20,184,166,.14),transparent 70%),linear-gradient(180deg,#f6fcfa,#e4f2ee)}
+.theme-light .rus-tip{background:rgba(255,255,255,.97);border-color:rgba(15,158,142,.4)}
+.theme-light .rus-dot{box-shadow:0 0 0 3px rgba(15,158,142,.14)}
 .chart-canvas-wrap{position:relative;width:100%;overflow:hidden}
 .chart-canvas-wrap canvas{display:block;width:100%;height:auto}
 .chart-tip{position:absolute;z-index:5;pointer-events:none;max-width:240px;padding:8px 10px;border:1px solid var(--rule-2);border-radius:8px;background:rgba(9,17,22,.96);color:var(--ink);font-size:12px;line-height:1.4;box-shadow:0 14px 30px rgba(0,0,0,.45)}
@@ -1256,14 +1272,14 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .graph-list .gl-group p{font-size:13px;color:var(--ink-2);margin:4px 0 8px}
 .graph-list .gl-unis{display:flex;flex-wrap:wrap;gap:6px}
 .graph-list .gl-unis a{font-size:11.5px;padding:5px 8px;border:1px solid var(--rule);border-radius:6px;color:var(--ink-2)}
-@media (max-width:900px){.geo-map{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:minmax(96px,auto)}.geo-tile{grid-column:auto!important;grid-row:auto!important}}
-@media (max-width:760px){.geo-map{grid-template-columns:repeat(2,minmax(0,1fr))}.prof-graph{display:none}.graph-list{display:grid;gap:10px}.chart-tip{display:none}}
+@media (max-width:900px){.rus-stage canvas{height:clamp(340px,62vw,520px)}}
+@media (max-width:760px){.rus-stage canvas{height:min(84vw,440px)}.rus-ctrl button{width:40px;height:40px}.rus-hint{font-size:9px;left:10px}.prof-graph{display:none}.graph-list{display:grid;gap:10px}.chart-tip{display:none}}
 /* ---- Light theme ---- */
 .theme-light{--bg:#f4fbf9;--bg-2:#fff;--panel:#fff;--panel-2:#eef8f5;--rule:#d5e6e1;--rule-2:#b9d5ce;--ink:#0b211f;--ink-2:#2f4a47;--ink-3:#5f7b77;--ink-4:#8aa5a0;--violet:#0f9e8e;--violet-deep:#0b7f73;--ok:#15803d;--bad:#b91c1c;--warn:#a16207;--shadow:0 20px 45px rgba(6,40,36,.12)}
 .theme-light body{background-color:#f4fbf9;background-image:linear-gradient(rgba(15,158,142,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,158,142,.05) 1px,transparent 1px),radial-gradient(800px 420px at 90% -10%,rgba(20,184,166,.12),transparent 70%)}
 .theme-light .hdr{background:rgba(244,251,249,.9)}
 .theme-light .nav{background:rgba(244,251,249,.98)}
-.theme-light .panel,.theme-light .kpi,.theme-light .geo-tile{background:linear-gradient(160deg,#fff,#f1faf7)}
+.theme-light .panel,.theme-light .kpi{background:linear-gradient(160deg,#fff,#f1faf7)}
 .theme-light .hero-home{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(238,248,245,.9))}
 .theme-light .chart-tip{background:#fff}
 .theme-light .start-card{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(238,248,245,.96)),url('moscow-city-960.webp') center/cover no-repeat}

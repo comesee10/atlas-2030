@@ -3703,7 +3703,7 @@ quizModeSwitch('oge') +
 paintQuizOge(st);
 }
 /* ============================================================ insights layer
-   Тема, инструменты шапки, схематичная карта округов, сравнение вузов,
+   Тема, инструменты шапки, объёмная 3D-карта России, сравнение вузов,
    граф «профессия → специальность → вуз», тепловая карта и bubble-график. */
 var THEME = 'dark';
 try { THEME = localStorage.getItem('atlas:theme') === 'light' ? 'light' : 'dark'; } catch (e) {}
@@ -3737,7 +3737,7 @@ if (!wrap) {
 wrap = document.createElement('div');
 wrap.className = 'atlas-tools';
 wrap.id = 'atlasTools';
-wrap.innerHTML = '<a href="#/map" title="Карта федеральных округов">Карта</a>' +
+wrap.innerHTML = '<a href="#/map" title="Объёмная карта России с вузами">Карта</a>' +
 '<a href="#/compare" title="Сравнение профессий и вузов">Сравнить</a>' +
 '<button id="atlasTheme" type="button" aria-label="Переключить тему"><span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Тема</span></button>';
 actions.insertBefore(wrap, actions.firstChild);
@@ -3772,55 +3772,567 @@ SPECIALTIES.length + ' ' + plural(SPECIALTIES.length, 'специальност�
 ' в ' + REGIONS.length + ' ' + plural(REGIONS.length, 'регионе', 'регионах', 'регионах') +
 ' России. Подбор вузов после 11 класса, колледжей после 9 класса и единая география федеральных округов.';
 }
-/* ---------- схематичная карта округов (tile-grid cartogram) ---------- */
-var GEO_TILES = {
-'СЗФО': [2, 1], 'ЦФО': [1, 2], 'ПФО': [2, 2], 'УФО': [3, 2],
-'СФО': [4, 2], 'ДФО': [5, 2], 'ЮФО': [2, 3], 'СКФО': [3, 3]
+/* ---------- объёмная 3D-карта России с вузами ---------- */
+var CITY_LL = {
+  'Москва': [55.76, 37.62], 'Долгопрудный': [55.94, 37.51], 'Воронеж': [51.67, 39.18],
+  'Ярославль': [57.63, 39.88], 'Тула': [54.2, 37.62], 'Рязань': [54.63, 39.69],
+  'Калуга': [54.51, 36.26], 'Липецк': [52.6, 39.57], 'Тверь': [56.86, 35.92],
+  'Курск': [51.73, 36.19], 'Белгород': [50.6, 36.59], 'Санкт-Петербург': [59.93, 30.34],
+  'Архангельск': [64.54, 40.52], 'Сыктывкар': [61.67, 50.84], 'Петрозаводск': [61.79, 34.35],
+  'Калининград': [54.71, 20.45], 'Мурманск': [68.96, 33.08], 'Вологда': [59.22, 39.89],
+  'Псков': [57.82, 28.33], 'Великий Новгород': [58.52, 31.28], 'Ростов-на-Дону': [47.24, 39.7],
+  'Новочеркасск': [47.42, 40.09], 'Краснодар': [45.04, 38.98], 'Сочи': [43.59, 39.72],
+  'Волгоград': [48.71, 44.51], 'Астрахань': [46.35, 48.04], 'Элиста': [46.31, 44.26],
+  'Ставрополь': [45.04, 41.97], 'Пятигорск': [44.05, 43.06], 'Нальчик': [43.49, 43.61],
+  'Владикавказ': [43.04, 44.67], 'Грозный': [43.32, 45.7], 'Махачкала': [42.98, 47.5],
+  'Черкесск': [44.23, 42.05], 'Магас': [43.17, 44.81], 'Казань': [55.8, 49.11],
+  'Пермь': [58.01, 56.25], 'Нижний Новгород': [56.33, 44.01], 'Самара': [53.2, 50.1],
+  'Уфа': [54.74, 55.97], 'Саратов': [51.53, 46.03], 'Ижевск': [56.85, 53.21],
+  'Оренбург': [51.77, 55.1], 'Пенза': [53.2, 45.0], 'Киров': [58.6, 49.67],
+  'Чебоксары': [56.14, 47.25], 'Йошкар-Ола': [56.64, 47.89], 'Саранск': [54.18, 45.17],
+  'Ульяновск': [54.31, 48.4], 'Екатеринбург': [56.84, 60.61], 'Челябинск': [55.16, 61.44],
+  'Магнитогорск': [53.42, 59.05], 'Тюмень': [57.15, 65.53], 'Курган': [55.44, 65.34],
+  'Сургут': [61.25, 73.4], 'Ханты-Мансийск': [61.0, 69.0], 'Новосибирск': [55.01, 82.94],
+  'Омск': [54.99, 73.32], 'Томск': [56.48, 84.95], 'Северск': [56.6, 84.89],
+  'Иркутск': [52.29, 104.31], 'Ангарск': [52.54, 103.89], 'Братск': [56.13, 101.61],
+  'Красноярск': [56.02, 92.89], 'Норильск': [69.35, 88.2], 'Барнаул': [53.35, 83.77],
+  'Бийск': [52.54, 85.21], 'Кемерово': [55.35, 86.09], 'Новокузнецк': [53.76, 87.11],
+  'Улан-Удэ': [51.83, 107.58], 'Чита': [52.03, 113.5], 'Абакан': [53.72, 91.43],
+  'Кызыл': [51.72, 94.44], 'Владивосток': [43.12, 131.89], 'Хабаровск': [48.48, 135.08],
+  'Комсомольск-на-Амуре': [50.55, 137.01], 'Якутск': [62.04, 129.68],
+  'Благовещенск': [50.29, 127.53], 'Южно-Сахалинск': [46.96, 142.74],
+  'Петропавловск-Камчатский': [53.04, 158.66], 'Магадан': [59.56, 150.8]
 };
-function renderMap() {
-setTitle('Карта федеральных округов — Профессии·2030');
-var max = Math.max.apply(null, DISTRICTS.map(function (d) { return d.count; })) || 1;
-var ordered = DISTRICTS.slice().sort(function (a, b) {
-var pa = GEO_TILES[a.code] || [1, 1], pb = GEO_TILES[b.code] || [1, 1];
-return pa[1] - pb[1] || pa[0] - pb[0];
-});
-var tiles = ordered.map(function (d) {
-var pos = GEO_TILES[d.code] || [1, 1];
-var heat = 0.10 + 0.42 * (d.count / max);
-return '<a class="geo-tile" href="#/universities?district=' + encodeURIComponent(d.code) + '"' +
-' style="grid-column:' + pos[0] + ';grid-row:' + pos[1] + ';background:linear-gradient(160deg,rgba(94,234,212,' + heat.toFixed(2) + '),rgba(13,24,32,.92))">' +
-'<span class="geo-tile-code">' + h(d.code) + '</span>' +
-'<b>' + h(d.short) + '</b>' +
-'<span class="geo-tile-name">' + h(d.name) + '</span>' +
-'<span class="geo-tile-meta">' + d.count + ' ' + plural(d.count, 'вуз', 'вуза', 'вузов') + ' · ' +
-d.programs + ' ' + plural(d.programs, 'программа', 'программы', 'программ') + '</span>' +
-'<span class="geo-tile-avg">≈' + d.avg + '</span></a>';
-}).join('');
-var cityCount = {};
-U.forEach(function (u) { cityCount[u.city] = (cityCount[u.city] || 0) + 1; });
-var topCities = Object.keys(cityCount).sort(function (a, b) { return cityCount[b] - cityCount[a] || a.localeCompare(b, 'ru'); }).slice(0, 12);
-var biggest = DISTRICTS.slice().sort(function (a, b) { return b.count - a.count; })[0];
-app.innerHTML = '<div class="view">' +
-'<section class="hero" style="padding:44px 0 26px">' +
-'<p class="eyebrow">Раздел · География</p>' +
-'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Карта <em>восьми округов</em></h1>' +
-'<p class="lead">Схематичная карта-картограмма: площадь плитки отражает число вузов в федеральном округе, цвет — насыщенность каталога. ' +
-'Это не географические границы, а навигационная схема по ' + U.length + ' вузам и ' + REGIONS.length + ' регионам.</p>' +
-'<div class="hero-cta"><a class="btn btn-primary" href="#/regions">Все регионы →</a><a class="btn" href="#/universities">Каталог вузов</a></div>' +
-'</section>' +
-'<div class="geo-map" role="list" aria-label="Федеральные округа">' + tiles + '</div>' +
-'<p class="source-note">Наведите на плитку, чтобы увидеть округ. Нажатие открывает отфильтрованный каталог вузов. ' +
-'Крупнейший округ — ' + h(biggest.code + ' · ' + biggest.short) + ': ' + biggest.count + ' ' + plural(biggest.count, 'вуз', 'вуза', 'вузов') + '.</p>' +
-'<section class="sec-head reveal"><div><p class="eyebrow">Города</p><h2 class="sec">Где сосредоточены вузы</h2></div>' +
-'<a class="sec-link" href="#/universities">Фильтр по городам →</a></section>' +
-'<div class="geo-city-list">' + topCities.map(function (c) {
-return '<a href="#/universities?city=' + encodeURIComponent(c) + '">' + h(c) + ' <b>' + cityCount[c] + '</b></a>';
-}).join('') + '</div>' +
-'<div class="panel reveal" style="padding:20px;margin-top:24px"><p class="label">Как читать карту</p>' +
-'<p class="muted" style="margin-top:6px">Плитки расположены по географической логике: северо-запад сверху, центр и Поволжье в середине, Кавказ и Юг ниже, Сибирь и Дальний Восток справа. ' +
-'Средний балл — ориентировочная сумма трёх ЕГЭ на бюджет по вузам округа.</p></div>' +
-'</div>';
+/* Контур страны: кольца записаны целыми десятыми долями градуса с дельтами. */
+function rusDecode(a) {
+var rings = [];
+for (var i = 0; i < a.length;) {
+var n = a[i++], ring = [], x = 0, y = 0;
+for (var j = 0; j < n; j++) { x += a[i++]; y += a[i++]; ring.push([x / 10, y / 10]); }
+rings.push(ring);
 }
+return rings;
+}
+var RUS_RINGS = rusDecode([247,1070,770,2,-5,39,2,30,-9,-2,-5,-45,-11,36,-2,5,-7,21,5,76,-8,1,7,37,-1,16,-6,5,-6,-6,-4,28,-12,10,10,16,-4,60,1,-8,9,14,4,90,-6,35,-14,60,1,8,-4,-1,-8,12,-3,69,2,18,-9,12,3,-8,7,5,4,81,-7,14,-4,0,-40,-26,-4,20,-16,-2,-7,-18,2,-37,-8,-34,-18,-14,7,-26,-8,-5,4,-23,-3,-15,-17,12,-6,-1,-14,-10,-1,-4,-8,4,-4,-17,-6,-4,-11,-15,-2,-3,-11,-14,-9,-14,44,5,14,9,10,16,3,53,30,8,15,-12,-1,-6,-9,-26,-11,-8,13,-26,-4,-25,-16,8,-7,-37,-3,0,7,-15,2,-13,-5,-63,-2,-71,-43,16,-1,15,-8,17,4,14,-11,-12,-47,-52,-50,-14,-6,-12,5,-15,-11,2,28,21,1,19,34,-40,-7,-4,9,-12,7,-17,4,-18,30,-8,4,-41,1,-8,-5,5,-8,-14,-19,-14,-6,-35,7,-37,-11,-22,2,-16,10,-32,-2,-14,4,-2,8,-32,7,-11,-10,4,-6,-9,-7,-51,11,-48,-16,-40,19,-15,-3,-13,6,-6,-5,-35,33,4,3,-35,-10,1,5,-23,1,-3,11,-18,2,-77,-14,-4,-3,7,-7,-17,-10,16,-7,-3,-5,-45,2,-11,-4,-34,11,-15,0,-21,-11,-1,-7,-11,6,-10,-21,16,-7,10,-13,-24,-18,19,-28,-8,-6,-23,13,-55,9,-33,18,15,10,-5,4,14,4,-9,1,1,4,14,4,4,17,-47,10,-4,6,-8,1,2,5,-6,5,-20,-2,-5,10,14,3,-19,14,1,8,-27,6,-9,13,4,3,-3,9,17,13,-10,5,34,24,-15,7,4,6,-9,7,7,9,-11,11,9,8,-16,7,2,7,35,8,90,-24,0,-7,-27,-8,-52,6,16,-7,1,-15,21,-6,-5,10,7,3,24,-6,8,3,-6,7,23,10,18,-4,6,7,-8,6,5,6,-7,6,28,-3,5,-6,-12,-1,0,-6,7,-3,74,22,8,-1,-10,-6,53,7,11,-6,12,6,-11,6,6,4,79,-18,7,5,-23,9,4,4,-6,11,32,20,27,-2,2,-6,-10,-8,10,-10,-2,-14,11,-6,-24,-21,11,-1,27,16,-6,5,4,7,-11,1,-2,5,8,10,-13,8,18,7,-2,7,10,-5,-4,-10,11,-1,-5,7,17,4,39,-5,-9,8,-1,10,63,3,-8,6,12,6,136,13,12,9,24,4,17,-3,-14,-3,16,575,707,-38,1,-21,7,-1,5,10,2,-1,6,20,8,-9,1,24,9,-3,5,126,18,7,-4,-7,-3,-97,-19,-31,-19,2,-9,16,1850,666,7,-3,-3,8,27,-2,20,-9,-26,-6,-5,-11,-32,11,-22,0,-5,3,2,4,-12,-2,5,-5,-6,-4,0,40,51,-18,5,999,789,-49,1,-38,13,47,10,43,-15,15,1436,507,11,-17,-15,3,-6,-14,9,-11,0,-7,-8,6,-6,-7,1,50,-6,9,1,14,9,5,-4,4,5,2,5,-26,6,1451,756,-8,-8,-53,-2,-20,7,5,6,40,2,4,1051,783,-57,-4,27,14,33,-6,6,511,805,-35,-5,-11,2,6,4,-23,0,67,1,4,227,543,-30,1,16,8,14,-6,4,1507,751,-27,-3,-19,4,21,1,4,1436,732,-37,2,22,5,14,-4,4,1813,709,-13,-1,1,8,22,-5,3,1800,708,-13,3,13,4]);
+var RUS_COLORS = {
+  'ЦФО': '#5eead4', 'СЗФО': '#38bdf8', 'ЮФО': '#2dd4bf', 'СКФО': '#a78bfa',
+  'ПФО': '#22d3ee', 'УФО': '#34d399', 'СФО': '#818cf8', 'ДФО': '#f0abfc'
+};
+/* Проекция Альберса: конусная равновеликая, стандартные параллели 50° и 70°. */
+var RUS_GEO = (function () {
+  var rad = Math.PI / 180;
+  var p1 = 50 * rad, p2 = 70 * rad, p0 = 60 * rad, l0 = 100 * rad;
+  var n = (Math.sin(p1) + Math.sin(p2)) / 2;
+  var C = Math.cos(p1) * Math.cos(p1) + 2 * n * Math.sin(p1);
+  var rho0 = Math.sqrt(C - 2 * n * Math.sin(p0)) / n;
+  function raw(lon, lat) {
+    var rho = Math.sqrt(C - 2 * n * Math.sin(lat * rad)) / n;
+    var th = n * (lon * rad - l0);
+    return [rho * Math.sin(th), rho0 - rho * Math.cos(th)];
+  }
+  var minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  RUS_RINGS.forEach(function (ring) {
+    ring.forEach(function (p) {
+      var q = raw(p[0], p[1]);
+      if (q[0] < minX) minX = q[0];
+      if (q[0] > maxX) maxX = q[0];
+      if (q[1] < minY) minY = q[1];
+      if (q[1] > maxY) maxY = q[1];
+    });
+  });
+  var k = 1000 / (maxX - minX);
+  var cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  function norm(lon, lat) {
+    var q = raw(lon, lat);
+    return [(q[0] - cx) * k, (q[1] - cy) * k];
+  }
+  return {
+    rings: RUS_RINGS.map(function (ring) {
+      return ring.map(function (p) { return norm(p[0], p[1]); });
+    }),
+    project: norm,
+    w: 1000,
+    h: (maxY - minY) * k
+  };
+})();
+var RUS_SLAB = 34;   /* толщина объёма страны в единицах карты */
+var mapState = null;
+
+function mapCities() {
+  var byCity = {};
+  U.forEach(function (u) {
+    var c = byCity[u.city];
+    if (!c) {
+      c = byCity[u.city] = { city: u.city, count: 0, avgSum: 0, unis: [], district: u.district, region: u.region };
+    }
+    c.count++;
+    c.avgSum += u.avg;
+    c.unis.push(u);
+  });
+  var out = [];
+  for (var key in byCity) {
+    if (!Object.prototype.hasOwnProperty.call(byCity, key)) continue;
+    var c = byCity[key];
+    var ll = CITY_LL[c.city];
+    if (!ll) continue;
+    var p = RUS_GEO.project(ll[0], ll[1]);
+    c.x = p[0];
+    c.y = p[1];
+    c.avg = Math.round(c.avgSum / c.count);
+    c.pin = 16 + Math.min(c.count, 12) * 3.4;
+    out.push(c);
+  }
+  out.sort(function (a, b) { return b.count - a.count; });
+  return out;
+}
+function hexMix(a, b, t) {
+  function c(v) { v = v.replace('#', ''); if (v.length === 3) v = v[0] + v[0] + v[1] + v[1] + v[2] + v[2]; var i = parseInt(v, 16); return [i >> 16 & 255, i >> 8 & 255, i & 255]; }
+  var A = c(a), B = c(b);
+  return 'rgb(' + Math.round(A[0] + (B[0] - A[0]) * t) + ',' + Math.round(A[1] + (B[1] - A[1]) * t) + ',' + Math.round(A[2] + (B[2] - A[2]) * t) + ')';
+}
+function drawRussia() {
+  var st = mapState;
+  if (!st || !st.cv || !st.cv.isConnected) return;
+  var cv = st.cv, ctx = st.ctx;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = cv.clientWidth, H = cv.clientHeight;
+  if (!W || !H) return;
+  var pw = Math.round(W * dpr), ph = Math.round(H * dpr);
+  if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  var light = document.documentElement.classList.contains('theme-light');
+  var cTop1 = light ? '#e4f7f2' : '#1a5b67';
+  var cTop2 = light ? '#bfe3da' : '#0a2028';
+  var cEdge = light ? '#0f9e8e' : '#5eead4';
+  var cWallLit = light ? '#a7cbc2' : '#0c2832';
+  var cWallDark = light ? '#6ea79b' : '#030d11';
+  var cGrid = light ? 'rgba(15,158,142,.18)' : 'rgba(94,234,212,.12)';
+  var cLabel = light ? '#1c4f47' : 'rgba(226,246,242,.82)';
+  var ca = Math.cos(st.yaw), sa = Math.sin(st.yaw);
+  var cp = Math.cos(st.pitch), sp = Math.sin(st.pitch);
+  var D = 5200;
+  function rot(x, y, z) {
+    var X = x * ca - y * sa;
+    var Y = x * sa + y * ca;
+    return { X: X, Y: Y * cp + z * sp, Z: -Y * sp + z * cp };
+  }
+  /* Габариты карты в экранных единицах — для подгонки под полотно. */
+  var samples = [];
+  RUS_GEO.rings.forEach(function (ring) {
+    ring.forEach(function (p) {
+      samples.push([p[0], p[1], 0]);
+      samples.push([p[0], p[1], -RUS_SLAB]);
+    });
+  });
+  st.cities.forEach(function (c) { samples.push([c.x, c.y, c.pin * 0.6]); });
+  var mnu = 1e9, mxu = -1e9, mnv = 1e9, mxv = -1e9;
+  samples.forEach(function (s) {
+    var r = rot(s[0], s[1], s[2]);
+    var pr = D / (D - r.Z);
+    var u = r.X * pr, v = r.Y * pr;
+    if (u < mnu) mnu = u;
+    if (u > mxu) mxu = u;
+    if (v < mnv) mnv = v;
+    if (v > mxv) mxv = v;
+  });
+  var padX = 30, padY = 28;
+  var fit = Math.min((W - padX * 2) / Math.max(1, mxu - mnu), (H - padY * 2) / Math.max(1, mxv - mnv));
+  var scale = Math.max(0.05, fit) * st.zoom;
+  var ox = W / 2 - (mnu + mxu) / 2 * scale;
+  var oy = H / 2 + (mnv + mxv) / 2 * scale;
+  function P(x, y, z) {
+    var s = rot(x, y, z);
+    var persp = D / (D - s.Z);
+    return { x: ox + s.X * persp * scale, y: oy - s.Y * persp * scale, z: s.Z };
+  }
+  /* Мягкое свечение под картой. */
+  var glow = ctx.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, Math.max(W, H) * 0.55);
+  glow.addColorStop(0, light ? 'rgba(20,184,166,.14)' : 'rgba(20,184,166,.16)');
+  glow.addColorStop(1, 'rgba(20,184,166,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+  /* Боковые стенки объёма: дальние к ближним. */
+  var walls = [];
+  RUS_GEO.rings.forEach(function (ring) {
+    for (var i = 0; i < ring.length; i++) {
+      var a = ring[i], b = ring[(i + 1) % ring.length];
+      var p1 = P(a[0], a[1], 0), p2 = P(b[0], b[1], 0);
+      var q1 = P(a[0], a[1], -RUS_SLAB), q2 = P(b[0], b[1], -RUS_SLAB);
+      var dx = b[0] - a[0], dy = b[1] - a[1];
+      var len = Math.hypot(dx, dy) || 1;
+      var nx = dy / len, ny = -dx / len;
+      var lit = Math.max(0, Math.min(1, 0.5 + 0.5 * (nx * -0.5 + ny * 0.86)));
+      walls.push({ p1: p1, p2: p2, q1: q1, q2: q2, z: (p1.z + p2.z) / 2, lit: lit });
+    }
+  });
+  walls.sort(function (x, y) { return x.z - y.z; });
+  walls.forEach(function (w) {
+    ctx.beginPath();
+    ctx.moveTo(w.p1.x, w.p1.y);
+    ctx.lineTo(w.p2.x, w.p2.y);
+    ctx.lineTo(w.q2.x, w.q2.y);
+    ctx.lineTo(w.q1.x, w.q1.y);
+    ctx.closePath();
+    ctx.fillStyle = hexMix(cWallDark, cWallLit, w.lit);
+    ctx.fill();
+  });
+  /* Верхняя грань. */
+  var topPath = null;
+  RUS_GEO.rings.forEach(function (ring, idx) {
+    ctx.beginPath();
+    ring.forEach(function (p, i) {
+      var s = P(p[0], p[1], 0);
+      if (i === 0) ctx.moveTo(s.x, s.y); else ctx.lineTo(s.x, s.y);
+    });
+    ctx.closePath();
+    if (idx === 0) {
+      topPath = new Path2D();
+      ring.forEach(function (p, i) {
+        var s = P(p[0], p[1], 0);
+        if (i === 0) topPath.moveTo(s.x, s.y); else topPath.lineTo(s.x, s.y);
+      });
+      topPath.closePath();
+      var g = ctx.createLinearGradient(0, H * 0.15, 0, H * 0.95);
+      g.addColorStop(0, cTop1);
+      g.addColorStop(1, cTop2);
+      ctx.fillStyle = g;
+      ctx.fill();
+      /* Мягкий блик по поверхности — читается объём, а не плоская заливка. */
+      var hl = ctx.createRadialGradient(W * 0.42, H * 0.3, 8, W * 0.42, H * 0.34, Math.max(W, H) * 0.62);
+      hl.addColorStop(0, light ? 'rgba(255,255,255,.55)' : 'rgba(120,240,220,.20)');
+      hl.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = hl;
+      ctx.fill();
+    } else {
+      ctx.fillStyle = cTop2;
+      ctx.fill();
+    }
+    ctx.strokeStyle = cEdge;
+    ctx.globalAlpha = idx === 0 ? 0.85 : 0.5;
+    ctx.lineWidth = idx === 0 ? 1.4 : 1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+  /* Сетка координат внутри силуэта страны. */
+  if (topPath) {
+    ctx.save();
+    ctx.clip(topPath);
+    ctx.strokeStyle = cGrid;
+    ctx.lineWidth = 1;
+    for (var lon = 20; lon <= 190; lon += 10) {
+      ctx.beginPath();
+      for (var la = 40; la <= 81; la += 2) {
+        var q = RUS_GEO.project(lon, la);
+        var s2 = P(q[0], q[1], 0);
+        if (la === 40) ctx.moveTo(s2.x, s2.y); else ctx.lineTo(s2.x, s2.y);
+      }
+      ctx.stroke();
+    }
+    for (var lat = 45; lat <= 80; lat += 5) {
+      ctx.beginPath();
+      for (var lo = 19; lo <= 190; lo += 2) {
+        var q2 = RUS_GEO.project(lo, lat);
+        var s3 = P(q2[0], q2[1], 0);
+        if (lo === 19) ctx.moveTo(s3.x, s3.y); else ctx.lineTo(s3.x, s3.y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* Метки вузов. */
+  var marks = [];
+  st.labelBoxes = [];
+  var labelMin = W < 560 ? 8 : 5;
+  var list = st.cities.slice().sort(function (a, b) { return a.y - b.y; });
+  list.forEach(function (c) {
+    var dim = st.filter && c.district !== st.filter;
+    var base = P(c.x, c.y, 0);
+    var top = P(c.x, c.y, c.pin);
+    var col = RUS_COLORS[c.district] || '#5eead4';
+    ctx.globalAlpha = dim ? 0.22 : 1;
+    ctx.strokeStyle = col;
+    ctx.lineWidth = dim ? 1 : 1.3;
+    ctx.beginPath();
+    ctx.moveTo(base.x, base.y);
+    ctx.lineTo(top.x, top.y);
+    ctx.stroke();
+    var r = (3.4 + Math.min(c.count, 12) * 0.52) * (dim ? 0.8 : 1);
+    ctx.shadowColor = col;
+    ctx.shadowBlur = dim ? 0 : 10;
+    ctx.beginPath();
+    ctx.arc(top.x, top.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = col;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 1.1;
+    ctx.strokeStyle = light ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.75)';
+    ctx.stroke();
+    if (st.hover === c) {
+      ctx.beginPath();
+      ctx.arc(top.x, top.y, r + 4.5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+    if (!dim && c.count >= labelMin) {
+      ctx.font = '600 11px ui-monospace, monospace';
+      ctx.textBaseline = 'middle';
+      var tw = ctx.measureText(c.city).width;
+      var cand = [
+        [top.x + r + 6, top.y + 1],
+        [top.x - r - 6 - tw, top.y + 1],
+        [top.x - tw / 2, top.y - r - 10],
+        [top.x - tw / 2, top.y + r + 12]
+      ];
+      for (var li = 0; li < cand.length; li++) {
+        var lb = [cand[li][0], cand[li][1] - 7, cand[li][0] + tw, cand[li][1] + 7];
+        var hit = false;
+        for (var q = 0; q < st.labelBoxes.length; q++) {
+          var bb = st.labelBoxes[q];
+          if (lb[0] < bb[2] && lb[2] > bb[0] && lb[1] < bb[3] && lb[3] > bb[1]) { hit = true; break; }
+        }
+        if (hit) continue;
+        st.labelBoxes.push(lb);
+        ctx.shadowColor = 'rgba(3,12,16,.75)';
+        ctx.shadowBlur = 5;
+        ctx.fillStyle = cLabel;
+        ctx.fillText(c.city, cand[li][0], cand[li][1]);
+        ctx.shadowBlur = 0;
+        break;
+      }
+    }
+    ctx.globalAlpha = 1;
+    marks.push({ c: c, x: top.x, y: top.y, r: r + 6, dim: dim });
+  });
+  st.marks = marks;
+}
+function mapHitTest(x, y) {
+  var st = mapState;
+  if (!st) return null;
+  var best = null, bestD = 1e9;
+  st.marks.forEach(function (m) {
+    if (m.dim) return;
+    var d = Math.hypot(m.x - x, m.y - y);
+    if (d < m.r && d < bestD) { bestD = d; best = m.c; }
+  });
+  return best;
+}
+function mapShowTip(c, x, y) {
+  var st = mapState;
+  if (!st || !st.tip) return;
+  if (!c) { st.tip.hidden = true; return; }
+  st.tip.innerHTML = '';
+  var name = document.createElement('b');
+  name.textContent = c.city;
+  var meta = document.createElement('span');
+  meta.textContent = c.count + ' ' + plural(c.count, 'вуз', 'вуза', 'вузов') + ' · ≈' + c.avg + ' балла · ' + c.district;
+  var reg = document.createElement('em');
+  reg.textContent = c.region;
+  st.tip.appendChild(name);
+  st.tip.appendChild(meta);
+  st.tip.appendChild(reg);
+  st.tip.hidden = false;
+  var stage = st.stage.getBoundingClientRect();
+  var tw = st.tip.offsetWidth, th = st.tip.offsetHeight;
+  var left = Math.max(6, Math.min(stage.width - tw - 6, x + 14));
+  var top = Math.max(6, Math.min(stage.height - th - 6, y - th - 12));
+  st.tip.style.left = left + 'px';
+  st.tip.style.top = top + 'px';
+}
+function initRussiaMap() {
+  var cv = document.getElementById('rusCanvas');
+  if (!cv) return;
+  var stage = document.getElementById('rusStage');
+  var tip = document.getElementById('rusTip');
+  var ctx = cv.getContext('2d');
+  if (!ctx) return;
+  var st = {
+    cv: cv, ctx: ctx, stage: stage, tip: tip,
+    yaw: -0.18, pitch: 0.86, zoom: 1, auto: true, drag: false, moved: 0,
+    hover: null, filter: '', cities: mapCities(), marks: [], raf: 0
+  };
+  mapState = st;
+  window.__atlasMap = st;
+  function frame() {
+    st.raf = requestAnimationFrame(frame);
+    if (!cv.isConnected) { cancelAnimationFrame(st.raf); mapState = null; return; }
+    if (st.auto && !st.drag) st.yaw += 0.0016;
+    drawRussia();
+  }
+  st.frame = frame;
+  frame();
+  /* Вращение мышью и пальцем. */
+  var px = 0, py = 0;
+  cv.addEventListener('pointerdown', function (e) {
+    st.drag = true;
+    st.moved = 0;
+    px = e.clientX;
+    py = e.clientY;
+    cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
+    cv.classList.add('grabbing');
+  });
+  cv.addEventListener('pointermove', function (e) {
+    var r = cv.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    if (st.drag) {
+      var dx = e.clientX - px, dy = e.clientY - py;
+      px = e.clientX;
+      py = e.clientY;
+      st.moved += Math.abs(dx) + Math.abs(dy);
+      st.yaw += dx * 0.006;
+      st.pitch = Math.max(0.22, Math.min(1.42, st.pitch + dy * 0.005));
+      st.hover = null;
+      mapShowTip(null);
+      cv.style.cursor = 'grabbing';
+    } else {
+      var c = mapHitTest(x, y);
+      if (c !== st.hover) {
+        st.hover = c;
+        mapShowTip(c, x, y);
+      } else if (c) {
+        mapShowTip(c, x, y);
+      }
+      cv.style.cursor = c ? 'pointer' : 'grab';
+    }
+  });
+  function endDrag(e) {
+    if (!st.drag) return;
+    st.drag = false;
+    cv.classList.remove('grabbing');
+    if (st.moved < 6) {
+      var r = cv.getBoundingClientRect();
+      var c = mapHitTest(e.clientX - r.left, e.clientY - r.top);
+      if (c) location.hash = '#/universities?city=' + encodeURIComponent(c.city);
+    }
+  }
+  cv.addEventListener('pointerup', endDrag);
+  cv.addEventListener('pointercancel', function () { st.drag = false; cv.classList.remove('grabbing'); });
+  cv.addEventListener('pointerleave', function () {
+    if (st.drag) return;
+    st.hover = null;
+    mapShowTip(null);
+  });
+  cv.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    st.zoom = Math.max(0.6, Math.min(2.4, st.zoom * (1 - e.deltaY * 0.0012)));
+    drawRussia();
+  }, { passive: false });
+  cv.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowLeft') st.yaw -= 0.12;
+    else if (k === 'ArrowRight') st.yaw += 0.12;
+    else if (k === 'ArrowUp') st.pitch = Math.max(0.22, st.pitch - 0.08);
+    else if (k === 'ArrowDown') st.pitch = Math.min(1.42, st.pitch + 0.08);
+    else if (k === '+' || k === '=') st.zoom = Math.min(2.4, st.zoom * 1.12);
+    else if (k === '-' || k === '_') st.zoom = Math.max(0.6, st.zoom / 1.12);
+    else if (k === 'Home') { st.yaw = -0.18; st.pitch = 0.86; st.zoom = 1; }
+    else return;
+    e.preventDefault();
+    drawRussia();
+  });
+  var zin = document.getElementById('rusZoomIn');
+  var zout = document.getElementById('rusZoomOut');
+  var spin = document.getElementById('rusSpin');
+  var reset = document.getElementById('rusReset');
+  if (zin) zin.addEventListener('click', function () { st.zoom = Math.min(2.4, st.zoom * 1.18); drawRussia(); });
+  if (zout) zout.addEventListener('click', function () { st.zoom = Math.max(0.6, st.zoom / 1.18); drawRussia(); });
+  if (spin) spin.addEventListener('click', function () {
+    st.auto = !st.auto;
+    spin.setAttribute('aria-pressed', st.auto ? 'true' : 'false');
+    spin.classList.toggle('on', st.auto);
+  });
+  if (reset) reset.addEventListener('click', function () {
+    st.yaw = -0.18;
+    st.pitch = 0.86;
+    st.zoom = 1;
+    drawRussia();
+  });
+  var chips = document.getElementById('rusChips');
+  if (chips) chips.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-district]') : null;
+    if (!b) return;
+    st.filter = b.getAttribute('data-district');
+    chips.querySelectorAll('button[data-district]').forEach(function (x) {
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+    drawRussia();
+  });
+  window.addEventListener('resize', function () { drawRussia(); });
+}
+function renderMap() {
+  setTitle('Карта России с вузами — Профессии·2030');
+  var cities = mapCities();
+  var cityCount = {};
+  U.forEach(function (u) { cityCount[u.city] = (cityCount[u.city] || 0) + 1; });
+  var topCities = Object.keys(cityCount).sort(function (a, b) {
+    return cityCount[b] - cityCount[a] || a.localeCompare(b, 'ru');
+  }).slice(0, 14);
+  var biggest = DISTRICTS.slice().sort(function (a, b) { return b.count - a.count; })[0];
+  var totalPrograms = U.reduce(function (n, u) { return n + (u.programs || []).length; }, 0);
+  var chips = '<button class="chip" type="button" data-district="" aria-pressed="true">Все округа</button>' +
+    FEDERAL.map(function (d) {
+      var n = U.filter(function (u) { return u.district === d.code; }).length;
+      return '<button class="chip rus-chip" type="button" data-district="' + h(d.code) + '" aria-pressed="false">' +
+        '<i class="rus-dot" style="background:' + (RUS_COLORS[d.code] || '#5eead4') + '"></i>' +
+        h(d.code) + ' <span class="mono">' + n + '</span></button>';
+    }).join('');
+  var legend = FEDERAL.map(function (d) {
+    var n = U.filter(function (u) { return u.district === d.code; }).length;
+    return '<span class="rus-leg"><i class="rus-dot" style="background:' + (RUS_COLORS[d.code] || '#5eead4') + '"></i>' +
+      h(d.code) + ' · ' + n + '</span>';
+  }).join('');
+  app.innerHTML = '<div class="view">' +
+    '<section class="hero" style="padding:44px 0 22px">' +
+    '<p class="eyebrow">Раздел · География</p>' +
+    '<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Объёмная карта <em>России</em></h1>' +
+    '<p class="lead">Объёмная модель страны: координатная сетка и метки городов с вузами. ' +
+    'Высота метки — число вузов в городе, цвет — федеральный округ. Нажатие открывает город в каталоге.</p>' +
+    '<div class="hero-cta"><a class="btn btn-primary" href="#/universities">Каталог вузов</a>' +
+    '<a class="btn" href="#/regions">Все регионы</a>' +
+    '<a class="btn" href="#/compare">Сравнение</a></div>' +
+    '</section>' +
+    '<div class="rus-wrap">' +
+    '<div class="rus-bar"><div class="chips rus-chips" id="rusChips" role="group" aria-label="Фильтр по федеральным округам">' + chips + '</div>' +
+    '<div class="rus-ctrl">' +
+    '<button id="rusZoomOut" type="button" aria-label="Отдалить" title="Отдалить">−</button>' +
+    '<button id="rusZoomIn" type="button" aria-label="Приблизить" title="Приблизить">+</button>' +
+    '<button id="rusSpin" type="button" aria-label="Автоматическое вращение" aria-pressed="true" title="Автоматическое вращение" class="on">⟳</button>' +
+    '<button id="rusReset" type="button" aria-label="Сбросить вид" title="Сбросить вид">⌂</button>' +
+    '</div></div>' +
+    '<div class="rus-stage" id="rusStage">' +
+    '<canvas id="rusCanvas" tabindex="0" role="img" aria-label="Объёмная карта России с метками городов, где есть вузы"></canvas>' +
+    '<div class="rus-tip" id="rusTip" hidden></div>' +
+    '<p class="rus-hint">Тяните карту — поворот · колесо — масштаб · нажмите на метку — город</p>' +
+    '</div>' +
+    '<div class="rus-legend">' + legend + '</div>' +
+    '</div>' +
+    '<div class="stats">' +
+    statCard(U.length, 'вузов на карте') +
+    statCard(cities.length, 'городов') +
+    statCard(totalPrograms, 'программ') +
+    statCard(DISTRICTS.length, 'федеральных округов') +
+    '</div>' +
+    '<p class="source-note">Контур страны построен по равновеликой конической проекции Альберса, объём — декоративная экструзия силуэта. ' +
+    'Данные о вузах, программах и баллах — из каталога атласа: ' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') +
+    ' в ' + cities.length + ' ' + plural(cities.length, 'городе', 'городах', 'городах') + '. ' +
+    'Крупнейший округ — ' + h(biggest.code + ' · ' + biggest.short) + ': ' + biggest.count + ' ' + plural(biggest.count, 'вуз', 'вуза', 'вузов') + '.</p>' +
+    '<section class="sec-head reveal"><div><p class="eyebrow">Города</p><h2 class="sec">Где сосредоточены вузы</h2></div>' +
+    '<a class="sec-link" href="#/universities">Фильтр по городам →</a></section>' +
+    '<div class="geo-city-list">' + topCities.map(function (c) {
+      return '<a href="#/universities?city=' + encodeURIComponent(c) + '">' + h(c) + ' <b>' + cityCount[c] + '</b></a>';
+    }).join('') + '</div>' +
+    '<section class="sec-head reveal"><div><p class="eyebrow">Округа</p><h2 class="sec">Федеральные округа по каталогу</h2></div>' +
+    '<a class="sec-link" href="#/universities">Все вузы →</a></section>' +
+    '<div class="geo-grid">' + DISTRICTS.map(districtCard).join('') + '</div>' +
+    '<div class="panel reveal" style="padding:20px;margin-top:24px"><p class="label">Как читать карту</p>' +
+    '<p class="muted" style="margin-top:6px">Каждый город отмечен вертикальной меткой: чем выше метка и больше её круг, тем больше вузов в городе. ' +
+    'Цвет метки — федеральный округ, верхняя панель фильтрует метки по округам. Протяните карту, чтобы повернуть страну, ' +
+    'колсо мыши или кнопки ＋／− меняют масштаб. Средний балл — ориентировочная сумма трёх ЕГЭ на бюджет по вузам города.</p></div>' +
+    '</div>';
+  initRussiaMap();
+}
+
 /* ---------- сравнение: профессии и вузы ---------- */
 function uniByShort(short) {
 for (var i = 0; i < U.length; i++) if (U[i].short === short) return U[i];
