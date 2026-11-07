@@ -495,6 +495,8 @@ toggleFavorite(b.getAttribute('data-fav'));
 });
 var cmpBar = document.createElement('div');
 cmpBar.className = 'cmp-bar';
+cmpBar.setAttribute('role', 'region');
+cmpBar.setAttribute('aria-label', 'Панель сравнения профессий');
 cmpBar.innerHTML = '<span class="n"><b id="cmpN">0</b> выбрано</span>' +
 '<button class="btn btn-sm btn-primary" id="cmpOpen">Сравнить</button>' +
 '<button class="clear" id="cmpClear">Очистить</button>';
@@ -1048,6 +1050,8 @@ var ROUTES = [
 [/^\/methodology$/, renderMethodology]
 ];
 function route() {
+if (storyCleanup) { storyCleanup(); storyCleanup = null; }
+if (BUBBLE_ANIM && BUBBLE_ANIM.raf) { cancelAnimationFrame(BUBBLE_ANIM.raf); BUBBLE_ANIM.raf = 0; }
 if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
 var legacyRoute = location.hash.slice(1);
 history.replaceState(null, '', '/atlas-2030' + legacyRoute);
@@ -1060,7 +1064,7 @@ r = parseHash();
 var found = false;
 for (var i = 0; i < ROUTES.length; i++) {
 var m = r.path.match(ROUTES[i][0]);
-if (m) { found = true; try { ROUTES[i][1](m, r.q); } catch (e) { render404(r.path); } break; }
+if (m) { found = true; try { ROUTES[i][1](m, r.q); } catch (e) { if (window.console && console.error) console.error('atlas: ошибка раздела ' + r.path, e); render404(r.path); } break; }
 }
 if (!found) render404(r.path);
 applySeo(r.path);
@@ -1077,8 +1081,15 @@ animateBars();
 animateCounters();
 updateCompare();
 updateProgress();
+/* Первый маршрут не перехватывает фокус: страница только что загрузилась.
+   Дальше фокус уходит в основной контент, чтобы скринридер и клавиатура
+   продолжали работу с нового раздела, а не с шапки. */
+if (routeCount++) {
+try { app.focus({ preventScroll: true }); } catch (e) { app.focus(); }
+}
 document.dispatchEvent(new CustomEvent('atlas:route', { detail: { path: r.path } }));
 }
+var routeCount = 0;
 function render404(path) {
 setTitle('Страница не найдена — Профессии·2030');
 app.innerHTML = '<div class="view" style="padding:70px 0">' +
@@ -1108,7 +1119,13 @@ els.forEach(function (e) { io.observe(e); });
 }
 var TILT_SEL = '.fcard,.spec-card,.city-card,.geo-card,.adv-card,.ind-card,.cc';
 var canTilt = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
-var noMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+var noMotion = !!(motionMQ && motionMQ.matches);
+if (motionMQ && motionMQ.addEventListener) {
+motionMQ.addEventListener('change', function (e) { noMotion = e.matches; });
+} else if (motionMQ && motionMQ.addListener) {
+motionMQ.addListener(function (e) { noMotion = e.matches; });
+}
 var tiltEl = null, tiltBox = null, tiltQueued = false, tiltX = 0, tiltY = 0;
 function tiltPaint() {
 tiltQueued = false;
@@ -1949,6 +1966,7 @@ listEl.innerHTML = list.length ? list.map(profRow).join('') :
 ? 'Под фильтр «Мой выбор» не подошла ни одна профессия. Измените предметы в опроснике или сбросьте фильтр.'
 : 'Попробуйте другой запрос или сбросьте фильтр сферы.') + '</li>';
 countEl.textContent = 'Показано ' + list.length + ' из ' + P.length;
+if (document.getElementById('bubbleChart')) drawBubble(list, true);
 listEl.classList.remove('swap');
 void listEl.offsetWidth;
 listEl.classList.add('swap');
@@ -2002,7 +2020,7 @@ var viewP = app.querySelector('.view');
 if (viewP && !document.getElementById('bubbleChart')) {
 viewP.insertAdjacentHTML('beforeend', bubbleSection());
 bindChart(document.getElementById('bubbleChart'));
-drawBubble();
+drawBubble(filteredProfessions(st));
 }
 repaint();
 }
@@ -2775,6 +2793,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">7 ноября 2026</span><div><b>Живые графики и чтение по разделам.</b> Тепловая карта получила фильтры по округу и сфере с плавной перестройкой шкалы, bubble-график обновляется вместе с каталогом. На странице профессии появилось закреплённое содержание с индикатором прокрутки, а при загрузке — скелетоны и мягкое появление блоков.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Объёмная 3D-карта России.</b> В разделе «Карта» — силуэт страны с метками городов, где есть вузы: высота метки отражает число вузов, цвет — федеральный округ. Карта поворачивается, масштабируется и открывает город в каталоге.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Фотобанк сфер.</b> Двенадцать фотографий с Wikimedia Commons: производство, лаборатория, энергетика, медиа. На страницах профессий появился баннер сферы с указанием автора и лицензии.</div></li>' +
 '<li><span class="mono">6 ноября 2026</span><div><b>Календарь приёмной кампании и избранное.</b> Помесячный календарь после 11 и после 9 класса, а также список избранных профессий, который хранится в браузере.</div></li>' +
@@ -2963,33 +2982,60 @@ var output = document.createElement('div');
 Array.prototype.slice.call(template.content.childNodes).forEach(function (node) { copyNode(node, output); });
 return output.innerHTML;
 }
+var storyCleanup = null;
 function buildToc(root) {
 var toc = document.getElementById('toc');
 if (!toc) return;
 var h2s = root.querySelectorAll('h2');
+toc.classList.add('toc-story');
 toc.innerHTML = Array.prototype.map.call(h2s, function (h2, i) {
 var id = 'sec-' + (i + 1);
 h2.id = id;
 return '<a href="#' + id + '" data-toc="' + id + '">' + h(h2.textContent.replace(/^\d+\.\s*/, '')) + '</a>';
-}).join('');
+}).join('') + '<i class="toc-progress" aria-hidden="true"></i>';
 toc.addEventListener('click', function (e) {
 var a = e.target.closest('a[data-toc]');
 if (!a) return;
 e.preventDefault();
 var t = document.getElementById(a.getAttribute('data-toc'));
-if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' });
+if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 118, behavior: noMotion ? 'auto' : 'smooth' });
 });
-if ('IntersectionObserver' in window) {
-var spy = new IntersectionObserver(function (entries) {
-entries.forEach(function (en) {
-if (!en.isIntersecting) return;
-toc.querySelectorAll('a').forEach(function (a) {
-a.classList.toggle('active', a.getAttribute('data-toc') === en.target.id);
-});
-});
-}, { rootMargin: '-88px 0px -62% 0px' });
-h2s.forEach(function (h2) { spy.observe(h2); });
+/* Секции проявляются по мере прокрутки: длинный разбор читается как история. */
+root.querySelectorAll('section').forEach(function (s) { s.classList.add('reveal', 'story'); });
+initReveal(root);
+var links = toc.querySelectorAll('a[data-toc]');
+var progress = toc.querySelector('.toc-progress');
+var ticking = false;
+function updateStory() {
+ticking = false;
+var line = 118;
+var current = null;
+for (var i = 0; i < h2s.length; i++) {
+if (h2s[i].getBoundingClientRect().top <= line) current = h2s[i];
 }
+for (var j = 0; j < links.length; j++) {
+links[j].classList.toggle('active', !!current && links[j].getAttribute('data-toc') === current.id);
+}
+if (progress && root) {
+var start = root.getBoundingClientRect().top + window.scrollY - 140;
+var total = Math.max(1, root.offsetHeight - window.innerHeight * 0.4);
+var p = Math.max(0, Math.min(1, (window.scrollY - start) / total));
+progress.style.transform = 'scaleX(' + p.toFixed(3) + ')';
+}
+}
+function onStoryScroll() {
+if (ticking) return;
+ticking = true;
+requestAnimationFrame(updateStory);
+}
+if (storyCleanup) storyCleanup();
+window.addEventListener('scroll', onStoryScroll, { passive: true });
+window.addEventListener('resize', onStoryScroll);
+storyCleanup = function () {
+window.removeEventListener('scroll', onStoryScroll);
+window.removeEventListener('resize', onStoryScroll);
+};
+updateStory();
 }
 function refreshStudyTable(root, slug, title) {
 var list = (PROG[slug] || []).slice().sort(function (a, b) {
@@ -3111,6 +3157,7 @@ var rich = document.getElementById('rich');
 rich.innerHTML = sanitizeRichHtml(d.body || '');
 prepareRich(rich);
 initPhotoParallax();
+initPhotoSkeleton();
 refreshStudyTable(rich, p.slug, p.title);
 buildToc(rich);
 var viewG = app.querySelector('.view');
@@ -4277,6 +4324,50 @@ img.style.transform = 'scale(1.06) translateY(' + (mid * -14).toFixed(1) + 'px)'
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 }
+/* Скелетон изображения: пока WebP не загрузился, под ним видна
+   мерцающая подложка. После load она отключается. */
+function initPhotoSkeleton() {
+app.querySelectorAll('.photo-fig').forEach(function (fig) {
+var img = fig.querySelector('img');
+if (!img) { fig.classList.add('is-ready'); return; }
+function done() { fig.classList.add('is-ready'); }
+if (img.complete && img.naturalWidth) done();
+else {
+img.addEventListener('load', done, { once: true });
+img.addEventListener('error', done, { once: true });
+}
+});
+}
+/* Магнитные кнопки: лёгкое смещение к курсору. Только на устройствах
+   с точным указателем и без режима уменьшения движения. */
+var magnetRaf = 0, magnetBtn = null, magnetX = 0, magnetY = 0;
+function initMagnet() {
+if (!canTilt || noMotion) return;
+document.addEventListener('pointermove', function (e) {
+if (noMotion) return;
+var b = e.target.closest && e.target.closest('.btn');
+if (!b || b.disabled) return;
+if (!b.classList.contains('magnet')) b.classList.add('magnet');
+magnetBtn = b; magnetX = e.clientX; magnetY = e.clientY;
+if (magnetRaf) return;
+magnetRaf = requestAnimationFrame(function () {
+magnetRaf = 0;
+if (!magnetBtn || !magnetBtn.isConnected) return;
+var r = magnetBtn.getBoundingClientRect();
+var dx = (magnetX - (r.left + r.width / 2)) / Math.max(1, r.width / 2);
+var dy = (magnetY - (r.top + r.height / 2)) / Math.max(1, r.height / 2);
+magnetBtn.style.setProperty('--mx', (dx * 3).toFixed(1) + 'px');
+magnetBtn.style.setProperty('--my', (dy * 2.5).toFixed(1) + 'px');
+});
+}, { passive: true });
+document.addEventListener('pointerout', function (e) {
+var b = e.target.closest && e.target.closest('.btn');
+if (!b) return;
+if (e.relatedTarget && b.contains(e.relatedTarget)) return;
+b.style.removeProperty('--mx');
+b.style.removeProperty('--my');
+}, { passive: true });
+}
 function mapShowTip(c, x, y) {
   var st = mapState;
   if (!st || !st.tip) return;
@@ -4516,7 +4607,7 @@ function renderMap() {
     '<div class="panel reveal" style="padding:20px;margin-top:24px"><p class="label">Как читать карту</p>' +
     '<p class="muted" style="margin-top:6px">Каждый город отмечен вертикальной меткой: чем выше метка и больше её круг, тем больше вузов в городе. ' +
     'Цвет метки — федеральный округ, верхняя панель фильтрует метки по округам. Протяните карту, чтобы повернуть страну, ' +
-    'колсо мыши или кнопки ＋／− меняют масштаб. Средний балл — ориентировочная сумма трёх ЕГЭ на бюджет по вузам города.</p></div>' +
+    'колесо мыши или кнопки ＋／− меняют масштаб. Средний балл — ориентировочная сумма трёх ЕГЭ на бюджет по вузам города.</p></div>' +
     '</div>';
   initRussiaMap();
 }
@@ -4656,7 +4747,8 @@ app.innerHTML = '<div class="view">' +
 '<p class="lead">' + (mode === 'uni'
 ? 'Два вуза рядом: средний балл, бюджетные места, стоимость и направления. Выбор сохраняется в адресе страницы.'
 : 'До трёх профессий рядом: спрос, рост, зарплата, баллы и ведущие вузы.') + '</p>' +
-'</section>' + tabs + body + '</div>';
+'</section>' +
+'<h2 class="sr-only">Таблица сравнения</h2>' + tabs + body + '</div>';
 if (mode === 'uni') {
 function sync() {
 var a2 = document.getElementById('cmpUniA').value;
@@ -4733,7 +4825,7 @@ g.take.map(function (u) { return '<a href="#/universities?q=' + encodeURICompone
 return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Маршрут</p>' +
 '<h2 class="sec">Профессия → специальность → вуз</h2></div>' +
 '<a class="sec-link" href="#/universities?q=' + encodeURIComponent(p.title) + '">Все программы →</a></div>' +
-'<div class="prof-graph"><svg viewBox="0 0 960 ' + H + '" role="img" aria-label="Граф связей профессии, специальностей и вузов">' +
+'<div class="prof-graph"><svg viewBox="0 0 960 ' + H + '" role="group" aria-label="Граф связей профессии, специальностей и вузов">' +
 edges + nodes + '</svg></div>' + list +
 '<p class="source-note">Граф построен по программам атласа: показаны до пяти специальностей и до двух вузов для каждой. ' +
 'Толщина и порядок связей не означают рейтинг.</p></section>';
@@ -4753,29 +4845,77 @@ for (var j = 0; j < SPHERES.length; j++) if (SPHERES[j].code === pp.sphereCode) 
 });
 return m;
 }
+var HEAT = { m: null, cells: [], base: '#162731', hot: '#5eead4', ink: '#f3fbfa' };
+function heatRgb(s) {
+s = String(s || '#162731').replace('#', '');
+if (s.length === 3) s = s.split('').map(function (c) { return c + c; }).join('');
+return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+}
+function heatColor(v, top) {
+var t = top > 0 ? Math.min(1, v / top) : 0;
+var b = heatRgb(HEAT.base), h = heatRgb(HEAT.hot);
+var r = Math.round(b[0] + (h[0] - b[0]) * t);
+var g = Math.round(b[1] + (h[1] - b[1]) * t);
+var bl = Math.round(b[2] + (h[2] - b[2]) * t);
+var lum = (0.2126 * r + 0.7152 * g + 0.0722 * bl) / 255;
+return { bg: 'rgb(' + r + ',' + g + ',' + bl + ')', fg: lum > 0.5 ? '#06201d' : HEAT.ink };
+}
+function heatTop(m, di, sj) {
+var top = 1, i, j;
+if (di >= 0 && sj >= 0) return m[di][sj] || 1;
+if (di >= 0) {
+for (j = 0; j < m[di].length; j++) if (m[di][j] > top) top = m[di][j];
+return top;
+}
+if (sj >= 0) {
+for (i = 0; i < m.length; i++) if (m[i][sj] > top) top = m[i][sj];
+return top;
+}
+for (i = 0; i < m.length; i++) for (j = 0; j < m[i].length; j++) if (m[i][j] > top) top = m[i][j];
+return top;
+}
+function applyHeatFilter() {
+var host = document.getElementById('heatmap');
+if (!host || !HEAT.m) return;
+var ds = document.getElementById('heatDistrict');
+var ss = document.getElementById('heatSphere');
+var dcode = ds ? ds.value : '';
+var scode = ss ? ss.value : '';
+var di = -1, sj = -1, i, j;
+for (i = 0; i < DISTRICTS.length; i++) if (DISTRICTS[i].code === dcode) { di = i; break; }
+for (j = 0; j < SPHERES.length; j++) if (SPHERES[j].code === scode) { sj = j; break; }
+var top = heatTop(HEAT.m, di, sj);
+HEAT.cells.forEach(function (td) {
+i = Number(td.getAttribute('data-di'));
+j = Number(td.getAttribute('data-sj'));
+var active = (di < 0 || i === di) && (sj < 0 || j === sj);
+td.classList.toggle('heat-dim', !active);
+var c = heatColor(HEAT.m[i][j], top);
+td.style.background = c.bg;
+td.style.color = c.fg;
+td.setAttribute('aria-label', DISTRICTS[i].short + ', ' + SPHERES[j].name + ': ' +
+HEAT.m[i][j] + ' ' + plural(HEAT.m[i][j], 'программа', 'программы', 'программ'));
+});
+var note = document.getElementById('heatNote');
+if (note) {
+if (di >= 0 && sj >= 0) note.textContent = DISTRICTS[di].short + ' · ' + SPHERES[sj].name + ': шкала по одной ячейке';
+else if (di >= 0) note.textContent = DISTRICTS[di].short + ': шкала внутри округа';
+else if (sj >= 0) note.textContent = SPHERES[sj].name + ': шкала внутри сферы';
+else note.textContent = 'Все округа и сферы: общая шкала';
+}
+host.setAttribute('aria-label', 'Тепловая карта: округа и сферы' +
+(di >= 0 ? ', округ ' + DISTRICTS[di].short : '') +
+(sj >= 0 ? ', сфера ' + SPHERES[sj].name : ''));
+}
 function renderHeatmap() {
 var host = document.getElementById('heatmap');
 if (!host) return;
 var m = heatMatrix();
-var max = 1;
-m.forEach(function (r) { r.forEach(function (v) { if (v > max) max = v; }); });
-var base = cssColor('--panel-2', '#162731');
-var hot = cssColor('--violet', '#5eead4');
-function rgb(s) {
-s = s.replace('#', '');
-if (s.length === 3) s = s.split('').map(function (c) { return c + c; }).join('');
-return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
-}
-var b = rgb(base), hcol = rgb(hot);
-var ink = cssColor('--ink', '#f3fbfa');
-function cellColor(v) {
-var t = v / max;
-var r = Math.round(b[0] + (hcol[0] - b[0]) * t);
-var g = Math.round(b[1] + (hcol[1] - b[1]) * t);
-var bl = Math.round(b[2] + (hcol[2] - b[2]) * t);
-var lum = (0.2126 * r + 0.7152 * g + 0.0722 * bl) / 255;
-return { bg: 'rgb(' + r + ',' + g + ',' + bl + ')', fg: lum > 0.5 ? '#06201d' : ink };
-}
+HEAT.m = m;
+HEAT.base = cssColor('--panel-2', '#162731');
+HEAT.hot = cssColor('--violet', '#5eead4');
+HEAT.ink = cssColor('--ink', '#f3fbfa');
+var max = heatTop(m, -1, -1);
 var html = '<table class="heat-table" aria-label="Число программ по федеральным округам и сферам">' +
 '<thead><tr><th class="heat-corner" scope="col"><span class="sr-only">Округ</span></th>';
 SPHERES.forEach(function (s, j) {
@@ -4783,26 +4923,46 @@ html += '<th scope="col" title="' + h(s.code + ' · ' + s.name) + '"><b>' + h(s.
 });
 html += '</tr></thead><tbody>';
 DISTRICTS.forEach(function (d, i) {
-html += '<tr><th scope="row"><b>' + h(d.code) + '</b><span>' + h(d.short) + '</span></th>';
+html += '<tr data-di="' + i + '"><th scope="row"><b>' + h(d.code) + '</b><span>' + h(d.short) + '</span></th>';
 m[i].forEach(function (v, j) {
-var c = cellColor(v);
+var c = heatColor(v, max);
 var tip = d.code + ' · ' + d.short + ' — ' + SPHERES[j].code + ' · ' + SPHERES[j].name + ': ' + v + ' ' + plural(v, 'программа', 'программы', 'программ');
-html += '<td style="background:' + c.bg + ';color:' + c.fg + '" title="' + h(tip) + '">' + v + '</td>';
+html += '<td data-di="' + i + '" data-sj="' + j + '" style="background:' + c.bg + ';color:' + c.fg + '" title="' + h(tip) + '">' + v + '</td>';
 });
 html += '</tr>';
 });
 html += '</tbody></table>';
 host.innerHTML = html;
+HEAT.cells = Array.prototype.slice.call(host.querySelectorAll('td[data-di]'));
+var ds = document.getElementById('heatDistrict');
+var ss = document.getElementById('heatSphere');
+if (ds && !ds.getAttribute('data-bound')) {
+ds.setAttribute('data-bound', '1');
+if (ss) ss.setAttribute('data-bound', '1');
+ds.addEventListener('change', applyHeatFilter);
+if (ss) ss.addEventListener('change', applyHeatFilter);
+}
+applyHeatFilter();
 }
 /* ---------- bubble-график: балл × рост × масштаб ---------- */
 var BUBBLE_GEOM = null;
+var BUBBLE_POOL = null;
+var BUBBLE_ANIM = { raf: 0, prev: null };
+var BUBBLE_FOCUS = -1;
 function sphereColor(code) {
 return {
 'D-01': '#5eead4', 'D-02': '#fbbf24', 'D-03': '#86efac',
 'D-04': '#fb7185', 'D-05': '#c4b5fd', 'D-06': '#7dd3fc'
 }[code] || '#5eead4';
 }
-function drawBubble() {
+function bubbleItems(pool) {
+var src = pool || BUBBLE_POOL || P;
+return src.map(function (p) {
+var mb = minBudget(p.slug);
+return { p: p, mb: mb, n: (PROG[p.slug] || []).length };
+}).filter(function (x) { return x.mb && x.n; });
+}
+function drawBubble(pool, animate) {
 var canvas = document.getElementById('bubbleChart');
 if (!canvas) return;
 var wrap = canvas.parentNode;
@@ -4815,11 +4975,24 @@ canvas.style.height = H + 'px';
 var ctx = canvas.getContext('2d');
 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 ctx.clearRect(0, 0, W, H);
-var items = P.map(function (p) {
-var mb = minBudget(p.slug);
-return { p: p, mb: mb, n: (PROG[p.slug] || []).length };
-}).filter(function (x) { return x.mb && x.n; });
-if (!items.length) return;
+if (pool) BUBBLE_POOL = pool;
+var items = bubbleItems(BUBBLE_POOL);
+var ink3 = cssColor('--ink-3', '#839da1');
+var ink = cssColor('--ink', '#f3fbfa');
+var rule = cssColor('--rule-2', '#3a3049');
+if (!items.length) {
+BUBBLE_GEOM = null;
+BUBBLE_ANIM.prev = null;
+if (BUBBLE_ANIM.raf) { cancelAnimationFrame(BUBBLE_ANIM.raf); BUBBLE_ANIM.raf = 0; }
+ctx.fillStyle = ink3;
+ctx.font = '13px "Onest", system-ui, sans-serif';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.fillText('Под текущий фильтр нет профессий с программами и баллами', W / 2, H / 2);
+canvas.setAttribute('aria-label', 'Bubble-график: под текущий фильтр нет профессий');
+renderBubbleList([], narrow);
+return;
+}
 var padL = 52, padR = narrow ? 12 : 18, padT = 22, padB = 44;
 var xs = items.map(function (x) { return x.mb; });
 var ys = items.map(function (x) { return x.p.growth; });
@@ -4835,9 +5008,7 @@ var n = raw / pow;
 var step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
 return step * pow;
 }
-var ink3 = cssColor('--ink-3', '#839da1');
-var ink = cssColor('--ink', '#f3fbfa');
-var rule = cssColor('--rule-2', '#3a3049');
+function drawAxes() {
 ctx.strokeStyle = rule;
 ctx.globalAlpha = 0.55;
 ctx.lineWidth = 1;
@@ -4869,21 +5040,20 @@ ctx.textAlign = 'center';
 ctx.textBaseline = 'middle';
 ctx.fillText('Рост вакансий к 2030, %', 0, 0);
 ctx.restore();
+}
 var sorted = items.slice().sort(function (a, b) { return a.n - b.n; });
-BUBBLE_GEOM = { padL: padL, padT: padT, plotW: plotW, plotH: plotH, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, items: [] };
-sorted.forEach(function (x) {
-var r = radius(x.n);
-var cx = px(x.mb), cy = py(x.p.growth);
-ctx.beginPath();
-ctx.arc(cx, cy, r, 0, Math.PI * 2);
-ctx.fillStyle = sphereColor(x.p.sphereCode) + '55';
-ctx.fill();
-ctx.strokeStyle = sphereColor(x.p.sphereCode);
-ctx.lineWidth = 1.2;
-ctx.stroke();
-BUBBLE_GEOM.items.push({ x: cx, y: cy, r: r, p: x.p, mb: x.mb, n: x.n });
+var targets = sorted.map(function (x) {
+return { x: px(x.mb), y: py(x.p.growth), r: radius(x.n), p: x.p, mb: x.mb, n: x.n };
 });
-if (!narrow) {
+BUBBLE_GEOM = { padL: padL, padT: padT, plotW: plotW, plotH: plotH, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, items: targets };
+canvas.setAttribute('aria-label', 'Bubble-график: ' + targets.length + ' ' +
+plural(targets.length, 'профессия', 'профессии', 'профессий') +
+' по текущему фильтру. Стрелки — перебор точек, Enter — открыть профессию');
+var prev = BUBBLE_ANIM.prev;
+var useTween = !!(animate && prev && !noMotion);
+var from = useTween ? prev : null;
+function drawLabels() {
+if (narrow) return;
 var font = '11px "Onest", system-ui, sans-serif';
 ctx.font = font;
 var lh = 13, padX = 5, padY = 3;
@@ -4956,6 +5126,52 @@ ctx.textBaseline = 'middle';
 ctx.fillText(l.text, l.left, l.top + lh / 2);
 });
 }
+function paint(e) {
+ctx.clearRect(0, 0, W, H);
+drawAxes();
+targets.forEach(function (tg) {
+var f = from ? from[tg.p.slug] : null;
+var x = f ? f.x + (tg.x - f.x) * e : tg.x;
+var y = f ? f.y + (tg.y - f.y) * e : tg.y + (1 - e) * 22;
+var r = f ? f.r + (tg.r - f.r) * e : tg.r * (0.35 + 0.65 * e);
+ctx.globalAlpha = f ? 1 : e;
+ctx.beginPath();
+ctx.arc(x, y, r, 0, Math.PI * 2);
+ctx.fillStyle = sphereColor(tg.p.sphereCode) + '55';
+ctx.fill();
+ctx.strokeStyle = sphereColor(tg.p.sphereCode);
+ctx.lineWidth = 1.2;
+ctx.stroke();
+});
+ctx.globalAlpha = 1;
+if (e >= 1 && BUBBLE_FOCUS >= 0 && targets[BUBBLE_FOCUS]) {
+var fit = targets[BUBBLE_FOCUS];
+ctx.beginPath();
+ctx.arc(fit.x, fit.y, fit.r + 4, 0, Math.PI * 2);
+ctx.strokeStyle = ink;
+ctx.lineWidth = 2;
+ctx.stroke();
+}
+if (e >= 1) drawLabels();
+}
+if (BUBBLE_ANIM.raf) { cancelAnimationFrame(BUBBLE_ANIM.raf); BUBBLE_ANIM.raf = 0; }
+var nextPrev = {};
+targets.forEach(function (tg) { nextPrev[tg.p.slug] = { x: tg.x, y: tg.y, r: tg.r }; });
+if (useTween) {
+var t0 = performance.now(), dur = 460;
+var step = function (now) {
+var t = Math.min(1, (now - t0) / dur);
+var e = 1 - Math.pow(1 - t, 3);
+paint(e);
+if (t < 1) BUBBLE_ANIM.raf = requestAnimationFrame(step);
+else { BUBBLE_ANIM.raf = 0; BUBBLE_ANIM.prev = nextPrev; paint(1); }
+};
+paint(0);
+BUBBLE_ANIM.raf = requestAnimationFrame(step);
+} else {
+BUBBLE_ANIM.prev = nextPrev;
+paint(1);
+}
 renderBubbleList(items, narrow);
 }
 function renderBubbleList(items, narrow) {
@@ -5001,6 +5217,19 @@ tip.style.top = top + 'px';
 tip.hidden = true;
 }
 }
+function chartTipItem(canvas, item) {
+var tip = canvas.parentNode.querySelector('.chart-tip');
+if (!tip || !item) return;
+tip.innerHTML = '<b>' + h(item.p.title) + '</b><br>Индекс: ' + item.p.index + ' · рост: +' + item.p.growth + '%<br>' +
+'Мин. балл: ≈' + item.mb + ' · программ: ' + item.n;
+tip.hidden = false;
+var tw = tip.offsetWidth, th = tip.offsetHeight;
+var left = item.x + item.r + 12;
+var top = item.y - th / 2;
+if (left + tw > canvas.clientWidth) left = item.x - item.r - tw - 12;
+tip.style.left = Math.max(4, left) + 'px';
+tip.style.top = Math.max(4, Math.min(canvas.clientHeight - th - 4, top)) + 'px';
+}
 function chartHit(canvas, ev) {
 if (canvas.id !== 'bubbleChart' || !BUBBLE_GEOM) return null;
 var rect = canvas.getBoundingClientRect();
@@ -5030,30 +5259,70 @@ canvas.style.cursor = 'default';
 var tip = canvas.parentNode.querySelector('.chart-tip');
 if (tip) tip.hidden = true;
 });
+/* Клавиатура: стрелки перебирают точки, Enter или пробел открывают
+   профессию. Подсказка выводится в aria-live-область. */
+if (canvas.id === 'bubbleChart') {
+canvas.addEventListener('keydown', function (e) {
+if (!BUBBLE_GEOM || !BUBBLE_GEOM.items.length) return;
+var n = BUBBLE_GEOM.items.length;
+var next = BUBBLE_FOCUS;
+if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = BUBBLE_FOCUS < 0 ? 0 : (BUBBLE_FOCUS + 1) % n;
+else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = BUBBLE_FOCUS < 0 ? n - 1 : (BUBBLE_FOCUS - 1 + n) % n;
+else if (e.key === 'Home') next = 0;
+else if (e.key === 'End') next = n - 1;
+else if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+var cur = BUBBLE_GEOM.items[BUBBLE_FOCUS];
+if (cur) location.hash = '#/professions/' + cur.p.slug;
+e.preventDefault();
+return;
+} else return;
+e.preventDefault();
+BUBBLE_FOCUS = next;
+drawBubble();
+chartTipItem(canvas, BUBBLE_GEOM.items[next]);
+});
+canvas.addEventListener('blur', function () {
+BUBBLE_FOCUS = -1;
+var tip = canvas.parentNode.querySelector('.chart-tip');
+if (tip) tip.hidden = true;
+drawBubble();
+});
+}
 }
 function bubbleSection() {
 return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Аналитика</p>' +
 '<h2 class="sec">Профессии: балл, рост и масштаб</h2></div><a class="sec-link" href="#/admission">История баллов →</a></div>' +
-'<div class="panel" style="padding:16px"><div class="chart-canvas-wrap"><canvas id="bubbleChart" aria-label="Bubble-график профессий: минимальный балл, рост вакансий и число программ"></canvas><div class="chart-tip" hidden></div></div>' +
+'<div class="panel" style="padding:16px"><div class="chart-canvas-wrap"><canvas id="bubbleChart" tabindex="0" role="img" aria-label="Bubble-график профессий: минимальный балл, рост вакансий и число программ"></canvas><div class="chart-tip" role="status" aria-live="polite" hidden></div></div>' +
 '<div class="chart-legend">' + SPHERES.map(function (s) {
 return '<span><i style="background:' + sphereColor(s.code) + '"></i>' + h(s.code + ' · ' + s.name) + '</span>';
 }).join('') + '<span>Размер круга — число программ</span></div>' +
 '<div class="bubble-list" id="bubbleList"></div></div>' +
 '<p class="source-note">По горизонтали — минимальный проходной балл на бюджет по программам профессии, по вертикали — рост вакансий к 2030 году. ' +
-'Показаны профессии, для которых в атласе есть программы и баллы. Нажмите на круг, чтобы открыть профессию. На телефоне подписи вынесены в список под графиком.</p></section>';
+'Показаны профессии, для которых в атласе есть программы и баллы, с учётом текущего фильтра. Нажмите на круг или выберите точку стрелками и нажмите Enter, чтобы открыть профессию. На телефоне подписи вынесены в список под графиком.</p></section>';
 }
 function heatSection() {
 return '<section class="enh-section"><div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Аналитика</p>' +
 '<h2 class="sec">Тепловая карта: округа и сферы</h2></div><a class="sec-link" href="#/admission">Бюджетные места →</a></div>' +
-'<div class="panel" style="padding:16px"><div class="heat-scroll" id="heatmap" tabindex="0" role="region" aria-label="Тепловая карта: округа и сферы"></div>' +
+'<div class="panel" style="padding:16px">' +
+'<div class="heat-ctrl">' +
+'<label class="select-field" for="heatDistrict"><span class="label">Округ</span><select id="heatDistrict"><option value="">Все округа</option>' +
+DISTRICTS.map(function (d) { return '<option value="' + h(d.code) + '">' + h(d.code + ' · ' + d.short) + '</option>'; }).join('') +
+'</select></label>' +
+'<label class="select-field" for="heatSphere"><span class="label">Сфера</span><select id="heatSphere"><option value="">Все сферы</option>' +
+SPHERES.map(function (s) { return '<option value="' + h(s.code) + '">' + h(s.code + ' · ' + s.name) + '</option>'; }).join('') +
+'</select></label>' +
+'<p class="mono tiny heat-note" id="heatNote" aria-live="polite">Все округа и сферы: общая шкала</p>' +
+'</div>' +
+'<div class="heat-scroll" id="heatmap" tabindex="0" role="region" aria-label="Тепловая карта: округа и сферы"></div>' +
 '<div class="chart-legend">' + SPHERES.map(function (s, i) {
 return '<span><b class="mono">' + (i + 1) + '</b> ' + h(s.code + ' · ' + s.name) + '</span>';
 }).join('') + '</div></div>' +
-'<p class="source-note">Число в ячейке — сколько программ атласа есть в округе по этой сфере. Чем темнее ячейка, тем больше предложений. Колонки 1–6 соответствуют сферам из легенды; на телефоне таблица прокручивается по горизонтали, названия округов остаются на месте.</p></section>';
+'<p class="source-note">Число в ячейке — сколько программ атласа есть в округе по этой сфере. Чем темнее ячейка, тем больше предложений. Выберите округ или сферу, чтобы пересчитать шкалу внутри выбранного среза: остальные ячейки приглушаются. Колонки 1–6 соответствуют сферам из легенды; на телефоне таблица прокручивается по горизонтали, названия округов остаются на месте.</p></section>';
 }
 /* ---------- инициализация ---------- */
 injectTools();
 applyTheme();
+initMagnet();
 updateFooterCounts();
 var resizeTimer2 = 0;
 window.addEventListener('resize', function () {

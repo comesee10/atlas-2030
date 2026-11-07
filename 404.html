@@ -6,7 +6,11 @@
   var base = '/atlas-2030/';
   if (path.indexOf(base) === 0) path = path.slice(base.length - 1) || '/';
   var allowed = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/;
-  sessionStorage.setItem('atlas:redirect', allowed.test(path) ? path : '/');
+  try {
+    sessionStorage.setItem('atlas:redirect', allowed.test(path) ? path : '/');
+  } catch (e) {
+    /* приватный режим или запрет хранилища: переходим без сохранения пути */
+  }
   location.replace(base);
 }());
 </script><p>Переходим к разделу…</p></body></html>

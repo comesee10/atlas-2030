@@ -286,6 +286,10 @@ table.data .p{font-family:var(--mono);color:var(--ink-2);font-variant-numeric:ta
 .toc a{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);border:1px solid var(--rule);border-radius:999px;padding:6px 10px;white-space:nowrap;transition:all .15s}
 .toc a:hover{color:var(--ink);border-color:var(--rule-2)}
 .toc a.active{color:var(--violet);border-color:var(--violet);background:rgba(167,139,250,.1)}
+.toc-story{position:sticky;top:64px;z-index:20;background:var(--bg);margin:0 0 8px;padding:10px 0 12px;box-shadow:0 1px 0 var(--rule)}
+.toc-progress{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--violet);transform:scaleX(0);transform-origin:left center;opacity:.85;transition:transform .15s linear}
+.story{scroll-margin-top:124px}
+@media (prefers-reduced-motion:reduce){.toc-progress{transition:none}}
 .rich{display:grid;gap:34px;min-width:0}
 .rich > *{min-width:0}
 .rich section{scroll-margin-top:90px}
@@ -700,7 +704,7 @@ text-transform:uppercase;color:var(--ink-4);text-align:left;flex-shrink:0;
 .cmp-table th,.cmp-table td{padding:10px 14px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
 .cmp-table thead th{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink);white-space:normal;min-width:140px;line-height:1.2;border-bottom:1px solid var(--rule-2)}
 .cmp-table thead th a:hover{color:var(--violet)}
-.cmp-table tbody th{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4);font-weight:400;white-space:nowrap;width:140px;position:sticky;left:0;background:var(--panel);z-index:2}
+.cmp-table tbody th{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:400;white-space:nowrap;width:140px;position:sticky;left:0;background:var(--panel);z-index:2}
 .cmp-table td{color:var(--ink-2)}
 .cmp-table .hi{color:var(--violet);font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums}
 .cmp-table .best{color:var(--ok)}
@@ -1231,11 +1235,13 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .theme-light .sph-card.has-photo::after{background:linear-gradient(180deg,rgba(244,251,249,.7) 0%,rgba(244,251,249,.1) 32%,rgba(244,251,249,.4) 54%,rgba(244,251,249,.9) 82%,rgba(244,251,249,.98) 100%)}
 .theme-light .sph-body .d{color:var(--ink-3)}
 /* ---- фотоблок на странице профессии ---- */
-.photo-fig{margin:24px 0 0;border:1px solid var(--rule);border-radius:16px;overflow:hidden;background:var(--panel)}
+.photo-fig{margin:24px 0 0;border:1px solid var(--rule);border-radius:16px;overflow:hidden;background:var(--panel);position:relative}
+.photo-fig:not(.is-ready){background:linear-gradient(100deg,var(--panel) 30%,var(--panel-2) 50%,var(--panel) 70%);background-size:220% 100%;animation:skelPan 1.5s linear infinite}
+.photo-fig img{position:relative;z-index:1}
 .photo-fig img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
 .photo-fig figcaption{padding:9px 14px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:10px;letter-spacing:.02em;color:var(--ink-4)}
-.photo-credit{color:var(--ink-4);border-bottom:1px dashed var(--rule-2);transition:color .2s,border-color .2s}
-.photo-credit:hover{color:var(--violet);border-color:var(--violet)}
+.photo-credit{color:var(--ink-2);border-bottom:1px dashed var(--rule-2);transition:color .2s,border-color .2s}
+.photo-credit:hover,.photo-credit:focus-visible{color:var(--violet);border-color:var(--violet)}
 .changelog{list-style:none;display:grid;gap:12px;margin:0;padding:0}
 .changelog li{display:grid;grid-template-columns:132px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--rule)}
 .changelog li:first-child{border-top:0}
@@ -1296,7 +1302,13 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .heat-table tbody th{position:sticky;left:0;z-index:2;background:var(--heat-bg);text-align:left;padding:0 14px 0 4px;white-space:nowrap;height:42px;font-weight:400;border-radius:3px}
 .heat-table tbody th b{display:inline-block;min-width:40px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--ink-3)}
 .heat-table tbody th span{font-size:12.5px;color:var(--ink)}
-.heat-table td{height:42px;text-align:center;border-radius:3px;font-family:var(--mono);font-size:11.5px}
+.heat-table td{height:42px;text-align:center;border-radius:3px;font-family:var(--mono);font-size:11.5px;transition:background-color .4s var(--ease),color .4s var(--ease),opacity .35s var(--ease)}
+.heat-table td.heat-dim{opacity:.18}
+.heat-ctrl{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;margin-bottom:14px}
+.heat-ctrl .select-field{min-width:190px}
+.heat-note{margin-left:auto;color:var(--ink-4);align-self:center}
+.chart-canvas-wrap canvas:focus-visible{outline:2px solid var(--violet);outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){.heat-table td{transition:none}}
 .theme-light .heat-scroll{--heat-bg:#fff}
 .bubble-list{display:none;margin-top:14px;border-top:1px solid var(--rule)}
 .bubble-list.is-on{display:block}
@@ -1449,6 +1461,21 @@ body{overflow-x:clip}
 .salary-val{grid-area:val}
 .salary-track{grid-area:track;margin-top:2px}
 }
+/* ---- скелетоны и магнитные кнопки ---- */
+@keyframes skelPan{from{background-position:220% 0}to{background-position:-220% 0}}
+@keyframes skelSweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.boot-skel{display:grid;gap:16px;max-width:900px;padding:58px 0}
+.skel{position:relative;overflow:hidden;background:var(--panel-2);border-radius:8px}
+.skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(94,234,212,.1),transparent);animation:skelSweep 1.3s linear infinite}
+.skel-eyebrow{width:128px;height:12px}
+.skel-h1{width:min(560px,82%);height:50px;border-radius:10px}
+.skel-h1.short{width:min(360px,58%)}
+.skel-lead{width:min(640px,92%);height:20px}
+.skel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+.skel-card{height:148px;border-radius:12px}
+.btn.magnet:not(:disabled){transform:translate(var(--mx,0px),calc(var(--my,0px) - 1px))}
+@media (max-width:760px){.skel-grid{grid-template-columns:1fr}.skel-card:nth-child(n+3){display:none}}
+@media (prefers-reduced-motion:reduce){.boot-skel .skel::after,.photo-fig:not(.is-ready){animation:none}}
 @media print{
 :root{
 --bg:#fff;--bg-2:#fff;--panel:#fff;--panel-2:#fff;--rule:#d8d4e0;--rule-2:#c4bfd0;
