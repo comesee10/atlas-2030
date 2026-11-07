@@ -3856,6 +3856,12 @@ var RUS_GEO = (function () {
   };
 })();
 var RUS_SLAB = 34;   /* толщина объёма страны в единицах карты */
+var RUS_VIEW = { yaw: -0.18, pitch: 0.86, zoom: 1 };
+var RUS_ICO = {
+  play: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.2l11 6.8-11 6.8z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>',
+  stop: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.6"/></svg>'
+};
 var mapState = null;
 
 function mapCities() {
@@ -4149,7 +4155,7 @@ function initRussiaMap() {
   if (!ctx) return;
   var st = {
     cv: cv, ctx: ctx, stage: stage, tip: tip,
-    yaw: -0.18, pitch: 0.86, zoom: 1, auto: true, drag: false, moved: 0,
+    yaw: RUS_VIEW.yaw, pitch: RUS_VIEW.pitch, zoom: RUS_VIEW.zoom, auto: true, drag: false, moved: 0,
     hover: null, filter: '', cities: mapCities(), marks: [], raf: 0
   };
   mapState = st;
@@ -4169,6 +4175,8 @@ function initRussiaMap() {
     st.moved = 0;
     px = e.clientX;
     py = e.clientY;
+    /* Взятие карты рукой останавливает автоповорот — иначе метка убегает из-под курсора. */
+    if (st.auto) { st.auto = false; updateSpinUI(); }
     cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     cv.classList.add('grabbing');
   });
@@ -4226,7 +4234,8 @@ function initRussiaMap() {
     else if (k === 'ArrowDown') st.pitch = Math.min(1.42, st.pitch + 0.08);
     else if (k === '+' || k === '=') st.zoom = Math.min(2.4, st.zoom * 1.12);
     else if (k === '-' || k === '_') st.zoom = Math.max(0.6, st.zoom / 1.12);
-    else if (k === 'Home') { st.yaw = -0.18; st.pitch = 0.86; st.zoom = 1; }
+    else if (k === 'Home') { st.yaw = RUS_VIEW.yaw; st.pitch = RUS_VIEW.pitch; st.zoom = RUS_VIEW.zoom; }
+    else if (k === ' ' || k === 'Spacebar') { st.auto = !st.auto; updateSpinUI(); }
     else return;
     e.preventDefault();
     drawRussia();
@@ -4235,19 +4244,42 @@ function initRussiaMap() {
   var zout = document.getElementById('rusZoomOut');
   var spin = document.getElementById('rusSpin');
   var reset = document.getElementById('rusReset');
+  var stop = document.getElementById('rusStop');
+  var state = document.getElementById('rusState');
+  function updateSpinUI() {
+    if (spin) {
+      spin.innerHTML = st.auto ? RUS_ICO.pause : RUS_ICO.play;
+      spin.setAttribute('aria-pressed', st.auto ? 'true' : 'false');
+      spin.setAttribute('aria-label', st.auto ? 'Остановить вращение карты' : 'Продолжить вращение карты');
+      spin.setAttribute('title', st.auto ? 'Остановить вращение' : 'Продолжить вращение');
+      spin.classList.toggle('on', st.auto);
+    }
+    if (state) state.textContent = st.auto ? 'Вращение включено' : 'Карта остановлена';
+    if (state) state.classList.toggle('off', !st.auto);
+  }
   if (zin) zin.addEventListener('click', function () { st.zoom = Math.min(2.4, st.zoom * 1.18); drawRussia(); });
   if (zout) zout.addEventListener('click', function () { st.zoom = Math.max(0.6, st.zoom / 1.18); drawRussia(); });
   if (spin) spin.addEventListener('click', function () {
     st.auto = !st.auto;
-    spin.setAttribute('aria-pressed', st.auto ? 'true' : 'false');
-    spin.classList.toggle('on', st.auto);
-  });
-  if (reset) reset.addEventListener('click', function () {
-    st.yaw = -0.18;
-    st.pitch = 0.86;
-    st.zoom = 1;
+    updateSpinUI();
     drawRussia();
   });
+  /* «Стоп»: вращение выключается, карта возвращается в исходное положение. */
+  if (stop) stop.addEventListener('click', function () {
+    st.auto = false;
+    st.yaw = RUS_VIEW.yaw;
+    st.pitch = RUS_VIEW.pitch;
+    st.zoom = RUS_VIEW.zoom;
+    updateSpinUI();
+    drawRussia();
+  });
+  if (reset) reset.addEventListener('click', function () {
+    st.yaw = RUS_VIEW.yaw;
+    st.pitch = RUS_VIEW.pitch;
+    st.zoom = RUS_VIEW.zoom;
+    drawRussia();
+  });
+  updateSpinUI();
   var chips = document.getElementById('rusChips');
   if (chips) chips.addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('button[data-district]') : null;
@@ -4297,11 +4329,13 @@ function renderMap() {
     '<div class="rus-ctrl">' +
     '<button id="rusZoomOut" type="button" aria-label="Отдалить" title="Отдалить">−</button>' +
     '<button id="rusZoomIn" type="button" aria-label="Приблизить" title="Приблизить">+</button>' +
-    '<button id="rusSpin" type="button" aria-label="Автоматическое вращение" aria-pressed="true" title="Автоматическое вращение" class="on">⟳</button>' +
+    '<button id="rusSpin" type="button" class="on" aria-label="Остановить вращение карты" aria-pressed="true" title="Остановить вращение"></button>' +
+    '<button id="rusStop" type="button" aria-label="Остановить карту и вернуть исходный вид" title="Остановить и вернуть исходный вид">' + RUS_ICO.stop + '</button>' +
     '<button id="rusReset" type="button" aria-label="Сбросить вид" title="Сбросить вид">⌂</button>' +
     '</div></div>' +
     '<div class="rus-stage" id="rusStage">' +
     '<canvas id="rusCanvas" tabindex="0" role="img" aria-label="Объёмная карта России с метками городов, где есть вузы"></canvas>' +
+    '<span class="rus-state" id="rusState">Вращение включено</span>' +
     '<div class="rus-tip" id="rusTip" hidden></div>' +
     '<p class="rus-hint">Тяните карту — поворот · колесо — масштаб · нажмите на метку — город</p>' +
     '</div>' +
