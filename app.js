@@ -1661,9 +1661,37 @@ function favButton(p, cls) {
 var on = isFavorite(p.slug);
 return '<button class="fav-btn' + (cls ? ' ' + cls : '') + '" type="button" data-fav="' + h(p.slug) + '" data-title="' + h(p.title) + '" aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + (on ? 'Убрать из избранного: ' : 'Добавить в избранное: ') + h(p.title) + '" title="' + (on ? 'В избранном' : 'В избранное') + '">' + FAV_ICON + '</button>';
 }
+/* Графическая метка профессии: сетка точек, узор которой выводится
+   из slug. Одна и та же профессия всегда получает один и тот же знак. */
+var SPHERE_MARK_COLOR = {
+'D-01': '#5eead4', 'D-02': '#38bdf8', 'D-03': '#2dd4bf',
+'D-04': '#facc15', 'D-05': '#a78bfa', 'D-06': '#f0abfc'
+};
+function profMark(slug, sphereCode) {
+var seed = 2166136261;
+for (var i = 0; i < slug.length; i++) {
+seed = (seed ^ slug.charCodeAt(i)) >>> 0;
+seed = (seed * 16777619) >>> 0;
+}
+var used = {}, cells = [], want = 4 + (seed % 4), guard = 0;
+while (cells.length < want && guard++ < 60) {
+seed = (seed * 1103515245 + 12345) >>> 0;
+var cx = seed % 4, cy = (seed >>> 9) % 4, key = cx + '-' + cy;
+if (used[key]) continue;
+used[key] = 1;
+cells.push([cx, cy]);
+}
+var d = '';
+cells.forEach(function (cell) {
+d += 'M' + (2 + cell[0] * 9) + ' ' + (2 + cell[1] * 9) + 'h6.5v6.5h-6.5z';
+});
+var col = SPHERE_MARK_COLOR[sphereCode] || '#5eead4';
+return '<svg class="pmark" viewBox="0 0 40 40" aria-hidden="true" style="color:' + col + '"><path d="' + d + '"/></svg>';
+}
 function fcard(p) {
 return '<div class="fcard-wrap reveal">' +
 '<a class="panel fcard" href="#/professions/' + p.slug + '">' +
+'<span class="pmark-bg">' + profMark(p.slug, p.sphereCode) + '</span>' +
 '<div class="top"><span class="code">' + h(p.sphereCode) + ' · ' + h(p.sphere) + '</span><span class="idx">' + p.index + '</span></div>' +
 '<h3>' + h(p.title) + '</h3>' +
 '<p>' + h(p.desc) + '</p>' +
@@ -1833,7 +1861,8 @@ return '<button class="chip" data-sphere="' + h(code) + '" aria-pressed="' + (ac
 function profRow(p) {
 return '<li class="prof-row">' +
 '<span class="rank">' + h(p.rank) + '</span>' +
-'<div class="t-cell"><a class="t" href="#/professions/' + p.slug + '">' + h(p.title) + '</a>' +
+'<div class="t-cell"><span class="pmark-row">' + profMark(p.slug, p.sphereCode) + '</span>' +
+'<a class="t" href="#/professions/' + p.slug + '">' + h(p.title) + '</a>' +
 '<span class="d">' + h(p.desc) + '</span></div>' +
 '<div class="meta"><span class="sph">' + h(p.sphereCode) + ' · ' + h(p.sphere) + '</span>' +
 '<div class="metrics"><span class="idx" title="Индекс спроса">' + p.index + '</span>' +
@@ -3043,6 +3072,7 @@ var inCmp = compare.has(p.slug);
 var inFav = isFavorite(p.slug);
 app.innerHTML = '<div class="view">' +
 '<header class="detail-head">' +
+'<div class="detail-mark">' + profMark(p.slug, p.sphereCode) + '</div>' +
 '<p class="eyebrow" style="margin-top:18px">' + h(p.sphereCode) + ' · ' + h(p.sphere) + '</p>' +
 '<h1>' + h(p.title) + '</h1>' +
 '<p class="lead">' + h(p.desc) + '</p>' +
