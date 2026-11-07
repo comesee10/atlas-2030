@@ -1639,6 +1639,12 @@ function glossHide() {
 if (glossTip) glossTip.hidden = true;
 }
 document.addEventListener('click', function (e) {
+var pr = e.target.closest && e.target.closest('[data-print]');
+if (pr) {
+e.preventDefault();
+window.print();
+return;
+}
 var g = e.target.closest ? e.target.closest('.gloss') : null;
 if (!g) { glossHide(); return; }
 e.preventDefault();
@@ -2004,6 +2010,12 @@ teacherPanel +
     '<div class="sph-grid reveal">' + SPHERES.map(function (s) {
       return sphereCard(s.code, '#/professions?sphere=' + s.code);
     }).join('') + '</div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Полотно</p><h2 class="sec">Все профессии на одной карте</h2></div>' +
+'<p class="muted" style="max-width:56ch">Площадь плитки — число программ в атласе, насыщенность цвета — индекс спроса. Нажмите на плитку, чтобы открыть профессию.</p></section>' +
+'<div class="panel chart reveal treemap" id="treemap"></div>' +
+'<div class="chart-legend">' + SPHERES.map(function (s) {
+return '<span><i style="background:' + sphereColor(s.code) + '"></i>' + h(s.code + ' · ' + s.name) + '</span>';
+}).join('') + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Спрос</p><h2 class="sec">Ведущие профессии по индексу спроса</h2></div>' +
 '<a class="sec-link" href="#/professions?sort=index">Весь рейтинг →</a></section>' +
 '<div class="panel chart reveal"><div class="chart-head"><p class="label">Индекс спроса · 0–100 <button class="index-hint" aria-label="Что такое индекс спроса" title="Что такое индекс спроса">?</button></p>' +
@@ -2052,6 +2064,7 @@ advCard('06', 'Сравнение и печатный отчёт', 'До трё�
 '<p class="muted">Все расчёты выполняются в браузере. Ответы опросника не отправляются на сервер: они хранятся только в этом браузере и открываются кнопкой «Мой выбор» в шапке.</p></div>' +
 '</div>' +
 '</div>';
+renderTreemap();
 }
 function sortBtn(key, label, active) {
 return '<button data-sort="' + key + '" aria-pressed="' + (active === key ? 'true' : 'false') + '">' + label + '</button>';
@@ -2581,7 +2594,11 @@ app.innerHTML = '<div class="view">' +
 '<p class="eyebrow">Раздел · Избранное</p>' +
 '<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Избранные <em>профессии</em></h1>' +
 '<p class="lead">Профессии, отмеченные звёздочкой. Список хранится только в этом браузере и не ограничен по количеству; сравнение по-прежнему вмещает до трёх позиций.</p>' +
-(list.length ? '<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Открыть каталог</a>' +
+(list.length ? '<div class="fav-print-head"><p class="label">Подборка для класса</p>' +
+'<h2 class="sec">' + list.length + ' ' + plural(list.length, 'профессия', 'профессии', 'профессий') + ' для обсуждения</h2>' +
+'<p class="muted">Атлас «Профессии·2030» · данные собраны 26 октября 2026 · проходные баллы — приёмные кампании 2024–2025</p></div>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Открыть каталог</a>' +
+'<button class="btn btn-sm" type="button" id="favPrint">Распечатать</button>' +
 '<button class="btn btn-sm" type="button" id="favClear">Очистить избранное</button></div>' : '') +
 '</section>' +
 (list.length
@@ -2599,6 +2616,8 @@ updateFavoritesUI();
 renderFavorites();
 toast('Избранное очищено');
 });
+var printBtn = document.getElementById('favPrint');
+if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
 /* Прямой перерендер после удаления звезды не проходит через route(),
    поэтому заново подключаем появление карточек .reveal. */
 initReveal();
@@ -3007,6 +3026,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Проще навигация и режимы.</b> В шапке осталось четыре раздела, остальное собрано в меню «Ещё», а на телефоне появилась нижняя навигация с подписями. Переключатель «Я ученик / Я учитель или родитель» меняет подачу главной и добавляет методические действия. Поиск понимает обычные фразы: «после 9 класса», «биология», «Москва бюджет». Возврат из профессии восстанавливает фильтры и место в списке, а термины объясняются прямо на странице.</div></li>' +
+'<li><span class="mono">7 ноября 2026</span><div><b>Новые графики.</b> На главной появилось полотно всех профессий: площадь плитки — число программ, цвет — индекс спроса. На странице профессии — радар по шести навыкам и самопроверка «подходит ли мне»: отметьте, что вам ближе, и получите вывод.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Живые графики и чтение по разделам.</b> Тепловая карта получила фильтры по округу и сфере с плавной перестройкой шкалы, bubble-график обновляется вместе с каталогом. На странице профессии появилось закреплённое содержание с индикатором прокрутки, а при загрузке — скелетоны и мягкое появление блоков.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Журнальная страница профессии.</b> Крупная серифная шапка, строка ключевых фактов — зарплата, число вузов и минимальный балл — и обложка сферы с подписью. Паспорт профессии стал спокойной колонкой без лишней рамки, текст разборов набран с воздухом.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Объёмная 3D-карта России.</b> В разделе «Карта» — силуэт страны с метками городов, где есть вузы: высота метки отражает число вузов, цвет — федеральный округ. Карта поворачивается, масштабируется и открывает город в каталоге.</div></li>' +
@@ -3314,6 +3334,190 @@ more.innerHTML = '12 программ с самым высоким минима�
 encodeURIComponent(title) + '">Все программы по профессии →</a>';
 sec.appendChild(more);
 }
+var RADAR_AXES = [
+{ k: 'math', name: 'Математика' },
+{ k: 'tech', name: 'Техника' },
+{ k: 'people', name: 'Люди и общение' },
+{ k: 'create', name: 'Творчество' },
+{ k: 'research', name: 'Исследования' },
+{ k: 'duty', name: 'Ответственность' }
+];
+/* Профиль профессии по шести навыкам: часть значений берётся из набора
+   ЕГЭ программ, часть — из сферы. Это ориентир атласа, а не тест. */
+function radarValues(p) {
+var progs = PROG[p.slug] || [];
+var n = progs.length || 1;
+var math = 0, tech = 0;
+progs.forEach(function (pr) {
+var e = norm(pr.ege || '');
+if (e.indexOf('мат') >= 0) math++;
+if (e.indexOf('физ') >= 0 || e.indexOf('инф') >= 0) tech++;
+});
+var base = {
+'D-01': [0.85, 0.9, 0.45, 0.7, 0.75, 0.6],
+'D-02': [0.6, 0.95, 0.4, 0.4, 0.55, 0.75],
+'D-03': [0.65, 0.5, 0.9, 0.45, 0.85, 0.9],
+'D-04': [0.7, 0.85, 0.4, 0.45, 0.8, 0.8],
+'D-05': [0.55, 0.35, 0.9, 0.5, 0.5, 0.85],
+'D-06': [0.4, 0.4, 0.6, 0.9, 0.5, 0.6]
+}[p.sphereCode] || [0.6, 0.6, 0.6, 0.6, 0.6, 0.6];
+var v = base.slice();
+v[0] = Math.max(v[0], math / n);
+v[1] = Math.min(1, v[1] + (tech / n) * 0.2);
+return v.map(function (x) { return Math.round(x * 100); });
+}
+function radarSection(p) {
+var vals = radarValues(p);
+var CX = 230, CY = 142, R = 92;
+function pt(i, r) {
+var a = -Math.PI / 2 + i * Math.PI / 3;
+return [CX + Math.cos(a) * r, CY + Math.sin(a) * r];
+}
+var grid = '', lines = '', labels = '', dots = '', poly = '';
+for (var ring = 1; ring <= 4; ring++) {
+var gp = [];
+for (var gi = 0; gi < 6; gi++) { var q = pt(gi, R * ring / 4); gp.push(q[0].toFixed(1) + ',' + q[1].toFixed(1)); }
+grid += '<polygon class="radar-ring" points="' + gp.join(' ') + '"></polygon>';
+}
+for (var i = 0; i < 6; i++) {
+var e = pt(i, R);
+lines += '<line class="radar-axis" x1="' + CX + '" y1="' + CY + '" x2="' + e[0].toFixed(1) + '" y2="' + e[1].toFixed(1) + '"></line>';
+var lp = pt(i, R + 26);
+var anchor = Math.abs(Math.cos(-Math.PI / 2 + i * Math.PI / 3)) < 0.35 ? 'middle' : (Math.cos(-Math.PI / 2 + i * Math.PI / 3) > 0 ? 'start' : 'end');
+labels += '<text class="radar-label" x="' + lp[0].toFixed(1) + '" y="' + (lp[1] + 4).toFixed(1) + '" text-anchor="' + anchor + '">' + h(RADAR_AXES[i].name) + '</text>';
+var vp = pt(i, R * vals[i] / 100);
+dots += '<circle class="radar-dot" data-i="' + i + '" cx="' + vp[0].toFixed(1) + '" cy="' + vp[1].toFixed(1) + '" r="4.5"></circle>';
+poly += vp[0].toFixed(1) + ',' + vp[1].toFixed(1) + ' ';
+}
+return '<section class="radar-sec reveal">' +
+'<div class="radar-grid">' +
+'<div class="radar-chart"><svg viewBox="0 0 460 300" role="img" aria-label="Профиль профессии по шести навыкам: ' +
+h(RADAR_AXES.map(function (a, i) { return a.name + ' — ' + vals[i] + ' из 100'; }).join(', ')) + '">' +
+grid + lines + '<polygon class="radar-poly" points="' + poly.trim() + '"></polygon>' + dots + labels +
+'</svg></div>' +
+'<div class="radar-side">' +
+'<p class="eyebrow">Самопроверка</p>' +
+'<h2 class="sec">Подходит ли мне</h2>' +
+'<p class="muted">Отметьте, что вам ближе. Атлас покажет, насколько профессия совпадает с вашим набором склонностей.</p>' +
+'<div class="radar-axes" role="group" aria-label="Что вам ближе">' +
+RADAR_AXES.map(function (a, i) {
+return '<button class="radar-chip" type="button" data-axis="' + i + '" aria-pressed="false">' + h(a.name) + '</button>';
+}).join('') + '</div>' +
+'<p class="radar-verdict" id="radarVerdict" role="status" aria-live="polite">Выберите хотя бы два пункта — и появится вывод.</p>' +
+'<p class="radar-note">Профиль построен по набору ЕГЭ программ атласа и сфере деятельности. Это ориентир для размышления, а не результат теста.</p>' +
+'</div></div></section>';
+}
+function initRadar(p) {
+var host = document.querySelector('.radar-sec');
+if (!host) return;
+var vals = radarValues(p);
+var chips = host.querySelectorAll('.radar-chip');
+var dots = host.querySelectorAll('.radar-dot');
+var verdict = document.getElementById('radarVerdict');
+function update() {
+var chosen = [];
+chips.forEach(function (c) { if (c.getAttribute('aria-pressed') === 'true') chosen.push(Number(c.getAttribute('data-axis'))); });
+dots.forEach(function (d) { d.classList.toggle('on', chosen.indexOf(Number(d.getAttribute('data-i'))) >= 0); });
+if (!verdict) return;
+if (!chosen.length) { verdict.textContent = 'Выберите хотя бы два пункта — и появится вывод.'; return; }
+var strong = 0, mid = 0;
+chosen.forEach(function (i) {
+if (vals[i] >= 70) strong++;
+else if (vals[i] >= 45) mid++;
+});
+var pct = Math.round((strong * 1 + mid * 0.5) / chosen.length * 100);
+var parts = [];
+if (strong) parts.push(strong + ' ' + plural(strong, 'пункт', 'пункта', 'пунктов') + ' совпадают');
+if (mid) parts.push(mid + ' ' + plural(mid, 'пункт', 'пункта', 'пунктов') + ' частично');
+verdict.innerHTML = parts.join(', ') + '. Совпадение примерно <b>' + pct + '%</b>. ' +
+(strong >= 2 ? 'По этим качествам профессия вам подходит.' : strong === 1 ? 'Совпадение есть, но оно неполное — посмотрите смежные профессии.' : 'Скорее всего, эта профессия не про ваше сочетание качеств: загляните в раздел «Смежные профессии».');
+}
+chips.forEach(function (c) {
+c.addEventListener('click', function () {
+var on = c.getAttribute('aria-pressed') === 'true';
+c.setAttribute('aria-pressed', on ? 'false' : 'true');
+update();
+});
+});
+}
+/* Тремап: площадь плитки — число программ, насыщенность — индекс спроса. */
+function treemapLayout(values, x, y, w, h) {
+var total = 0;
+values.forEach(function (v) { total += v; });
+if (total <= 0) return [];
+var scale = (w * h) / total;
+var rest = values.map(function (v) { return { area: Math.max(1, v) * scale }; });
+var rects = [];
+var rx = x, ry = y, rw = w, rh = h;
+function worst(row, len) {
+if (!row.length) return Infinity;
+var sum = 0, max = 0, min = Infinity;
+row.forEach(function (it) { sum += it.area; if (it.area > max) max = it.area; if (it.area < min) min = it.area; });
+var s2 = sum * sum, l2 = len * len;
+return Math.max(l2 * max / s2, s2 / (l2 * min));
+}
+while (rest.length) {
+var len = Math.min(rw, rh);
+var row = [], rowSum = 0;
+while (rest.length) {
+var trial = row.concat([rest[0]]);
+var tSum = rowSum + rest[0].area;
+if (row.length && worst(trial, len) > worst(row, len)) break;
+row = trial; rowSum = tSum; rest.shift();
+}
+if (!row.length) break;
+if (rw >= rh) {
+var colW = rowSum / rh;
+var cy = ry;
+row.forEach(function (it) {
+var ih = it.area / colW;
+rects.push({ x: rx, y: cy, w: colW, h: ih });
+cy += ih;
+});
+rx += colW; rw -= colW;
+} else {
+var rowH = rowSum / rw;
+var cx = rx;
+row.forEach(function (it) {
+var iw = it.area / rowH;
+rects.push({ x: cx, y: ry, w: iw, h: rowH });
+cx += iw;
+});
+ry += rowH; rh -= rowH;
+}
+}
+return rects;
+}
+function renderTreemap() {
+var host = document.getElementById('treemap');
+if (!host) return;
+var list = P.slice().sort(function (a, b) { return b.index - a.index; });
+var vals = list.map(function (p) { return Math.max(1, (PROG[p.slug] || []).length + p.index / 10); });
+var W = 1200, H = 600;
+var rects = treemapLayout(vals, 0, 0, W, H);
+var out = '';
+rects.forEach(function (r, i) {
+var p = list[i];
+if (!p) return;
+var c = sphereColor(p.sphereCode);
+var t = Math.max(0, Math.min(1, (p.index - 60) / 40));
+var op = (0.14 + 0.34 * t).toFixed(2);
+var tw = Math.max(0, r.w - 2), th = Math.max(0, r.h - 2);
+var label = '';
+if (tw > 92 && th > 46) {
+var maxChars = Math.max(6, Math.floor((tw - 16) / 6.6));
+var title = cut(p.title, maxChars);
+label = '<text class="tm-title" x="' + (r.x + 8).toFixed(1) + '" y="' + (r.y + 20).toFixed(1) + '">' + h(title) + '</text>' +
+'<text class="tm-idx" x="' + (r.x + 8).toFixed(1) + '" y="' + (r.y + 36).toFixed(1) + '">индекс ' + p.index + '</text>';
+}
+out += '<a class="tm-tile" href="#/professions/' + h(p.slug) + '" aria-label="' + h(p.title + ', индекс спроса ' + p.index) + '">' +
+'<title>' + h(p.title + ' · индекс ' + p.index + ' · ' + (PROG[p.slug] || []).length + ' программ') + '</title>' +
+'<rect x="' + (r.x + 1).toFixed(1) + '" y="' + (r.y + 1).toFixed(1) + '" width="' + tw.toFixed(1) + '" height="' + th.toFixed(1) + '" rx="6" fill="' + c + '" fill-opacity="' + op + '"></rect>' +
+'<rect class="tm-hit" x="' + (r.x + 1).toFixed(1) + '" y="' + (r.y + 1).toFixed(1) + '" width="' + tw.toFixed(1) + '" height="' + th.toFixed(1) + '" rx="6"></rect>' +
+label + '</a>';
+});
+host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Тремап ' + P.length + ' профессий: площадь плитки — число программ, насыщенность — индекс спроса">' + out + '</svg>';
+}
 function renderProfession(slug) {
 var p = P.filter(function (x) { return x.slug === slug; })[0];
 var d = D[slug];
@@ -3353,9 +3557,11 @@ app.innerHTML = '<div class="view">' +
 '<button class="btn btn-sm" id="addCmp" aria-pressed="' + (inCmp ? 'true' : 'false') + '">' + (inCmp ? 'В сравнении ✓' : 'Добавить к сравнению') + '</button>' +
 '<button class="btn btn-sm fav-detail" type="button" data-fav="' + h(p.slug) + '" data-title="' + h(p.title) + '" aria-pressed="' + (inFav ? 'true' : 'false') + '">' +
 FAV_ICON + '<span class="fav-txt">' + (inFav ? 'В избранном' : 'В избранное') + '</span></button>' +
+'<button class="btn btn-sm" type="button" data-print="1">Печать</button>' +
 '</div>' +
 photoFigure(p.sphereCode) +
 '</header>' +
+radarSection(p) +
 '<div class="detail-body">' +
 '<div><div class="toc" id="toc" aria-label="Содержание"></div><div class="rich" id="rich"></div></div>' +
 '<aside class="passport">' +
@@ -3383,6 +3589,7 @@ rich.innerHTML = sanitizeRichHtml(d.body || '');
 prepareRich(rich);
 initPhotoParallax();
 initPhotoSkeleton();
+initRadar(p);
 refreshStudyTable(rich, p.slug, p.title);
 buildToc(rich);
 var viewG = app.querySelector('.view');
