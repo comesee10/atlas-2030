@@ -101,6 +101,33 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(4.5px) rotate(45deg)}
 .burger[aria-expanded="true"] span:nth-child(2){opacity:0}
 .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-4.5px) rotate(-45deg)}
+/* ---- меню «Ещё» в шапке ---- */
+.nav-more{position:relative}
+.nav-more>summary{list-style:none;cursor:pointer;padding:9px 9px;font-size:13px;color:var(--ink-2);border-radius:6px;display:inline-flex;align-items:center;gap:5px;transition:color .15s,background .15s}
+.nav-more>summary::-webkit-details-marker{display:none}
+.nav-more>summary:hover{color:var(--ink);background:rgba(167,139,250,.09)}
+.nav-more[open]>summary{color:var(--violet);background:rgba(167,139,250,.12)}
+.nav-more.is-current>summary{color:var(--violet)}
+.nav-more-list{position:absolute;right:0;top:calc(100% + 10px);min-width:236px;display:grid;gap:2px;padding:8px;background:var(--bg-2);border:1px solid var(--rule-2);border-radius:12px;box-shadow:var(--shadow);z-index:70}
+.nav-more-list a{display:block;padding:9px 10px;font-size:13.5px;color:var(--ink-2);border-radius:7px;border:0}
+.nav-more-list a:hover{background:rgba(167,139,250,.1);color:var(--ink)}
+.nav-more-list a[aria-current="page"]{color:var(--violet);background:rgba(167,139,250,.12)}
+/* ---- нижняя навигация на телефоне ---- */
+.tabbar{display:none}
+/* ---- переключатель режима ---- */
+.role-switch{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--rule-2);border-radius:999px;margin-bottom:18px;background:rgba(16,29,38,.55)}
+.role-switch button{border:0;background:transparent;color:var(--ink-3);font-family:var(--sans);font-size:12.5px;line-height:1.2;padding:8px 14px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
+.role-switch button:hover{color:var(--ink)}
+.role-switch button[aria-pressed="true"]{background:rgba(94,234,212,.16);color:var(--ink)}
+/* ---- панель учителя ---- */
+.teach-panel{margin:4px 0 0;padding:26px;border:1px solid var(--rule);border-radius:14px;background:linear-gradient(150deg,rgba(16,29,38,.78),rgba(9,17,22,.55))}
+.teach-panel .sec{margin:10px 0 20px}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.teach-card{display:grid;gap:8px;align-content:start;padding:18px;border:1px solid var(--rule);border-radius:12px;background:rgba(16,29,38,.5);text-decoration:none;color:var(--ink);transition:transform .2s var(--ease),border-color .2s}
+.teach-card:hover{transform:translateY(-2px);border-color:var(--violet)}
+.teach-card b{font-size:14.5px;font-weight:600}
+.teach-card span{font-size:13.5px;color:var(--ink-3);line-height:1.5}
+.teach-card i{font-family:var(--mono);font-size:11px;font-style:normal;color:var(--violet);letter-spacing:.08em;text-transform:uppercase}
 main{min-height:60vh;padding-bottom:80px}
 .view{animation:viewIn .4s var(--ease) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -490,6 +517,9 @@ background:rgba(167,139,250,.07);border-radius:0 8px 8px 0;
 animation:tipIn .28s var(--ease);
 }
 .index-tooltip p{font-size:12.5px;line-height:1.6;color:var(--ink-2);margin:0}
+.gloss{font:inherit;color:inherit;background:none;border:0;border-bottom:1px dashed var(--rule-2);padding:0;cursor:help;text-align:left;transition:color .15s,border-color .15s}
+.gloss:hover,.gloss:focus-visible{color:var(--violet);border-color:var(--violet);outline:none}
+.gloss-tip{position:fixed;z-index:120;max-width:330px;padding:10px 12px;border:1px solid var(--rule-2);border-radius:10px;background:var(--bg-2);color:var(--ink-2);font-size:12.5px;line-height:1.55;box-shadow:var(--shadow)}
 @keyframes tipIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .cta-block{display:flex;justify-content:center;margin:22px 0 6px}
 .cta-block .btn{
@@ -548,6 +578,10 @@ display:none;
 .nav.open{display:flex;animation:viewIn .2s var(--ease)}
 .nav a{padding:12px 8px;font-size:15px;border-bottom:1px solid rgba(44,36,56,.5)}
 .nav a:last-child{border-bottom:0}
+.nav-more{width:100%}
+.nav-more>summary{padding:12px 8px;font-size:15px;border-bottom:1px solid rgba(44,36,56,.5)}
+.nav-more-list{position:static;min-width:0;padding:2px 0 6px 10px;background:transparent;border:0;box-shadow:none;border-radius:0}
+.nav-more-list a{padding:11px 8px;font-size:14.5px;border-bottom:1px solid rgba(44,36,56,.35)}
 .burger{display:grid}
 .hdr-actions{margin-left:auto}
 }
@@ -570,6 +604,11 @@ display:none;
 .wrap{padding:0 16px}
 .hdr-in{height:56px;gap:10px}
 .brand-sub{display:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:66;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(16,12,26,.97);backdrop-filter:blur(14px);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px 8px;font-size:10.5px;line-height:1.2;color:var(--ink-3);text-decoration:none;border:0;background:transparent}
+.tabbar a[aria-current="page"]{color:var(--violet)}
+body{padding-bottom:66px}
+.cmp-bar{bottom:74px}
 .nav{
 position:absolute;left:0;right:0;top:56px;flex-direction:column;gap:0;margin:0;
 background:rgba(16,12,26,.98);border-bottom:1px solid var(--rule);padding:8px 16px 14px;
@@ -1482,7 +1521,7 @@ body{overflow-x:clip}
 --ink:#111;--ink-2:#333;--ink-3:#555;--ink-4:#666;--violet:#5b3fc4;
 }
 body{background:#fff!important;background-image:none!important;color:#111}
-.hdr,.ftr,.palette,.cmp-bar,.toast,.skip,.report-actions,.quiz-nav,.toc,.passport .btn,.burger,.search-btn,.photo-band{display:none!important}
+.hdr,.ftr,.palette,.cmp-bar,.toast,.skip,.report-actions,.quiz-nav,.toc,.passport .btn,.burger,.search-btn,.photo-band,.tabbar,.role-switch,.teach-panel{display:none!important}
 .view{animation:none}
 .wrap{max-width:none;padding:0}
 main{padding:0}

@@ -20,6 +20,29 @@ var U = A.universities || [];
 var C = A.colleges || [];
 var D = A.details || {};
 var CD = A.collegeDetails || {};
+/* Режим атласа: школьник или взрослый, который помогает выбрать путь.
+   Хранится только в этом браузере и меняет подачу, а не данные. */
+var ROLE = 'student';
+try { ROLE = localStorage.getItem('atlas:role') === 'teacher' ? 'teacher' : 'student'; } catch (e) {}
+document.documentElement.setAttribute('data-role', ROLE);
+function setRole(role) {
+ROLE = role === 'teacher' ? 'teacher' : 'student';
+try { localStorage.setItem('atlas:role', ROLE); } catch (e) {}
+document.documentElement.setAttribute('data-role', ROLE);
+route();
+}
+function roleSwitchHtml() {
+return '<div class="role-switch" role="group" aria-label="Режим атласа">' +
+'<button type="button" data-role="student" aria-pressed="' + (ROLE === 'student' ? 'true' : 'false') + '">Я ученик</button>' +
+'<button type="button" data-role="teacher" aria-pressed="' + (ROLE === 'teacher' ? 'true' : 'false') + '">Я учитель или родитель</button>' +
+'</div>';
+}
+document.addEventListener('click', function (e) {
+var b = e.target.closest && e.target.closest('button[data-role]');
+if (!b) return;
+e.preventDefault();
+setRole(b.getAttribute('data-role'));
+});
 function h(s) {
 return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
 return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -804,17 +827,28 @@ burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Откры
 function closeNav() {
 if (!navEl) return;
 navEl.classList.remove('open');
+var more = document.getElementById('navMore');
+if (more) more.removeAttribute('open');
 if (burger) { burger.setAttribute('aria-expanded', 'false'); burger.setAttribute('aria-label', 'Открыть меню'); }
 }
 navEl.addEventListener('click', function (e) { if (e.target.closest('a')) closeNav(); });
+document.addEventListener('click', function (e) {
+var more = document.getElementById('navMore');
+if (more && more.hasAttribute('open') && !more.contains(e.target)) more.removeAttribute('open');
+});
 var openFavBtn = document.getElementById('openFav');
 if (openFavBtn) openFavBtn.addEventListener('click', function () { location.hash = '#/favorites'; });
 function setNav(path) {
-document.querySelectorAll('.nav a[data-route]').forEach(function (a) {
+document.querySelectorAll('.nav a[data-route], .tabbar a[data-route]').forEach(function (a) {
 var r = a.getAttribute('data-route');
 var on = r === '/' ? path === '/' : (path === r || path.indexOf(r + '/') === 0);
 if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
 });
+var more = document.getElementById('navMore');
+if (more) {
+var active = !!more.querySelector('a[aria-current="page"]');
+more.classList.toggle('is-current', active);
+}
 }
 var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
 var PAGE_TITLES = {
@@ -827,6 +861,28 @@ function absUrl(u) {
 if (!u || u === '#/') return SITE_URL;
 return SITE_URL + String(u).replace(/^#?\//, '').replace(/^/, '');
 }
+/* Состояние каталога: с какой страницы и в каком месте открыли профессию.
+   Нужен, чтобы кнопка «назад» возвращала к списку, а не в начало. */
+function catalogState() {
+try { return JSON.parse(sessionStorage.getItem('atlas:return') || 'null'); } catch (e) { return null; }
+}
+function currentQuery() {
+var hash = location.hash || '';
+var i = hash.indexOf('?');
+if (i >= 0) return hash.slice(i);
+return location.search || '';
+}
+function saveCatalogState() {
+try { sessionStorage.setItem('atlas:return', JSON.stringify({ q: currentQuery(), y: window.scrollY })); } catch (e) {}
+}
+function clearCatalogState() {
+try { sessionStorage.removeItem('atlas:return'); } catch (e) {}
+}
+function catalogBackHref() {
+var st = catalogState();
+if (st && st.q) return '#/professions' + st.q;
+return '#/professions';
+}
 function crumbItems(path) {
 if (path === '/') return null;
 var seg = path.split('/').filter(Boolean);
@@ -834,7 +890,7 @@ if (!seg.length) return null;
 var root = seg[0];
 var items = [{ t: 'Главная', u: '#/' }];
 if (!PAGE_TITLES[root]) return null;
-items.push({ t: PAGE_TITLES[root], u: '#/' + root });
+items.push({ t: PAGE_TITLES[root], u: root === 'professions' ? catalogBackHref() : '#/' + root });
 if (root === 'professions' && seg[1]) {
 var p = PROF_BY_SLUG[decodeURIComponent(seg[1])];
 if (!p) return null;
@@ -1057,6 +1113,7 @@ var legacyRoute = location.hash.slice(1);
 history.replaceState(null, '', '/atlas-2030' + legacyRoute);
 }
 var r = parseHash();
+if (r.path.indexOf('/professions') !== 0) clearCatalogState();
 if (r.path === '/siberia') {
 history.replaceState(null, '', '#/universities?district=' + encodeURIComponent('СФО'));
 r = parseHash();
@@ -1540,6 +1597,55 @@ hint.classList.toggle('on', !tip.hidden);
 hint.setAttribute('aria-expanded', tip.hidden ? 'false' : 'true');
 });
 var toTopEl = document.getElementById('toTop');
+/* Короткие пояснения к терминам: школьник наводит на подчёркнутое слово
+   и видит, что оно значит, без чтения методологии. */
+var GLOSSARY = {
+index: 'Индекс спроса — оценка атласа: число вакансий, их рост к 2030 году и дефицит специалистов. 100 — максимальный спрос.',
+ball: 'Минимальный балл на бюджет — самый низкий проходной балл по программам профессии в вузах атласа. Это ориентир, а не гарантия.',
+growth: 'Рост вакансий — на сколько процентов, по оценке атласа, вырастет спрос на профессию к 2030 году.',
+budget: 'Бюджетные места — места, на которых учатся за счёт государства. Нужно набрать проходной балл и подать документы.',
+attest: 'Средний балл аттестата — средний результат аттестата, который колледжи обычно просят при поступлении.',
+programs: 'Программы в атласе — направления подготовки, найденные в открытых данных вузов. Их меньше, чем во всём стране.',
+zone: 'Пограничная зона — разница до 10 баллов от проходного. Шансы в этой зоне неопределённые.'
+};
+function gloss(key, label) {
+return '<button class="gloss" type="button" data-gloss="' + h(key) + '" aria-label="Пояснить: ' + h(label) + '">' + h(label) + '</button>';
+}
+var glossTip = null;
+function glossShow(btn) {
+var key = btn.getAttribute('data-gloss');
+var text = GLOSSARY[key];
+if (!text) return;
+if (!glossTip) {
+glossTip = document.createElement('div');
+glossTip.className = 'gloss-tip';
+glossTip.setAttribute('role', 'status');
+glossTip.hidden = true;
+document.body.appendChild(glossTip);
+}
+glossTip.textContent = text;
+glossTip.hidden = false;
+var r = btn.getBoundingClientRect();
+var tw = glossTip.offsetWidth, th = glossTip.offsetHeight;
+var left = Math.max(12, Math.min(window.innerWidth - tw - 12, r.left));
+var top = r.bottom + 10;
+if (top + th > window.innerHeight - 12) top = Math.max(12, r.top - th - 10);
+glossTip.style.left = left + 'px';
+glossTip.style.top = top + 'px';
+}
+function glossHide() {
+if (glossTip) glossTip.hidden = true;
+}
+document.addEventListener('click', function (e) {
+var g = e.target.closest ? e.target.closest('.gloss') : null;
+if (!g) { glossHide(); return; }
+e.preventDefault();
+if (glossTip && !glossTip.hidden && glossTip.textContent === GLOSSARY[g.getAttribute('data-gloss')]) glossHide();
+else glossShow(g);
+});
+document.addEventListener('keydown', function (e) {
+if (e.key === 'Escape') glossHide();
+});
 var topRing = toTopEl ? toTopEl.querySelector('circle') : null;
 function updateProgress() {
 var doc = document.documentElement;
@@ -1557,7 +1663,7 @@ window.scrollTo({ top: 0, behavior: noMotion ? 'auto' : 'smooth' });
 window.addEventListener('scroll', updateProgress, { passive: true });
 window.addEventListener('resize', updateProgress);
 var PAL_INDEX = [];
-var PAL_GROUPS = { 'Профессия': 'Профессии', 'Специальность': 'Специальности', 'Вуз': 'Вузы', 'Колледж': 'Колледжи' };
+var PAL_GROUPS = { 'Профессия': 'Профессии', 'Специальность': 'Специальности', 'Вуз': 'Вузы', 'Колледж': 'Колледжи', 'Действие': 'Быстрый переход' };
 P.forEach(function (p) {
 PAL_INDEX.push({ type: 'Профессия', title: p.title, sub: p.sphereCode + ' · ' + p.sphere, href: '#/professions/' + p.slug, icon: '§' });
 });
@@ -1575,6 +1681,61 @@ href: '#/universities?q=' + encodeURIComponent(s.direction), icon: 'С'
 });
 });
 var palette = document.getElementById('palette');
+/* Запросы обычными словами: «после 9 класса», «биология», «Москва бюджет».
+   Сверху результатов появляются готовые переходы, а не только совпадения по названиям. */
+function palIntents(q) {
+var nq = norm(q);
+if (!nq) return [];
+var out = [];
+function add(title, sub, href, icon) {
+if (out.length >= 4) return;
+out.push({ type: 'Действие', title: title, sub: sub, href: href, icon: icon || '→' });
+}
+if (/(после|из|окончил)\s*9|9\s*класс|девят|огэ/.test(nq)) {
+add('Подбор после 9 класса', 'ОГЭ → специальности колледжей и шансы на бюджет', '#/quiz-oge', '9');
+add('Все специальности колледжей', C.length + ' направлений с коротким маршрутом к профессии', '#/colleges', 'К');
+}
+if (/егэ|11\s*класс|одиннадцат/.test(nq)) {
+add('Подбор по предметам ЕГЭ', 'Три шага: предметы, сфера, сумма баллов', '#/quiz', 'Е');
+}
+var SUBJ_INTENT = [
+['математ', 'Мат', 'Математика'], ['информат', 'Инф', 'Информатика'], ['физик', 'Физ', 'Физика'],
+['хими', 'Хим', 'Химия'], ['биолог', 'Био', 'Биология'], ['обществ', 'Общ', 'Обществознание'],
+['истори', 'Ист', 'История'], ['географ', 'Гео', 'География'], ['литератур', 'Лит', 'Литература'],
+['английск', 'Ин.яз', 'Английский язык'], ['иностран', 'Ин.яз', 'Иностранный язык'], ['русск', 'Рус', 'Русский язык']
+];
+for (var si = 0; si < SUBJ_INTENT.length; si++) {
+var s = SUBJ_INTENT[si];
+if (nq.indexOf(s[0]) >= 0) {
+add('Вузы с предметом «' + s[2] + '»', 'Программы, где этот предмет есть в наборе ЕГЭ', '#/universities?exam=' + encodeURIComponent(s[1]), 'Е');
+break;
+}
+}
+var budget = /бюджет/.test(nq), paid = /платн/.test(nq);
+var city = '';
+var padded = ' ' + nq + ' ';
+for (var ci = 0; ci < CITIES.length; ci++) {
+var nc = norm(CITIES[ci]);
+if (nc.length >= 4 && padded.indexOf(' ' + nc + ' ') >= 0) { city = CITIES[ci]; break; }
+}
+if (city) {
+var cp = new URLSearchParams();
+cp.set('city', city);
+if (budget) cp.set('mode', 'budget');
+if (paid) cp.set('mode', 'paid');
+add('Вузы: ' + city + (budget ? ', бюджет' : paid ? ', платное' : ''), 'Город в каталоге с баллами и направлениями', '#/universities?' + cp.toString(), 'В');
+} else if (budget) {
+add('Только бюджетные места', 'Вузы, где есть программы на бюджете', '#/universities?mode=budget', 'В');
+} else if (paid) {
+add('Только платное обучение', 'Программы с указанным платным баллом', '#/universities?mode=paid', 'В');
+}
+if (/календар/.test(nq)) add('Календарь приёмной кампании', 'Помесячно: после 11 и после 9 класса', '#/calendar', 'К');
+if (/^карт|карта\b/.test(nq)) add('Объёмная карта России', 'Города с вузами на 3D-карте', '#/map', 'М');
+if (/сравн/.test(nq)) add('Сравнение профессий и вузов', 'До трёх позиций рядом', '#/compare', 'С');
+if (/избран/.test(nq)) add('Избранное', 'Профессии, отмеченные звёздочкой', '#/favorites', '★');
+if (/методолог/.test(nq)) add('Методология', 'Формулы, источники и границы данных', '#/methodology', 'М');
+return out;
+}
 var palInput = document.getElementById('paletteInput');
 var palList = document.getElementById('paletteList');
 var palItems = [];
@@ -1593,12 +1754,12 @@ var res;
 if (!nq) {
 res = PAL_INDEX.filter(function (x) { return x.type === 'Профессия'; }).slice(0, 6);
 } else {
-res = PAL_INDEX.filter(function (x) { return norm(x.title + ' ' + x.sub).indexOf(nq) >= 0; }).slice(0, 16);
+res = palIntents(q).concat(PAL_INDEX.filter(function (x) { return norm(x.title + ' ' + x.sub).indexOf(nq) >= 0; })).slice(0, 18);
 }
 palItems = res;
 if (!res.length) {
 palSel = -1;
-palList.innerHTML = '<div class="p-empty">Ничего не нашлось. Попробуйте «инженер», «МФТИ» или «Москва».</div>';
+palList.innerHTML = '<div class="p-empty">Ничего не нашлось. Попробуйте «после 9 класса», «биология», «Москва бюджет» или название профессии.</div>';
 return;
 }
 var out = '';
@@ -1772,18 +1933,34 @@ var uniTop = U.slice().sort(function (a, b) { return b.avg - a.avg; }).slice(0, 
 var colTop = C.slice().sort(function (a, b) { return b.count - a.count; }).slice(0, 4);
 var specTop = SPECIALTIES.slice(0, 6);
 var geoTop = DISTRICTS.slice();
+var teacher = ROLE === 'teacher';
+var teacherPanel = !teacher ? '' :
+'<section class="teach-panel reveal"><p class="eyebrow">Учителю и родителю</p>' +
+'<h2 class="sec">Три готовых действия</h2>' +
+'<div class="teach-grid">' +
+'<a class="teach-card" href="#/professions"><b>01 · Собрать подборку</b><span>Отметьте профессии галочкой в каталоге — таблица сравнения соберётся автоматически.</span><i>Каталог →</i></a>' +
+'<a class="teach-card" href="#/compare"><b>02 · Показать классу</b><span>Спрос, зарплата, предметы ЕГЭ и ведущие вузы — на одном экране для проектора.</span><i>Сравнение →</i></a>' +
+'<a class="teach-card" href="#/methodology"><b>03 · Проверить источники</b><span>Открытая методика индекса, годы приёмных кампаний и границы данных.</span><i>Методология →</i></a>' +
+'</div></section>';
 app.innerHTML = '<div class="view">' +
 '<section class="hero hero-home">' +
 '<canvas class="hero-canvas" aria-hidden="true"></canvas>' +
 '<div class="hero-grid">' +
 '<div class="hero-copy">' +
+roleSwitchHtml() +
 '<p class="eyebrow">Раздел I · Навигатор</p>' +
-'<h1 class="display">Профессии, которые будут <em>нужны</em> в 2030 году</h1>' +
+(teacher
+? '<h1 class="display">Профессии будущего — <em>на уроке</em> и дома</h1>' +
+'<p class="lead">Материал для классного часа и семейного разговора: ' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', ' +
+U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' и ' + TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') +
+'. Соберите подборку, сравните варианты и разберите с учениками, какие предметы ведут к каждой профессии.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Собрать подборку для класса →</a><a class="btn" href="#/compare">Сравнить профессии</a></div>'
+: '<h1 class="display">Профессии, которые будут <em>нужны</em> в 2030 году</h1>' +
 '<p class="lead">Атлас объединяет ' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', ' +
 U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ', ' +
 TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + ' и ' +
-C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'колледжей') + '. Он позволяет последовательно перейти от профессии к специальности, вузу и набору ЕГЭ.</p>' +
-'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Пройти опросник →</a><a class="btn" href="#/professions">Открыть каталог</a></div>' +
+C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'колледжей') + '. Ответьте на три вопроса — и увидите, какие профессии и программы подходят именно вам.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Подобрать профессию за 3 шага →</a><a class="btn" href="#/professions">Открыть каталог</a></div>') +
 '<div class="hero-meta"><span>' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + '</span>' +
 '<span>' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + '</span>' +
 '<span>' + TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + '</span>' +
@@ -1791,11 +1968,15 @@ C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'кол�
 '<span>2027–2030</span></div>' +
 '</div>' +
 '<aside class="panel start-card">' +
-'<h2>Порядок работы</h2>' +
+'<h2>' + (teacher ? 'Как провести занятие' : 'Порядок работы') + '</h2>' +
 '<div class="start-steps">' +
-'<div class="start-step"><b>01</b><span>Отметьте предметы ЕГЭ, которые планируете сдавать.</span></div>' +
+(teacher
+? '<div class="start-step"><b>01</b><span>Выберите сферу и отметьте 2–3 профессии для сравнения.</span></div>' +
+'<div class="start-step"><b>02</b><span>Покажите классу таблицу: спрос, зарплата, предметы ЕГЭ и вузы.</span></div>' +
+'<div class="start-step"><b>03</b><span>Разберите, что проверить на сайте вуза перед подачей документов.</span></div>'
+: '<div class="start-step"><b>01</b><span>Отметьте предметы ЕГЭ, которые планируете сдавать.</span></div>' +
 '<div class="start-step"><b>02</b><span>Выберите сферу или воспользуйтесь общей подборкой.</span></div>' +
-'<div class="start-step"><b>03</b><span>Укажите ожидаемую сумму баллов и получите список программ.</span></div>' +
+'<div class="start-step"><b>03</b><span>Укажите ожидаемую сумму баллов и получите список программ.</span></div>') +
 '</div>' +
 '<div class="start-mini"><p class="label">Наибольший спрос</p>' +
 top.slice(0, 3).map(function (p) {
@@ -1812,6 +1993,7 @@ statCard(TOTAL_PROGRAMS, 'программ и специальностей') +
 statCard(DISTRICTS.length, 'федеральных округов') +
 '</div>' +
 '</section>' +
+teacherPanel +
 // Дата — вне .hero-home: у секции overflow:hidden, и transform reveal
 // уводил текст за границу обрезки (IntersectionObserver не срабатывал).
 '<p class="data-date reveal">Данные собраны 26 октября 2026 · проходные баллы — приёмные кампании 2024–2025 · даты кампании 2026–2027 уточняйте в вузе</p>' +
@@ -1964,7 +2146,8 @@ listEl.innerHTML = list.length ? list.map(profRow).join('') :
 '<li class="empty"><b>Ничего не найдено</b>' +
 (st.exams.length
 ? 'Под фильтр «Мой выбор» не подошла ни одна профессия. Измените предметы в опроснике или сбросьте фильтр.'
-: 'Попробуйте другой запрос или сбросьте фильтр сферы.') + '</li>';
+: 'Попробуйте другой запрос или сбросьте фильтр сферы.') +
+'<button class="btn btn-sm" type="button" id="profReset" style="margin-top:14px">Сбросить фильтры</button></li>';
 countEl.textContent = 'Показано ' + list.length + ' из ' + P.length;
 if (document.getElementById('bubbleChart')) drawBubble(list, true);
 listEl.classList.remove('swap');
@@ -1998,10 +2181,30 @@ document.querySelectorAll('#sphereChips button').forEach(function (x) { x.setAtt
 repaint();
 });
 listEl.addEventListener('click', function (e) {
+var reset = e.target.closest('#profReset');
+if (reset) {
+e.preventDefault();
+resetFilters();
+return;
+}
+var prof = e.target.closest('a[href^="#/professions/"]');
+if (prof) saveCatalogState();
 var b = e.target.closest('.cmp');
 if (!b) return;
 toggleCompare(b.getAttribute('data-slug'));
 });
+function resetFilters() {
+st.q = '';
+st.sphere = '';
+st.exams = [];
+if (searchEl) searchEl.value = '';
+document.querySelectorAll('#sphereChips button').forEach(function (x) {
+x.setAttribute('aria-pressed', x.getAttribute('data-sphere') === '' ? 'true' : 'false');
+});
+var mf = document.getElementById('myFilter');
+if (mf) mf.remove();
+repaint();
+}
 var clearE = document.getElementById('clearE');
 if (clearE) clearE.addEventListener('click', function () {
 st.exams = [];
@@ -2023,6 +2226,14 @@ bindChart(document.getElementById('bubbleChart'));
 drawBubble(filteredProfessions(st));
 }
 repaint();
+/* Возврат из профессии: восстанавливаем позицию списка и снятые фильтры. */
+var back = catalogState();
+if (back && back.q !== undefined) {
+if (currentQuery() === back.q && typeof back.y === 'number') {
+requestAnimationFrame(function () { window.scrollTo(0, back.y); });
+}
+clearCatalogState();
+}
 }
 function uniRow(pr) {
 return '<tr><td data-label="Направление">' + h(pr.direction) + '<span class="code">' + h(pr.code) + '</span></td>' +
@@ -2793,6 +3004,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">7 ноября 2026</span><div><b>Проще навигация и режимы.</b> В шапке осталось четыре раздела, остальное собрано в меню «Ещё», а на телефоне появилась нижняя навигация с подписями. Переключатель «Я ученик / Я учитель или родитель» меняет подачу главной и добавляет методические действия. Поиск понимает обычные фразы: «после 9 класса», «биология», «Москва бюджет». Возврат из профессии восстанавливает фильтры и место в списке, а термины объясняются прямо на странице.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Живые графики и чтение по разделам.</b> Тепловая карта получила фильтры по округу и сфере с плавной перестройкой шкалы, bubble-график обновляется вместе с каталогом. На странице профессии появилось закреплённое содержание с индикатором прокрутки, а при загрузке — скелетоны и мягкое появление блоков.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Объёмная 3D-карта России.</b> В разделе «Карта» — силуэт страны с метками городов, где есть вузы: высота метки отражает число вузов, цвет — федеральный округ. Карта поворачивается, масштабируется и открывает город в каталоге.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Фотобанк сфер.</b> Двенадцать фотографий с Wikimedia Commons: производство, лаборатория, энергетика, медиа. На страницах профессий появился баннер сферы с указанием автора и лицензии.</div></li>' +
@@ -3135,12 +3347,12 @@ photoFigure(p.sphereCode) +
 '<div><div class="toc" id="toc" aria-label="Содержание"></div><div class="rich" id="rich"></div></div>' +
 '<aside class="passport panel">' +
 '<p class="label">Паспорт профессии</p>' +
-'<div class="pp-row"><p class="pp-k">Индекс спроса</p><p class="pp-v">' + p.index + '<small>/100</small></p>' +
+'<div class="pp-row"><p class="pp-k">' + gloss('index', 'Индекс спроса') + '</p><p class="pp-v">' + p.index + '<small>/100</small></p>' +
 '<div class="pp-bar"><i data-w="' + p.index + '"></i></div></div>' +
-'<div class="pp-row"><p class="pp-k">Рост вакансий к 2030</p><p class="pp-v" style="font-size:22px;color:var(--ok)">+' + p.growth + '%</p></div>' +
+'<div class="pp-row"><p class="pp-k">' + gloss('growth', 'Рост вакансий к 2030') + '</p><p class="pp-v" style="font-size:22px;color:var(--ok)">+' + p.growth + '%</p></div>' +
 '<div class="pp-row"><p class="pp-k">Зарплата, тыс. ₽/мес</p><p class="pp-v" style="font-size:22px">' + h(String(p.salary).replace(' тыс. ₽', '')) + '</p></div>' +
-'<div class="pp-row"><p class="pp-k">Программ в атласе</p><p class="pp-v" style="font-size:22px">' + progs.length + '</p></div>' +
-'<div class="pp-row"><p class="pp-k">Мин. балл на бюджет</p><p class="pp-v" style="font-size:22px">' + (mb ? '≈' + mb : '—') + '</p></div>' +
+'<div class="pp-row"><p class="pp-k">' + gloss('programs', 'Программ в атласе') + '</p><p class="pp-v" style="font-size:22px">' + progs.length + '</p></div>' +
+'<div class="pp-row"><p class="pp-k">' + gloss('ball', 'Мин. балл на бюджет') + '</p><p class="pp-v" style="font-size:22px">' + (mb ? '≈' + mb : '—') + '</p></div>' +
 (topCities.length ? '<div class="pp-row"><p class="pp-k">Где больше всего учат</p><p class="pp-v" style="font-size:13.5px;font-family:var(--sans);font-weight:500;line-height:1.55">' +
 topCities.map(function (c) {
 return '<a href="#/universities?q=' + encodeURIComponent(c) + '" style="color:var(--violet)">' + h(c) + ' · ' + cityCount[c] + '</a>';
@@ -3198,7 +3410,7 @@ app.innerHTML = '<div class="view">' +
 '<aside class="passport panel">' +
 '<p class="label">Паспорт специальности</p>' + rows +
 '<div class="pp-row"><p class="pp-k">Колледжей в атласе</p><p class="pp-v" style="font-size:22px">' + c.count + '</p></div>' +
-'<div class="pp-row"><p class="pp-k">Средний балл аттестата</p><p class="pp-v" style="font-size:22px">от ' + h(c.price) + '</p></div>' +
+'<div class="pp-row"><p class="pp-k">' + gloss('attest', 'Средний балл аттестата') + '</p><p class="pp-v" style="font-size:22px">от ' + h(c.price) + '</p></div>' +
 '<a class="btn btn-primary btn-sm" href="#/colleges">Все специальности</a>' +
 '</aside>' +
 '</div>' +
@@ -3897,8 +4109,7 @@ if (!wrap) {
 wrap = document.createElement('div');
 wrap.className = 'atlas-tools';
 wrap.id = 'atlasTools';
-wrap.innerHTML = '<a href="#/map" title="Объёмная карта России с вузами">Карта</a>' +
-'<button id="atlasTheme" type="button" aria-label="Переключить тему"><span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Тема</span></button>';
+wrap.innerHTML = '<button id="atlasTheme" type="button" aria-label="Переключить тему"><span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Тема</span></button>';
 actions.insertBefore(wrap, actions.firstChild);
 document.getElementById('atlasTheme').addEventListener('click', function () {
 THEME = THEME === 'light' ? 'dark' : 'light';

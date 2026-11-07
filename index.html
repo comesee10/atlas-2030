@@ -33,7 +33,7 @@
 <meta name="twitter:title" content="Профессии·2030 — атлас востребованных профессий">
 <meta name="twitter:description" content="Опросник, профессии, вузы и колледжи России с маршрутами поступления.">
 <meta name="twitter:image" content="https://comesee10.github.io/atlas-2030/og.png">
-<link rel="stylesheet" href="styles.css?v=20261107-6">
+<link rel="stylesheet" href="styles.css?v=20261107-7">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none';">
 <script type="application/ld+json">
 {
@@ -86,13 +86,24 @@
     </a>
 
     <nav class="nav" id="nav" aria-label="Основная навигация">
-      <a href="#/quiz" data-route="/quiz">Опросник</a>
+      <a href="#/quiz" data-route="/quiz">Подобрать</a>
       <a href="#/professions" data-route="/professions">Профессии</a>
-      <a href="#/specialties" data-route="/specialties">Специальности</a>
       <a href="#/universities" data-route="/universities">Вузы</a>
-      <a href="#/colleges" data-route="/colleges">Колледжи</a>
       <a href="#/calendar" data-route="/calendar">Календарь</a>
-      <a href="#/regions" data-route="/regions">Регионы</a>
+      <details class="nav-more" id="navMore">
+        <summary>Ещё<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="nav-more-list">
+          <a href="#/colleges" data-route="/colleges">Колледжи после 9 класса</a>
+          <a href="#/specialties" data-route="/specialties">Специальности и коды</a>
+          <a href="#/admission" data-route="/admission">Бюджетные места</a>
+          <a href="#/regions" data-route="/regions">Регионы и округа</a>
+          <a href="#/map" data-route="/map">Карта России</a>
+          <a href="#/compare" data-route="/compare">Сравнение</a>
+          <a href="#/favorites" data-route="/favorites">Избранное</a>
+          <a href="#/methodology" data-route="/methodology">Методология</a>
+          <a href="#/about" data-route="/about">О проекте</a>
+        </div>
+      </details>
     </nav>
 
     <div class="hdr-actions">
@@ -191,11 +202,30 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<nav class="tabbar" id="tabbar" aria-label="Быстрая навигация">
+  <a href="#/quiz" data-route="/quiz">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/></svg>
+    <span>Подобрать</span>
+  </a>
+  <a href="#/professions" data-route="/professions">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/><path d="M8 5v14"/></svg>
+    <span>Профессии</span>
+  </a>
+  <a href="#/universities" data-route="/universities">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-6 9 6"/><path d="M5 10v9M19 10v9M9 19v-5h6v5"/><path d="M3 21h18"/></svg>
+    <span>Вузы</span>
+  </a>
+  <a href="#/calendar" data-route="/calendar">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+    <span>Календарь</span>
+  </a>
+</nav>
+
 <script defer src="data-core.js?v=20261104-1"></script>
 <script defer src="data-universities-1.js?v=20261104-1"></script>
 <script defer src="data-universities-2.js?v=20261104-1"></script>
 <script defer src="data-universities-3.js?v=20261104-1"></script>
 <script defer src="catalog-expansion.js?v=20261104-1"></script>
-<script defer src="app.js?v=20261107-6"></script>
+<script defer src="app.js?v=20261107-7"></script>
 </body>
 </html>
