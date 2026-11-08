@@ -294,12 +294,14 @@ transform:scaleY(0);transform-origin:50% 0;transition:transform .22s var(--ease)
 .empty{padding:56px 20px;text-align:center;color:var(--ink-3);border:1px dashed var(--rule-2);border-radius:12px;margin-top:24px}
 .empty b{display:block;color:var(--ink);font-family:var(--serif);font-size:20px;margin-bottom:6px}
 .cmp-bar{
-position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);
+position:fixed;left:50%;bottom:18px;transform:translate(-50%,calc(100% + 120px));
 display:flex;align-items:center;gap:14px;padding:10px 12px 10px 18px;
 background:rgba(25,19,36,.97);border:1px solid var(--violet);border-radius:12px;
-box-shadow:var(--shadow);z-index:70;transition:transform .28s var(--ease);max-width:calc(100% - 24px);
+box-shadow:var(--shadow);z-index:70;max-width:calc(100% - 24px);
+opacity:0;visibility:hidden;pointer-events:none;
+transition:transform .28s var(--ease),opacity .2s var(--ease),visibility .28s var(--ease);
 }
-.cmp-bar.show{transform:translate(-50%,0)}
+.cmp-bar.show{transform:translate(-50%,0);opacity:1;visibility:visible;pointer-events:auto}
 .cmp-bar .n{font-size:13px;color:var(--ink-2)}
 .cmp-bar .n b{color:var(--violet);font-family:var(--mono)}
 .cmp-bar .clear{font-size:12px;color:var(--ink-3);text-decoration:underline;text-underline-offset:3px}
@@ -1122,7 +1124,7 @@ background-size:48px 48px,48px 48px,auto,auto;
 .hero-home{border:1px solid rgba(94,234,212,.13);border-radius:18px;padding:42px 34px 28px;margin-top:28px;background:linear-gradient(135deg,rgba(13,28,36,.72),rgba(9,17,22,.28));box-shadow:var(--shadow);overflow:hidden}
 .hero-home::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(94,234,212,.06) 45%,transparent 70%);transform:translateX(-100%);animation:heroSheen 11s ease-in-out infinite}
 @keyframes heroSheen{0%,55%{transform:translateX(-100%)}75%,100%{transform:translateX(100%)}}
-.hero-home .start-card{border-color:rgba(94,234,212,.25);background:linear-gradient(180deg,rgba(15,39,47,.72),rgba(12,23,31,.94)),url('moscow-city-960.webp') center/cover no-repeat}
+.hero-home .start-card{border-color:rgba(94,234,212,.25);background:linear-gradient(180deg,rgba(9,24,31,.88),rgba(8,17,23,.97)),url('moscow-city-960.webp') center/cover no-repeat}
 .eyebrow{color:var(--violet)}
 .hero-meta span{border-color:rgba(94,234,212,.18)}
 .bar-fill{background:linear-gradient(90deg,var(--violet-deep),var(--violet),#fda4af)}
@@ -1296,7 +1298,8 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .sph-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:0 20px 40px -26px rgba(20,184,166,.85)}
 .sph-card .sph-ph{position:absolute;inset:0;z-index:-1;background:linear-gradient(150deg,#16414c,#0b2530);background-size:cover;background-position:center;transform:scale(1.001);transition:transform .55s var(--ease),filter .45s var(--ease)}
 .sph-card.has-photo .sph-ph{background-image:var(--ph)}
-.sph-card.has-photo::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(6,16,22,.58) 0%,rgba(6,16,22,.12) 32%,rgba(6,16,22,.34) 54%,rgba(6,16,22,.88) 82%,rgba(6,16,22,.96) 100%);transition:opacity .4s var(--ease)}
+.sph-card.has-photo::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(6,16,22,.74) 0%,rgba(6,16,22,.3) 26%,rgba(6,16,22,.66) 55%,rgba(6,16,22,.95) 82%,rgba(6,16,22,.98) 100%);transition:opacity .4s var(--ease)}
+.sph-card.has-photo .sph-body{text-shadow:0 1px 3px rgba(0,0,0,.78),0 2px 18px rgba(0,0,0,.55)}
 .sph-card:hover .sph-ph{transform:scale(1.07)}
 .sph-body{position:relative;display:flex;flex-direction:column;gap:8px;padding:15px 16px 14px;min-height:176px;justify-content:flex-end}
 .sph-text{display:flex;flex-direction:column;gap:3px;margin-top:auto}
@@ -1308,7 +1311,8 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .sph-sm .sph-body .n{font-size:15px}
 .sph-sm .sph-body .d{display:none}
 .theme-light .sph-card{background:linear-gradient(150deg,#d9f0ea,#c2e4dc)}
-.theme-light .sph-card.has-photo::after{background:linear-gradient(180deg,rgba(244,251,249,.7) 0%,rgba(244,251,249,.1) 32%,rgba(244,251,249,.4) 54%,rgba(244,251,249,.9) 82%,rgba(244,251,249,.98) 100%)}
+.theme-light .sph-card.has-photo::after{background:linear-gradient(180deg,rgba(244,251,249,.78) 0%,rgba(244,251,249,.16) 26%,rgba(244,251,249,.52) 55%,rgba(244,251,249,.93) 82%,rgba(244,251,249,.99) 100%)}
+.theme-light .sph-card.has-photo .sph-body{text-shadow:none}
 .theme-light .sph-body .d{color:var(--ink-3)}
 /* ---- фотоблок на странице профессии ---- */
 .photo-fig{margin:24px 0 0;border:1px solid var(--rule);border-radius:16px;overflow:hidden;background:var(--panel);position:relative}
@@ -1316,7 +1320,8 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .photo-fig img{position:relative;z-index:1}
 /* ---- обложка страницы профессии ---- */
 .cover-img{position:relative}
-.cover-ov{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:70px 22px 18px;background:linear-gradient(180deg,rgba(5,11,15,0),rgba(5,11,15,.88));color:#eafaf7}
+.cover-ov{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:70px 22px 18px;background:linear-gradient(180deg,rgba(5,11,15,0),rgba(5,11,15,.94));color:#eafaf7}
+.cover-code,.cover-name{text-shadow:0 1px 3px rgba(0,0,0,.7),0 2px 18px rgba(0,0,0,.5)}
 .cover-code{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:#5eead4}
 .cover-name{font-family:var(--serif);font-weight:700;font-size:clamp(17px,2.1vw,26px);line-height:1.15}
 .fact-strip{display:flex;flex-wrap:wrap;gap:14px 34px;margin-top:24px;padding:16px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
@@ -1459,7 +1464,7 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .theme-light .panel,.theme-light .kpi{background:linear-gradient(160deg,#fff,#f1faf7)}
 .theme-light .hero-home{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(238,248,245,.9))}
 .theme-light .chart-tip{background:#fff}
-.theme-light .start-card{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(238,248,245,.96)),url('moscow-city-960.webp') center/cover no-repeat}
+.theme-light .start-card{background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(238,248,245,.97)),url('moscow-city-960.webp') center/cover no-repeat}
 .theme-light .search-field,.theme-light .seg-tabs{background:rgba(255,255,255,.88)}
 .theme-light .prof-graph{background:linear-gradient(150deg,#fff,#f2faf8)}
 .theme-light .graph-node rect{fill:#fff;stroke:rgba(15,158,142,.35)}
@@ -1645,6 +1650,88 @@ a{text-decoration:none;color:#111}
 .teacher-page .q-hint{color:#555}
 .teacher-page .sec-head{margin:24px 0 12px}
 .teacher-page .display{font-size:26px}
+}
+/* ---- печать профессии и колледжа: A4 без потерь и мелкого кегля ---- */
+@page{size:A4;margin:12mm 11mm 14mm}
+@media print{
+/* scroll-анимации не должны оставлять блоки прозрачными на бумаге */
+.reveal,.reveal.in,.story,.view,.rich section,.radar-poly,.fav-print-head{
+opacity:1!important;transform:none!important;animation:none!important}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{width:auto}
+.wrap{max-width:none;padding:0}
+.photo-fig,.photo-band{display:none!important}
+.detail-head{padding:0 0 12px}
+.detail-head h1{font-size:21pt;line-height:1.1;max-width:none}
+.detail-head .lead{font-size:10.5pt;line-height:1.45;margin-top:6px}
+.fact-strip{gap:8px 20px;margin-top:10px;padding:8px 0}
+.fact-strip>div{min-width:84px}
+.fact-strip .k{font-size:7.5pt}
+.fact-strip .v{font-size:12.5pt}
+/* паспорт профессии — компактной таблицей перед содержанием */
+.detail-body{display:flex!important;flex-direction:column;gap:12px}
+.passport{display:grid!important;position:static!important;order:-1;grid-template-columns:1fr 1fr;gap:0 22px;
+border:1px solid #ddd;border-radius:10px;padding:10px 14px;margin:0;break-inside:avoid;background:#fff}
+.passport>.label{grid-column:1/-1;border-bottom:1px solid #ddd;padding-bottom:5px;margin:0 0 2px}
+.passport .pp-row{border-top:1px solid #eee;padding:5px 0;margin:0}
+.passport .pp-row:first-of-type{border-top:0;padding-top:2px}
+.passport .pp-k{font-size:7.5pt;margin-bottom:1px;color:#555}
+.passport .pp-v{font-size:11.5pt!important;line-height:1.2;color:#111}
+.passport .pp-bar,.passport .btn,.passport .similar{display:none!important}
+/* радар: схема остаётся, интерактив убираем */
+.radar-sec{display:block!important;margin:4px 0 0;padding:10px 14px;border:1px solid #ddd;border-radius:10px;background:#fff;break-inside:avoid}
+.radar-grid{display:flex;gap:18px;align-items:center}
+.radar-chart{flex:0 0 44%;max-width:320px}
+.radar-side .eyebrow{margin-bottom:2px}
+.radar-side .sec{font-size:13pt;margin:0 0 4px}
+.radar-side .muted,.radar-axes,.radar-verdict,.radar-note{display:none!important}
+.radar-ring,.radar-axis{stroke:#ccc}
+.radar-label{fill:#444;font-size:11px}
+.radar-poly{fill:rgba(94,234,212,.22);stroke:#4b3bb0}
+/* содержание */
+.rich{gap:16px}
+.rich h2{font-size:15pt;margin-bottom:6px;padding-left:8px}
+.rich h3{font-size:8pt;margin:8px 0 4px}
+.rich p{font-size:10.5pt;line-height:1.5}
+.rich li{font-size:10pt;line-height:1.45;padding:5px 0;gap:8px;grid-template-columns:30px 1fr}
+.rich li > span:first-child,.rich li > span:nth-child(2){font-size:8pt}
+.rich li.row > span:first-child{font-size:10pt}
+.rich li.row > span:last-child{font-size:9.5pt}
+.rich li.row > span:last-child > span{font-size:7pt}
+.rich li.career p:nth-child(1){font-size:7.5pt}
+.rich li.career p:nth-child(2){font-size:10.5pt}
+.rich li.career p:nth-child(3){font-size:9pt}
+.rich table,.rich .tbl table.study{font-size:8.5pt;min-width:0!important;width:100%!important}
+.rich th,.rich .tbl table.study th{font-size:7pt;padding:0 5px 4px 0}
+.rich td,.rich .tbl table.study td{padding:4px 5px 4px 0}
+.rich td span,.rich .tbl table.study td span{font-size:7.5pt}
+.rich .tbl,.tbl-wrap{overflow:visible!important}
+/* графики и списки — светлые, без тяжёлой заливки */
+.salary-chart{background:#fff!important;border:1px solid #ddd}
+.salary-track{background:#e9e9e9}
+.salary-fill{background:#4b3bb0}
+.salary-stage,.salary-note,.salary-chart .label,.salary-head .mono{color:#555}
+.salary-role{color:#111}
+.salary-val{color:#4b3bb0}
+.graph-list .gl-group{background:#fff;border-color:#ddd}
+.graph-list .gl-group p{color:#333}
+.graph-list .gl-unis a{color:#333;border-color:#ddd}
+/* таблицы: обычная сетка, даже если сработал мобильный брейкпоинт */
+table.data{display:table!important;min-width:0!important;width:100%!important;font-size:8.5pt!important;border-collapse:collapse!important}
+table.data thead{display:table-header-group!important}
+table.data tbody{display:table-row-group!important}
+table.data tr{display:table-row!important;padding:0!important;border:0!important;break-inside:avoid}
+table.data th{display:table-cell!important;font-size:7pt!important;padding:0 5px 4px 0!important;text-align:left!important}
+table.data td{display:table-cell!important;text-align:left!important;padding:4px 5px 4px 0!important;border-top:1px solid #ddd!important;vertical-align:top!important}
+table.data td::before{content:none!important;display:none!important}
+table.data td:first-child{display:table-cell!important;text-align:left!important;padding:4px 5px 4px 0!important;font-weight:400!important}
+table.data td:nth-last-child(2),table.data td:last-child{text-align:right!important;padding-right:0!important}
+table.data .code{font-size:7pt}
+/* не рвём блоки между страницами */
+.rich section,.fcard,.res,.q-card,.lesson-step,.passport,.radar-sec,tr{break-inside:avoid;page-break-inside:avoid}
+.rich h2,.rich h3{break-after:avoid;page-break-after:avoid}
+a{color:#111;text-decoration:none}
+.toc,.prof-graph,.chart-legend,.detail-head .hero-cta,.cmp-bar,.to-top{display:none!important}
 }
 @media (prefers-reduced-motion: reduce){
 html{scroll-behavior:auto}
