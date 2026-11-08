@@ -3041,6 +3041,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">8 ноября 2026</span><div><b>Светлая тема и подписи на полотне.</b> Убраны тёмные и серые подложки в светлой теме: фильтры вузов, переключатель режима, блоки урока и радар. На полотне «Все профессии на одной карте» подписаны все плитки, добавлена легенда шкалы индекса спроса от ' + indexRange()[0] + ' до ' + indexRange()[1] + ' баллов.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Печать профессии и фотографии.</b> Страница профессии печатается на A4 целиком: паспорт профессии, радар и все разделы, таблицы — обычной сеткой и читаемым кеглем. Текст на фотографиях стал контрастнее, панель сравнения больше не выглядывает снизу, а подпись сферы снова видна на фотографии.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Сценарий урока и переходы.</b> Появилась отдельная страница «Учителю и родителю»: занятие на 25–30 минут, шесть шагов, восемь вопросов для обсуждения, памятка для родителей и печать. Переход из карточки профессии в её заголовок стал общим элементом (View Transitions) там, где браузер это поддерживает. Сборка стала легче: CSS сжимается, скрипты начинают загружаться раньше.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Проще навигация и режимы.</b> В шапке осталось четыре раздела, остальное собрано в меню «Ещё», а на телефоне появилась нижняя навигация с подписями. Переключатель «Я ученик / Я учитель или родитель» меняет подачу главной и добавляет методические действия. Поиск понимает обычные фразы: «после 9 класса», «биология», «Москва бюджет». Возврат из профессии восстанавливает фильтры и место в списке, а термины объясняются прямо на странице.</div></li>' +
@@ -3589,6 +3590,32 @@ ry += rowH; rh -= rowH;
 }
 return rects;
 }
+/* Диапазон индекса спроса — для легенды и журнала изменений. */
+function indexRange() {
+var mn = Infinity, mx = -Infinity;
+P.forEach(function (p) { if (p.index < mn) mn = p.index; if (p.index > mx) mx = p.index; });
+return [mn, mx];
+}
+/* Разбивка названия на строки, чтобы подпись помещалась в плитку. */
+function wrapLines(text, maxChars, maxLines) {
+var words = String(text).split(' ');
+var lines = [], cur = '', i = 0;
+while (i < words.length) {
+var w = words[i];
+if (!cur) { cur = w; i++; }
+else if ((cur + ' ' + w).length <= maxChars) { cur += ' ' + w; i++; }
+else { lines.push(cur); cur = ''; if (lines.length >= maxLines) break; }
+}
+if (cur && lines.length < maxLines) lines.push(cur);
+if (!lines.length) return [cut(String(text), maxChars)];
+var rest = i < words.length;
+return lines.map(function (ln, li) {
+var last = li === lines.length - 1;
+if (ln.length > maxChars) return cut(ln, maxChars);
+if (last && rest) return cut(ln + '…', maxChars);
+return ln;
+});
+}
 function renderTreemap() {
 var host = document.getElementById('treemap');
 if (!host) return;
@@ -3606,10 +3633,22 @@ var op = (0.14 + 0.34 * t).toFixed(2);
 var tw = Math.max(0, r.w - 2), th = Math.max(0, r.h - 2);
 var label = '';
 if (tw > 92 && th > 46) {
-var maxChars = Math.max(6, Math.floor((tw - 16) / 6.6));
-var title = cut(p.title, maxChars);
-label = '<text class="tm-title" x="' + (r.x + 8).toFixed(1) + '" y="' + (r.y + 20).toFixed(1) + '">' + h(title) + '</text>' +
-'<text class="tm-idx" x="' + (r.x + 8).toFixed(1) + '" y="' + (r.y + 36).toFixed(1) + '">индекс ' + p.index + '</text>';
+var maxChars = Math.max(5, Math.floor((tw - 16) / 7));
+var lines = wrapLines(p.title, maxChars, th > 74 ? 2 : 1);
+label = lines.map(function (ln, li) {
+return '<text class="tm-title" x="' + (r.x + 8).toFixed(1) + '" y="' + (r.y + 19 + li * 15).toFixed(1) + '">' + h(ln) + '</text>';
+}).join('');
+var iy = r.y + 19 + (lines.length - 1) * 15 + 17;
+if (iy + 3 <= r.y + th - 4) {
+label += '<text class="tm-idx" x="' + (r.x + 8).toFixed(1) + '" y="' + iy.toFixed(1) + '">индекс ' + p.index + '</text>';
+}
+} else if (tw > 56 && th > 26) {
+/* узкая плитка: название в одну строку */
+var mc = Math.max(4, Math.floor((tw - 12) / 6.3));
+label = '<text class="tm-title tm-title-sm" x="' + (r.x + 7).toFixed(1) + '" y="' + (r.y + 18).toFixed(1) + '">' + h(cut(p.title, mc)) + '</text>';
+} else if (tw > 26 && th > 18) {
+/* самая мелкая плитка: хотя бы индекс спроса по центру */
+label = '<text class="tm-idx tm-idx-on" text-anchor="middle" x="' + (r.x + tw / 2).toFixed(1) + '" y="' + (r.y + th / 2 + 4).toFixed(1) + '">' + p.index + '</text>';
 }
 out += '<a class="tm-tile" href="#/professions/' + h(p.slug) + '" aria-label="' + h(p.title + ', индекс спроса ' + p.index) + '">' +
 '<title>' + h(p.title + ' · индекс ' + p.index + ' · ' + (PROG[p.slug] || []).length + ' программ') + '</title>' +
@@ -3617,7 +3656,25 @@ out += '<a class="tm-tile" href="#/professions/' + h(p.slug) + '" aria-label="' 
 '<rect class="tm-hit" x="' + (r.x + 1).toFixed(1) + '" y="' + (r.y + 1).toFixed(1) + '" width="' + tw.toFixed(1) + '" height="' + th.toFixed(1) + '" rx="6"></rect>' +
 label + '</a>';
 });
-host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Тремап ' + P.length + ' профессий: площадь плитки — число программ, насыщенность — индекс спроса">' + out + '</svg>';
+var idxVals = list.map(function (p) { return p.index; });
+var imin = idxVals.length ? Math.min.apply(null, idxVals) : 0;
+var imax = idxVals.length ? Math.max.apply(null, idxVals) : 0;
+var ramp = [0.14, 0.2, 0.27, 0.34, 0.41, 0.48].map(function (o) {
+return '<i style="--o:' + o + '"></i>';
+}).join('');
+host.innerHTML = '<div class="tm-scroll"><svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Тремап ' + P.length +
+' профессий: площадь плитки — число программ, насыщенность — индекс спроса от ' + imin + ' до ' + imax + '">' + out + '</svg></div>' +
+'<div class="tm-legend">' +
+'<div class="tm-legend-top">' +
+'<span class="label">Насыщенность заливки — индекс спроса</span>' +
+'<span class="tm-ramp" aria-hidden="true">' + ramp + '</span>' +
+'<span class="tm-ramp-cap">слабее · ' + imin + '</span>' +
+'<span class="tm-ramp-cap">· ' + imax + ' · сильнее</span>' +
+'</div>' +
+'<p class="tm-hint">Площадь плитки — число программ в атласе, цвет — сфера (легенда ниже). Чем гуще заливка, тем выше индекс спроса: от ' +
+imin + ' до ' + imax + ' баллов. На плитках подписаны названия, у самых мелких — индекс; полные данные открываются по нажатию. ' +
+'<span class="tm-scroll-note">На узком экране полотно прокручивается по горизонтали.</span></p>' +
+'</div>';
 }
 function renderProfession(slug) {
 var p = P.filter(function (x) { return x.slug === slug; })[0];
@@ -4420,7 +4477,10 @@ b.setAttribute('aria-label', THEME === 'light' ? 'Включить тёмную 
 }
 var meta = document.querySelector('meta[name="theme-color"]');
 if (meta) meta.setAttribute('content', THEME === 'light' ? '#f4fbf9' : '#091116');
-setTimeout(function () { renderHeatmap(); drawBubble(); }, 0);
+var repaint = function () { renderHeatmap(); drawBubble(); };
+setTimeout(repaint, 0);
+/* view-transition применяет тему позже таймаута — перерисовываем после готовности. */
+if (vt && vt.ready) vt.ready.then(repaint, function () {});
 }
 function injectTools() {
 var actions = document.querySelector('.hdr-actions');
