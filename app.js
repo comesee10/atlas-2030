@@ -2026,9 +2026,9 @@ teacherPanel +
     '<div class="sph-grid reveal">' + SPHERES.map(function (s) {
       return sphereCard(s.code, '#/professions?sphere=' + s.code);
     }).join('') + '</div>' +
-'<section class="sec-head reveal"><div><p class="eyebrow">Полотно</p><h2 class="sec">Все профессии на одной карте</h2></div>' +
-'<p class="muted" style="max-width:56ch">Площадь плитки — число программ в атласе, насыщенность цвета — индекс спроса. Нажмите на плитку, чтобы открыть профессию.</p></section>' +
-'<div class="panel chart reveal treemap" id="treemap"></div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Спрос и обучение</p><h2 class="sec">Все профессии на одной карте</h2></div>' +
+'<p class="muted" style="max-width:56ch">Каждая точка — профессия: положение по шкале показывает индекс спроса, размер — число программ обучения. Строки — шесть сфер атласа, ромб — среднее значение сферы.</p></section>' +
+'<div class="panel chart reveal plot" id="plot"></div>' +
 '<div class="chart-legend">' + SPHERES.map(function (s) {
 return '<span><i style="background:' + sphereColor(s.code) + '"></i>' + h(s.code + ' · ' + s.name) + '</span>';
 }).join('') + '</div>' +
@@ -2080,7 +2080,7 @@ advCard('06', 'Сравнение и печатный отчёт', 'До трё�
 '<p class="muted">Все расчёты выполняются в браузере. Ответы опросника не отправляются на сервер: они хранятся только в этом браузере и открываются кнопкой «Мой выбор» в шапке.</p></div>' +
 '</div>' +
 '</div>';
-renderTreemap();
+renderPlot();
 }
 function sortBtn(key, label, active) {
 return '<button data-sort="' + key + '" aria-pressed="' + (active === key ? 'true' : 'false') + '">' + label + '</button>';
@@ -3041,7 +3041,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
-'<li><span class="mono">8 ноября 2026</span><div><b>Светлая тема и подписи на полотне.</b> Убраны тёмные и серые подложки в светлой теме: фильтры вузов, переключатель режима, блоки урока и радар. На полотне «Все профессии на одной карте» подписаны все плитки, добавлена легенда шкалы индекса спроса от ' + indexRange()[0] + ' до ' + indexRange()[1] + ' баллов.</div></li>' +
+'<li><span class="mono">8 ноября 2026</span><div><b>Светлая тема и новый график.</b> Убраны тёмные и серые подложки в светлой теме: фильтры вузов, переключатель режима, блоки урока и радар. Полотно «Все профессии на одной карте» заменено на график «спрос по сферам»: 47 точек на шкале индекса от ' + indexRange()[0] + ' до ' + indexRange()[1] + ', размер точки — число программ обучения, ромб — среднее значение сферы, крайние значения подписаны и отмечены кольцом.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Печать профессии и фотографии.</b> Страница профессии печатается на A4 целиком: паспорт профессии, радар и все разделы, таблицы — обычной сеткой и читаемым кеглем. Текст на фотографиях стал контрастнее, панель сравнения больше не выглядывает снизу, а подпись сферы снова видна на фотографии.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Сценарий урока и переходы.</b> Появилась отдельная страница «Учителю и родителю»: занятие на 25–30 минут, шесть шагов, восемь вопросов для обсуждения, памятка для родителей и печать. Переход из карточки профессии в её заголовок стал общим элементом (View Transitions) там, где браузер это поддерживает. Сборка стала легче: CSS сжимается, скрипты начинают загружаться раньше.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Проще навигация и режимы.</b> В шапке осталось четыре раздела, остальное собрано в меню «Ещё», а на телефоне появилась нижняя навигация с подписями. Переключатель «Я ученик / Я учитель или родитель» меняет подачу главной и добавляет методические действия. Поиск понимает обычные фразы: «после 9 класса», «биология», «Москва бюджет». Возврат из профессии восстанавливает фильтры и место в списке, а термины объясняются прямо на странице.</div></li>' +
@@ -3542,139 +3542,134 @@ update();
 });
 });
 }
-/* Тремап: площадь плитки — число программ, насыщенность — индекс спроса. */
-function treemapLayout(values, x, y, w, h) {
-var total = 0;
-values.forEach(function (v) { total += v; });
-if (total <= 0) return [];
-var scale = (w * h) / total;
-var rest = values.map(function (v) { return { area: Math.max(1, v) * scale }; });
-var rects = [];
-var rx = x, ry = y, rw = w, rh = h;
-function worst(row, len) {
-if (!row.length) return Infinity;
-var sum = 0, max = 0, min = Infinity;
-row.forEach(function (it) { sum += it.area; if (it.area > max) max = it.area; if (it.area < min) min = it.area; });
-var s2 = sum * sum, l2 = len * len;
-return Math.max(l2 * max / s2, s2 / (l2 * min));
-}
-while (rest.length) {
-var len = Math.min(rw, rh);
-var row = [], rowSum = 0;
-while (rest.length) {
-var trial = row.concat([rest[0]]);
-var tSum = rowSum + rest[0].area;
-if (row.length && worst(trial, len) > worst(row, len)) break;
-row = trial; rowSum = tSum; rest.shift();
-}
-if (!row.length) break;
-if (rw >= rh) {
-var colW = rowSum / rh;
-var cy = ry;
-row.forEach(function (it) {
-var ih = it.area / colW;
-rects.push({ x: rx, y: cy, w: colW, h: ih });
-cy += ih;
-});
-rx += colW; rw -= colW;
-} else {
-var rowH = rowSum / rw;
-var cx = rx;
-row.forEach(function (it) {
-var iw = it.area / rowH;
-rects.push({ x: cx, y: ry, w: iw, h: rowH });
-cx += iw;
-});
-ry += rowH; rh -= rowH;
-}
-}
-return rects;
-}
-/* Диапазон индекса спроса — для легенды и журнала изменений. */
+/* Диапазон индекса спроса — для пояснения и журнала изменений. */
 function indexRange() {
 var mn = Infinity, mx = -Infinity;
 P.forEach(function (p) { if (p.index < mn) mn = p.index; if (p.index > mx) mx = p.index; });
 return [mn, mx];
 }
-/* Разбивка названия на строки, чтобы подпись помещалась в плитку. */
-function wrapLines(text, maxChars, maxLines) {
-var words = String(text).split(' ');
-var lines = [], cur = '', i = 0;
-while (i < words.length) {
-var w = words[i];
-if (!cur) { cur = w; i++; }
-else if ((cur + ' ' + w).length <= maxChars) { cur += ' ' + w; i++; }
-else { lines.push(cur); cur = ''; if (lines.length >= maxLines) break; }
-}
-if (cur && lines.length < maxLines) lines.push(cur);
-if (!lines.length) return [cut(String(text), maxChars)];
-var rest = i < words.length;
-return lines.map(function (ln, li) {
-var last = li === lines.length - 1;
-if (ln.length > maxChars) return cut(ln, maxChars);
-if (last && rest) return cut(ln + '…', maxChars);
-return ln;
-});
-}
-function renderTreemap() {
-var host = document.getElementById('treemap');
+/* График «спрос по сферам»: строка — сфера, позиция точки — индекс спроса,
+   размер точки — число программ обучения, ромб — среднее значение сферы. */
+function renderPlot() {
+var host = document.getElementById('plot');
 if (!host) return;
-var list = P.slice().sort(function (a, b) { return b.index - a.index; });
-var vals = list.map(function (p) { return Math.max(1, (PROG[p.slug] || []).length + p.index / 10); });
-var W = 1200, H = 600;
-var rects = treemapLayout(vals, 0, 0, W, H);
-var out = '';
-rects.forEach(function (r, i) {
-var p = list[i];
-if (!p) return;
-var c = sphereColor(p.sphereCode);
-var t = Math.max(0, Math.min(1, (p.index - 60) / 40));
-var op = (0.14 + 0.34 * t).toFixed(2);
-var tw = Math.max(0, r.w - 2), th = Math.max(0, r.h - 2);
-var label = '';
-if (tw > 92 && th > 46) {
-var maxChars = Math.max(5, Math.floor((tw - 16) / 7));
-var lines = wrapLines(p.title, maxChars, th > 74 ? 2 : 1);
-label = lines.map(function (ln, li) {
-return '<text class="tm-title" x="' + (r.x + 8).toFixed(1) + '" y="' + (r.y + 19 + li * 15).toFixed(1) + '">' + h(ln) + '</text>';
-}).join('');
-var iy = r.y + 19 + (lines.length - 1) * 15 + 17;
-if (iy + 3 <= r.y + th - 4) {
-label += '<text class="tm-idx" x="' + (r.x + 8).toFixed(1) + '" y="' + iy.toFixed(1) + '">индекс ' + p.index + '</text>';
-}
-} else if (tw > 56 && th > 26) {
-/* узкая плитка: название в одну строку */
-var mc = Math.max(4, Math.floor((tw - 12) / 6.3));
-label = '<text class="tm-title tm-title-sm" x="' + (r.x + 7).toFixed(1) + '" y="' + (r.y + 18).toFixed(1) + '">' + h(cut(p.title, mc)) + '</text>';
-} else if (tw > 26 && th > 18) {
-/* самая мелкая плитка: хотя бы индекс спроса по центру */
-label = '<text class="tm-idx tm-idx-on" text-anchor="middle" x="' + (r.x + tw / 2).toFixed(1) + '" y="' + (r.y + th / 2 + 4).toFixed(1) + '">' + p.index + '</text>';
-}
-out += '<a class="tm-tile" href="#/professions/' + h(p.slug) + '" aria-label="' + h(p.title + ', индекс спроса ' + p.index) + '">' +
-'<title>' + h(p.title + ' · индекс ' + p.index + ' · ' + (PROG[p.slug] || []).length + ' программ') + '</title>' +
-'<rect x="' + (r.x + 1).toFixed(1) + '" y="' + (r.y + 1).toFixed(1) + '" width="' + tw.toFixed(1) + '" height="' + th.toFixed(1) + '" rx="6" fill="' + c + '" fill-opacity="' + op + '"></rect>' +
-'<rect class="tm-hit" x="' + (r.x + 1).toFixed(1) + '" y="' + (r.y + 1).toFixed(1) + '" width="' + tw.toFixed(1) + '" height="' + th.toFixed(1) + '" rx="6"></rect>' +
-label + '</a>';
+var rows = SPHERES.map(function (s) {
+var items = P.filter(function (p) { return p.sphereCode === s.code; }).map(function (p) {
+return { p: p, n: (PROG[p.slug] || []).length };
+}).sort(function (a, b) { return a.p.index - b.p.index; });
+return { s: s, items: items };
+}).filter(function (r) { return r.items.length; });
+if (!rows.length) return;
+
+var W = 1160, L = 190, R = 1136, TOP = 20, ROW = 78;
+var plotBottom = TOP + rows.length * ROW;
+var H = plotBottom + 54;
+var X0 = 70, X1 = 100;
+var X = function (v) { return L + (v - X0) / (X1 - X0) * (R - L); };
+
+var maxN = 1, minN = Infinity;
+rows.forEach(function (r) {
+r.items.forEach(function (it) {
+if (it.n > maxN) maxN = it.n;
+if (it.n < minN) minN = it.n;
 });
-var idxVals = list.map(function (p) { return p.index; });
-var imin = idxVals.length ? Math.min.apply(null, idxVals) : 0;
-var imax = idxVals.length ? Math.max.apply(null, idxVals) : 0;
-var ramp = [0.14, 0.2, 0.27, 0.34, 0.41, 0.48].map(function (o) {
-return '<i style="--o:' + o + '"></i>';
-}).join('');
-host.innerHTML = '<div class="tm-scroll"><svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Тремап ' + P.length +
-' профессий: площадь плитки — число программ, насыщенность — индекс спроса от ' + imin + ' до ' + imax + '">' + out + '</svg></div>' +
-'<div class="tm-legend">' +
-'<div class="tm-legend-top">' +
-'<span class="label">Насыщенность заливки — индекс спроса</span>' +
-'<span class="tm-ramp" aria-hidden="true">' + ramp + '</span>' +
-'<span class="tm-ramp-cap">слабее · ' + imin + '</span>' +
-'<span class="tm-ramp-cap">· ' + imax + ' · сильнее</span>' +
-'</div>' +
-'<p class="tm-hint">Площадь плитки — число программ в атласе, цвет — сфера (легенда ниже). Чем гуще заливка, тем выше индекс спроса: от ' +
-imin + ' до ' + imax + ' баллов. На плитках подписаны названия, у самых мелких — индекс; полные данные открываются по нажатию. ' +
-'<span class="tm-scroll-note">На узком экране полотно прокручивается по горизонтали.</span></p>' +
+});
+var rad = function (n) { return 4.5 + 7 * Math.sqrt((n || 0) / maxN); };
+var rng = indexRange();
+var imax = rng[1], imin = rng[0];
+
+/* Шкала индекса: сетка и подписи */
+var grid = '';
+[70, 75, 80, 85, 90, 95, 100].forEach(function (t) {
+var x = X(t).toFixed(1);
+grid += '<line class="plot-grid" x1="' + x + '" y1="' + TOP + '" x2="' + x + '" y2="' + plotBottom + '"></line>' +
+'<text class="plot-tick" x="' + x + '" y="' + (plotBottom + 20) + '" text-anchor="middle">' + t + '</text>';
+});
+grid += '<text class="plot-axis" x="' + ((L + R) / 2) + '" y="' + (plotBottom + 42) + '" text-anchor="middle">ИНДЕКС СПРОСА, 70–100</text>';
+
+var body = '';
+rows.forEach(function (r, i) {
+var cy = TOP + i * ROW + ROW / 2;
+var sum = 0;
+r.items.forEach(function (it) { sum += it.p.index; });
+var mean = sum / r.items.length;
+var first = r.items[0].p.index, last = r.items[r.items.length - 1].p.index;
+
+body += '<rect class="plot-band" x="8" y="' + (TOP + i * ROW + 7) + '" width="' + (W - 16) + '" height="' + (ROW - 14) + '" rx="10"></rect>';
+body += '<text class="plot-code" x="22" y="' + (cy - 12) + '">' + h(r.s.code) + '</text>' +
+'<text class="plot-name" x="22" y="' + (cy + 6) + '">' + h(cut(r.s.name, 26)) + '</text>' +
+'<text class="plot-meta" x="22" y="' + (cy + 23) + '">' + r.items.length + ' ' +
+plural(r.items.length, 'профессия', 'профессии', 'профессий') + ' · ср. ' + Math.round(mean) + '</text>';
+
+/* диапазон сферы и среднее значение */
+body += '<line class="plot-range" x1="' + X(first).toFixed(1) + '" y1="' + cy + '" x2="' + X(last).toFixed(1) + '" y2="' + cy + '"></line>';
+body += '<rect class="plot-mean" x="' + (X(mean) - 5).toFixed(1) + '" y="' + (cy - 5) + '" width="10" height="10" transform="rotate(45 ' + X(mean).toFixed(1) + ' ' + cy + ')"></rect>';
+
+/* точки профессий; при близких значениях сдвигаем по вертикали, чтобы не слипались */
+var prevX = -1e9, prevR = 0, side = 1;
+r.items.forEach(function (it) {
+var cx = X(it.p.index), rr = rad(it.n);
+var dy = 0;
+if (cx - prevX < prevR + rr + 4) { dy = side * 12; side = -side; } else { side = 1; }
+prevX = cx; prevR = rr;
+var y = cy + dy;
+var col = sphereColor(it.p.sphereCode);
+var tip = it.p.title + ' · индекс ' + it.p.index + ' · ' + it.n + ' ' +
+plural(it.n, 'программа', 'программы', 'программ');
+var key = (it.p.index === imax || it.p.index === imin);
+body += '<a class="plot-dot' + (key ? ' is-key' : '') + '" href="#/professions/' + h(it.p.slug) + '"' +
+' aria-label="' + h(tip) + '" data-tip="' + h(tip) + '">' +
+'<circle cx="' + cx.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + rr.toFixed(1) + '" fill="' + col + '"></circle></a>';
+
+/* подписываем крайние значения индекса */
+if (key) {
+var right = cx > (L + R) / 2;
+var lx = right ? cx - rr - 9 : cx + rr + 9;
+var ly = (it.p.index === imax) ? y - rr - 7 : y + rr + 15;
+body += '<text class="plot-key" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' +
+(right ? 'end' : 'start') + '">' + h(cut(it.p.title, 32) + ' · ' + it.p.index) + '</text>';
+}
+});
+});
+
+var top = P.filter(function (p) { return p.index === imax; })[0];
+var low = P.filter(function (p) { return p.index === imin; })[0];
+host.innerHTML = '<div class="plot-scroll"><svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Индекс спроса по шести сферам: ' +
+P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', от ' + imin + ' до ' + imax + '">' + grid + body + '</svg></div>' +
+'<div class="chart-tip" hidden></div>' +
+'<div class="plot-legend">' +
+'<p class="plot-hint">Точка — профессия: положение по шкале — индекс спроса, размер — число программ обучения в атласе (от ' +
+minN + ' до ' + maxN + '). Ромб — среднее значение сферы, тонкая линия — её диапазон. ' +
+(top ? 'Максимум — «' + h(top.title) + '», ' + imax + '; ' : '') +
+(low ? 'минимум — «' + h(low.title) + '», ' + imin + '; ' : '') +
+'обе точки отмечены кольцом. Нажмите на точку, чтобы открыть профессию. ' +
+'<span class="plot-scroll-note">На узком экране график прокручивается по горизонтали.</span></p>' +
 '</div>';
+
+/* подсказка при наведении и при переходе с клавиатуры */
+var tip = host.querySelector('.chart-tip');
+if (!tip) return;
+function showTip(a) {
+var text = a.getAttribute('data-tip');
+if (!text) return;
+tip.textContent = text;
+tip.hidden = false;
+var box = host.getBoundingClientRect(), dot = a.getBoundingClientRect();
+var left = dot.left - box.left + dot.width / 2 - tip.offsetWidth / 2;
+var topPos = dot.top - box.top - tip.offsetHeight - 10;
+if (left < 4) left = 4;
+if (left + tip.offsetWidth > box.width - 4) left = box.width - tip.offsetWidth - 4;
+if (topPos < 4) topPos = dot.bottom - box.top + 10;
+tip.style.left = Math.round(left) + 'px';
+tip.style.top = Math.round(topPos) + 'px';
+}
+function hideTip() { tip.hidden = true; }
+host.querySelectorAll('.plot-dot').forEach(function (a) {
+a.addEventListener('mouseenter', function () { showTip(a); });
+a.addEventListener('mouseleave', hideTip);
+a.addEventListener('focus', function () { showTip(a); });
+a.addEventListener('blur', hideTip);
+});
 }
 function renderProfession(slug) {
 var p = P.filter(function (x) { return x.slug === slug; })[0];

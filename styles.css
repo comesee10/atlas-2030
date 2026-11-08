@@ -1328,25 +1328,30 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .fact-strip>div{display:grid;gap:4px;min-width:118px}
 .fact-strip .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4)}
 .fact-strip .v{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-/* ---- тремап профессий ---- */
-.treemap{padding:10px}
-.treemap svg{display:block;width:100%;height:auto}
-.tm-tile .tm-hit{fill:transparent;stroke:transparent;stroke-width:2;transition:stroke .15s}
-.tm-tile:hover .tm-hit{stroke:var(--violet)}
-.tm-title{fill:var(--ink);font-family:var(--sans);font-size:12.5px;font-weight:600}
-.tm-idx{fill:var(--ink-3);font-family:var(--mono);font-size:10.5px}
-.tm-title-sm{font-size:11px;font-weight:600}
-.tm-idx-on{font-size:11px;font-weight:500;fill:var(--ink-2)}
-.tm-legend{margin-top:8px;padding-top:10px;border-top:1px solid var(--rule);display:grid;gap:7px}
-.tm-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tm-scroll-note{display:none}
-@media (max-width:960px){.tm-scroll svg{min-width:960px}.tm-scroll-note{display:inline}}
-.tm-legend-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.tm-ramp{display:inline-flex;gap:2px}
-.tm-ramp i{width:30px;height:11px;border-radius:2px;background:var(--violet);opacity:var(--o,.3)}
-.theme-light .tm-ramp i{opacity:calc(var(--o,.3) + .3)}
-.tm-ramp-cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--ink-3)}
-.tm-hint{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-3);max-width:82ch}
+/* ---- график «спрос по сферам» ---- */
+.plot{position:relative;padding:18px 16px 16px}
+.plot svg{display:block;width:100%;height:auto}
+.plot-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.plot-band{fill:var(--panel-2);opacity:.55}
+.plot-grid{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 5}
+.plot-range{stroke:var(--ink-4);stroke-width:1.5;opacity:.55}
+.plot-mean{fill:var(--panel);stroke:var(--ink-2);stroke-width:1.5}
+.plot-code{fill:var(--ink-4);font-family:var(--mono);font-size:10px;letter-spacing:.09em}
+.plot-name{fill:var(--ink);font-family:var(--sans);font-size:13px;font-weight:600}
+.plot-meta{fill:var(--ink-4);font-family:var(--mono);font-size:10px}
+.plot-tick{fill:var(--ink-4);font-family:var(--mono);font-size:10.5px}
+.plot-axis{fill:var(--ink-3);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em}
+.plot-dot circle{stroke:var(--panel);stroke-width:1.5;transition:stroke .15s,stroke-width .15s}
+.plot-dot:hover circle,.plot-dot:focus circle{stroke:var(--violet);stroke-width:2.5}
+.plot-dot.is-key circle{stroke:var(--violet);stroke-width:2.5}
+.plot-dot{outline:none}
+.plot-key{fill:var(--ink);font-family:var(--sans);font-size:12px;font-weight:600;paint-order:stroke;stroke:var(--panel-2);stroke-width:4px;stroke-linejoin:round}
+.plot-legend{margin-top:10px;padding-top:10px;border-top:1px solid var(--rule)}
+.plot-hint{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-3);max-width:96ch}
+.plot-scroll-note{display:none}
+.theme-light .plot-band{fill:#f1faf7;opacity:1}
+.theme-light .plot-key{stroke:#f1faf7}
+@media (max-width:960px){.plot-scroll svg{min-width:900px}.plot-scroll-note{display:inline}}
 /* ---- профиль профессии и самопроверка ---- */
 .radar-sec{margin:30px 0 0;padding:26px;border:1px solid var(--rule);border-radius:16px;background:linear-gradient(150deg,rgba(16,29,38,.6),rgba(9,17,22,.4))}
 .radar-grid{display:grid;grid-template-columns:minmax(280px,420px) minmax(0,1fr);gap:32px;align-items:center}
