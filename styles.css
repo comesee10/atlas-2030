@@ -1512,6 +1512,11 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .theme-light .tbl-hint{color:#4b6b66}
 .theme-light .plot-code,.theme-light .plot-meta,.theme-light .plot-tick,.theme-light .plot-axis{fill:#4b6b66}
 .theme-light .graph-list .gl-group b,.theme-light .bar-row .v{color:var(--violet-deep)}
+.theme-light .tabbar{background:rgba(255,255,255,.97);border-top-color:var(--rule-2);box-shadow:0 -12px 30px -22px rgba(6,40,36,.6)}
+.theme-light .tabbar a{color:var(--ink-2)}
+.theme-light .tabbar a[aria-current="page"]{color:var(--violet-deep)}
+.theme-light .pp-bar{background:rgba(15,158,142,.16)}
+.theme-light .start-card::after{background:radial-gradient(circle,rgba(15,158,142,.2),transparent 70%)}
 /* ---- Mobile baseline: no horizontal overflow, comfortable tap targets ---- */
 body{overflow-x:clip}
 .atlas-tools .tt-label{display:none}
