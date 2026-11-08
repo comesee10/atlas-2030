@@ -1319,7 +1319,7 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .photo-fig:not(.is-ready){background:linear-gradient(100deg,var(--panel) 30%,var(--panel-2) 50%,var(--panel) 70%);background-size:220% 100%;animation:skelPan 1.5s linear infinite}
 .photo-fig img{position:relative;z-index:1}
 /* ---- обложка страницы профессии ---- */
-.cover-img{position:relative}
+.cover-img{position:relative;overflow:hidden}
 .cover-ov{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:70px 22px 18px;background:linear-gradient(180deg,rgba(5,11,15,0),rgba(5,11,15,.94));color:#eafaf7}
 .cover-code,.cover-name{text-shadow:0 1px 3px rgba(0,0,0,.7),0 2px 18px rgba(0,0,0,.5)}
 .cover-code{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:#5eead4}
@@ -1587,8 +1587,8 @@ body{overflow-x:clip}
 .salary-meta{display:grid;gap:2px;min-width:0}
 .salary-stage{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
 .salary-role{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35;overflow-wrap:anywhere}
-.salary-track{position:relative;height:10px;border-radius:999px;background:rgba(94,234,212,.12);overflow:hidden}
-.salary-fill{position:absolute;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,var(--violet-deep),var(--violet));min-width:3px}
+.salary-track{position:relative;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--violet-deep),var(--violet));overflow:hidden}
+.salary-fill{position:absolute;top:0;bottom:0;border-radius:999px;background:rgba(255,255,255,.5);min-width:3px}
 .salary-val{font-family:var(--mono);font-size:11px;color:var(--violet);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .salary-note{margin-top:10px;font-size:11.5px;color:var(--ink-4);line-height:1.45}
 /* ---- Календарь приёмной кампании ---- */
@@ -1614,7 +1614,6 @@ body{overflow-x:clip}
 .cal-check li::before{content:"✓";position:absolute;left:0;top:0;color:var(--violet);font-family:var(--mono);font-size:11px}
 .theme-light .fav-btn{background:#fff}
 .theme-light .salary-chart,.theme-light .cal-card{background:linear-gradient(160deg,#fff,#f1faf7)}
-.theme-light .salary-track{background:rgba(15,158,142,.14)}
 @media (max-width:980px){.cal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){
 .cal-grid{grid-template-columns:1fr}
@@ -1746,8 +1745,8 @@ border:1px solid #ddd;border-radius:10px;padding:10px 14px;margin:0;break-inside
 .rich .tbl,.tbl-wrap{overflow:visible!important}
 /* графики и списки — светлые, без тяжёлой заливки */
 .salary-chart{background:#fff!important;border:1px solid #ddd}
-.salary-track{background:#e9e9e9}
-.salary-fill{background:#4b3bb0}
+.salary-track{background:#0f9e8e}
+.salary-fill{background:#ffffff}
 .salary-stage,.salary-note,.salary-chart .label,.salary-head .mono{color:#555}
 .salary-role{color:#111}
 .salary-val{color:#4b3bb0}
