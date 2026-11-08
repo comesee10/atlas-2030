@@ -1508,6 +1508,10 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .theme-light .lesson-plan{background:linear-gradient(160deg,#fff,#f1faf7)}
 .theme-light .q-card{background:#fff}
 .theme-light .q-card:hover{background:#f7fdfb}
+.theme-light .toc a{color:var(--ink-2)}
+.theme-light .tbl-hint{color:#4b6b66}
+.theme-light .plot-code,.theme-light .plot-meta,.theme-light .plot-tick,.theme-light .plot-axis{fill:#4b6b66}
+.theme-light .graph-list .gl-group b,.theme-light .bar-row .v{color:var(--violet-deep)}
 /* ---- Mobile baseline: no horizontal overflow, comfortable tap targets ---- */
 body{overflow-x:clip}
 .atlas-tools .tt-label{display:none}
