@@ -157,7 +157,7 @@ function spherePhoto(code, size) {
 function photoCredit(code) {
   var c = PHOTO_CREDITS[code];
   if (!c) return '';
-  return '<a class="photo-credit" href="' + h(c.src) + '" target="_blank" rel="noopener">Фото: ' + h(c.by) + ' · ' + h(c.lic) + ' · Wikimedia Commons</a>';
+  return '<a class="photo-credit" href="' + h(c.src) + '" target="_blank" rel="noopener noreferrer">Фото: ' + h(c.by) + ' · ' + h(c.lic) + ' · Wikimedia Commons</a>';
 }
 /* Карточка сферы с фотографией: фото лежит фоном, текст — поверх затемнения. */
 function sphereCard(code, href, extraClass) {
@@ -3041,6 +3041,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">8 ноября 2026</span><div><b>Чистка и защита.</b> Удалены правила стилей для классов, которых больше нет в разметке (−1,8 КБ). Service worker стал устойчивее: сбой записи в кэш и отсутствие отдельных файлов больше не роняют офлайн-режим. Добавлены политики Content-Security-Policy для автономной копии, страницы 404 и офлайн-страницы, а также referrer-политика.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Полоса прокрутки.</b> У графиков и таблиц полоса прокрутки стала светлой с бирюзовым бегунком — в обеих темах.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Фото и подпись.</b> Снимок обрезается по своей рамке, поэтому параллакс не заходит на подпись «Фото: …» под ним и не оставляет полосу у края.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Полосы зарплаты.</b> Трек диаграммы зарплат стал сплошной зелёной полосой от начала до конца, диапазон отмечен светлым участком — строка «300+» видна во всю длину.</div></li>' +

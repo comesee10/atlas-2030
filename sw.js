@@ -1,7 +1,7 @@
 ﻿/* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v32';
+const VERSION = 'atlas-2030-v33';
 const SHELL = [
   './',
   './index.html',
@@ -35,6 +35,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(VERSION)
       .then((cache) => cache.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' }))))
+      /* Если какого-то файла нет (обрыв, отсутствующий ресурс), добавляем
+         по одному: отсутствующие пропускаем, чтобы установка не срывалась. */
+      .catch(() => caches.open(VERSION).then((cache) =>
+        Promise.all(SHELL.map((u) =>
+          fetch(new Request(u, { cache: 'reload' }))
+            .then((res) => (res && res.ok) ? cache.put(u, res) : null)
+            .catch(() => null)
+        ))))
       .then(() => self.skipWaiting())
   );
 });
@@ -59,7 +67,8 @@ self.addEventListener('fetch', (event) => {
         .then((res) => {
           if (res && res.ok) {
             const copy = res.clone();
-            caches.open(VERSION).then((cache) => cache.put('./index.html', copy));
+            /* квота кэша может быть исчерпана — не даём promise отклониться */
+            caches.open(VERSION).then((cache) => cache.put('./index.html', copy)).catch(() => {});
           }
           return res;
         })
@@ -74,7 +83,7 @@ self.addEventListener('fetch', (event) => {
       const network = fetch(req).then((res) => {
         if (res && res.ok) {
           const copy = res.clone();
-          caches.open(VERSION).then((cache) => cache.put(req, copy));
+          caches.open(VERSION).then((cache) => cache.put(req, copy)).catch(() => {});
         }
         return res;
       }).catch(() => hit || caches.match(req, { ignoreSearch: true }));
