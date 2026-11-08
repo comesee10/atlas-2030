@@ -1103,6 +1103,7 @@ background:linear-gradient(180deg,rgba(32,26,44,.96),rgba(22,17,32,.98));
 /* Atlas 2030 visual refresh: preserve the original information architecture while
    giving the interface a clearer editorial/data-lab identity. */
 :root{
+color-scheme:dark;
 --bg:#091116;--bg-2:#0d1820;--panel:#101d26;--panel-2:#162731;
 --rule:#20333e;--rule-2:#31505c;--ink:#f3fbfa;--ink-2:#c6d8d8;
 --ink-3:#839da1;--ink-4:#587176;--violet:#5eead4;--violet-deep:#14b8a6;
@@ -1332,6 +1333,18 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .plot{position:relative;padding:18px 16px 16px}
 .plot svg{display:block;width:100%;height:auto}
 .plot-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* ---- светлая полоса прокрутки ----
+   Стилизуем через webkit: это даёт классическую полосу с треком нужного цвета.
+   Стандартный scrollbar-color здесь не задаётся: в Chrome он переключает
+   полосу в оверлейный режим и прячет трек. */
+*::-webkit-scrollbar{height:11px;width:11px}
+*::-webkit-scrollbar-track{background:var(--rule);border-radius:999px}
+*::-webkit-scrollbar-thumb{background:var(--violet);border-radius:999px}
+*::-webkit-scrollbar-thumb:hover{background:var(--violet-deep)}
+*::-webkit-scrollbar-corner{background:transparent}
+@supports not selector(::-webkit-scrollbar){
+*{scrollbar-width:thin;scrollbar-color:var(--violet) var(--rule)}
+}
 .plot-band{fill:var(--panel-2);opacity:.55}
 .plot-grid{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 5}
 .plot-range{stroke:var(--ink-4);stroke-width:1.5;opacity:.55}
@@ -1474,7 +1487,7 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 @media (max-width:900px){.rus-stage canvas{height:clamp(340px,62vw,520px)}}
 @media (max-width:760px){.rus-stage canvas{height:min(84vw,440px)}.rus-ctrl button{width:40px;height:40px}.rus-hint{font-size:9px;left:10px}.prof-graph{display:none}.graph-list{display:grid;gap:10px}.chart-tip{display:none}}
 /* ---- Light theme ---- */
-.theme-light{--bg:#f4fbf9;--bg-2:#fff;--panel:#fff;--panel-2:#eef8f5;--rule:#d5e6e1;--rule-2:#b9d5ce;--ink:#0b211f;--ink-2:#2f4a47;--ink-3:#5f7b77;--ink-4:#8aa5a0;--violet:#0f9e8e;--violet-deep:#0b7f73;--ok:#15803d;--bad:#b91c1c;--warn:#a16207;--shadow:0 20px 45px rgba(6,40,36,.12)}
+.theme-light{color-scheme:light;--bg:#f4fbf9;--bg-2:#fff;--panel:#fff;--panel-2:#eef8f5;--rule:#d5e6e1;--rule-2:#b9d5ce;--ink:#0b211f;--ink-2:#2f4a47;--ink-3:#5f7b77;--ink-4:#8aa5a0;--violet:#0f9e8e;--violet-deep:#0b7f73;--ok:#15803d;--bad:#b91c1c;--warn:#a16207;--shadow:0 20px 45px rgba(6,40,36,.12)}
 .theme-light body{background-color:#f4fbf9;background-image:linear-gradient(rgba(15,158,142,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,158,142,.05) 1px,transparent 1px),radial-gradient(800px 420px at 90% -10%,rgba(20,184,166,.12),transparent 70%)}
 .theme-light .hdr{background:rgba(244,251,249,.9)}
 .theme-light .nav{background:rgba(244,251,249,.98)}
