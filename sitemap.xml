@@ -19,4 +19,5 @@
   <url><loc>https://comesee10.github.io/atlas-2030/quiz</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/about</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/methodology</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/teacher</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

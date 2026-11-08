@@ -857,7 +857,8 @@ var PAGE_TITLES = {
 quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
 admission: 'Бюджетные места', calendar: 'Календарь приёма', favorites: 'Избранное',
-map: 'Карта', compare: 'Сравнение', about: 'О проекте', methodology: 'Методология'
+map: 'Карта', compare: 'Сравнение', about: 'О проекте', methodology: 'Методология',
+teacher: 'Учителю и родителю'
 };
 function absUrl(u) {
 if (!u || u === '#/') return SITE_URL;
@@ -1027,6 +1028,19 @@ inLanguage: 'ru',
 isAccessibleForFree: true,
 provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
 });
+} else if (path === '/teacher') {
+g.push({
+'@type': 'LearningResource',
+name: 'Сценарий урока о профессиях будущего — Профессии·2030',
+description: 'Готовое занятие на 25–30 минут для 8–11 классов: спрос, зарплата, предметы ЕГЭ, сравнение профессий и вопросы для обсуждения.',
+url: absUrl('#/teacher'),
+inLanguage: 'ru',
+isAccessibleForFree: true,
+learningResourceType: 'Lesson plan',
+educationalLevel: '8–11 класс',
+about: 'Профориентация и выбор профессии',
+provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+});
 }
 return g;
 }
@@ -1105,12 +1119,13 @@ var ROUTES = [
 [/^\/specialties$/, renderSpecialties],
 [/^\/regions$/, renderRegions],
 [/^\/about$/, renderAbout],
-[/^\/methodology$/, renderMethodology]
+[/^\/methodology$/, renderMethodology],
+[/^\/teacher$/, renderTeacher]
 ];
 function route() {
 if (storyCleanup) { storyCleanup(); storyCleanup = null; }
 if (BUBBLE_ANIM && BUBBLE_ANIM.raf) { cancelAnimationFrame(BUBBLE_ANIM.raf); BUBBLE_ANIM.raf = 0; }
-if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology)(?:\?.*)?$/.test(location.hash.slice(1))) {
+if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology|teacher)(?:\?.*)?$/.test(location.hash.slice(1))) {
 var legacyRoute = location.hash.slice(1);
 history.replaceState(null, '', '/atlas-2030' + legacyRoute);
 }
@@ -1949,6 +1964,7 @@ var teacherPanel = !teacher ? '' :
 '<a class="teach-card" href="#/professions"><b>01 · Собрать подборку</b><span>Отметьте профессии галочкой в каталоге — таблица сравнения соберётся автоматически.</span><i>Каталог →</i></a>' +
 '<a class="teach-card" href="#/compare"><b>02 · Показать классу</b><span>Спрос, зарплата, предметы ЕГЭ и ведущие вузы — на одном экране для проектора.</span><i>Сравнение →</i></a>' +
 '<a class="teach-card" href="#/methodology"><b>03 · Проверить источники</b><span>Открытая методика индекса, годы приёмных кампаний и границы данных.</span><i>Методология →</i></a>' +
+'<a class="teach-card" href="#/teacher"><b>04 · Провести урок</b><span>Сценарий на 25–30 минут, вопросы для обсуждения и печатная подборка.</span><i>Сценарий урока →</i></a>' +
 '</div></section>';
 app.innerHTML = '<div class="view">' +
 '<section class="hero hero-home">' +
@@ -3025,6 +3041,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">8 ноября 2026</span><div><b>Сценарий урока и переходы.</b> Появилась отдельная страница «Учителю и родителю»: занятие на 25–30 минут, шесть шагов, восемь вопросов для обсуждения, памятка для родителей и печать. Переход из карточки профессии в её заголовок стал общим элементом (View Transitions) там, где браузер это поддерживает. Сборка стала легче: CSS сжимается, скрипты начинают загружаться раньше.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Проще навигация и режимы.</b> В шапке осталось четыре раздела, остальное собрано в меню «Ещё», а на телефоне появилась нижняя навигация с подписями. Переключатель «Я ученик / Я учитель или родитель» меняет подачу главной и добавляет методические действия. Поиск понимает обычные фразы: «после 9 класса», «биология», «Москва бюджет». Возврат из профессии восстанавливает фильтры и место в списке, а термины объясняются прямо на странице.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Новые графики.</b> На главной появилось полотно всех профессий: площадь плитки — число программ, цвет — индекс спроса. На странице профессии — радар по шести навыкам и самопроверка «подходит ли мне»: отметьте, что вам ближе, и получите вывод.</div></li>' +
 '<li><span class="mono">7 ноября 2026</span><div><b>Живые графики и чтение по разделам.</b> Тепловая карта получила фильтры по округу и сфере с плавной перестройкой шкалы, bubble-график обновляется вместе с каталогом. На странице профессии появилось закреплённое содержание с индикатором прокрутки, а при загрузке — скелетоны и мягкое появление блоков.</div></li>' +
@@ -3099,6 +3116,89 @@ var targetUrl = new URL(a.href, location.href);
 if (targetUrl.origin !== location.origin) a.rel = 'noopener noreferrer';
 } catch (e) { a.removeAttribute('href'); }
 });
+}
+/* ---------- страница для учителя и родителя ---------- */
+function renderTeacher() {
+setTitle('Учителю и родителю: сценарий урока — Профессии·2030');
+var steps = [
+{ t: '0–3 мин', h: 'Вход и вопрос', d: 'Покажите на экране три профессии из разных сфер. Спросите: что общего у инженера машинного обучения, врача и специалиста по кибербезопасности? Подведите к мысли: всем им нужны точные предметы и привычка учиться дальше.', href: '#/professions', link: 'Открыть каталог' },
+{ t: '3–8 мин', h: 'Разбор паспорта профессии', d: 'Откройте одну профессию. Разберите вместе индекс спроса, рост вакансий, зарплатный диапазон и минимальный балл. Отдельно проговорите: балл — ориентир, а не гарантия поступления.', href: '#/professions/ml-engineer', link: 'Пример: инженер ML' },
+{ t: '8–15 мин', h: 'Работа в группах', d: 'Разделите класс на группы по 3–4 человека. Каждая выбирает сферу, отмечает две профессии и собирает сравнение: спрос, зарплата, предметы ЕГЭ, ведущие вузы и города.', href: '#/compare', link: 'Сравнение профессий' },
+{ t: '15–22 мин', h: 'Короткие презентации', d: 'Каждая группа за одну минуту объясняет выбор: почему эти профессии, какие предметы нужны и что смущает. Остальные задают один уточняющий вопрос.', href: '#/specialties', link: 'Специальности и коды' },
+{ t: '22–27 мин', h: 'Обсуждение', d: 'Перейдите к вопросам ниже. Держите рамку: интерес, устойчивость спроса и реалистичность баллов важны вместе, а не по отдельности.', href: '#/methodology', link: 'Методология' },
+{ t: '27–30 мин', h: 'Итог и следующий шаг', d: 'Попросите каждого записать одну профессию и одно действие на неделю: пройти опросник, проверить сайт вуза или обсудить выбор с родителями.', href: '#/quiz', link: 'Опросник' }
+];
+var questions = [
+{ q: 'Какие задачи в профессии кажутся наиболее интересными и почему?', h: 'Просите опираться на описание профессии, а не на название.' },
+{ q: 'Какие школьные предметы действительно нужны для этой профессии, а какие можно добрать позже?', h: 'Смотрите наборы ЕГЭ и программы вузов.' },
+{ q: 'Что важнее при выборе: интерес, доход или устойчивость спроса? Аргументируйте.', h: 'Хороший ответ соединяет все три критерия.' },
+{ q: 'Какие риски есть у профессии через десять лет и как их снизить?', h: 'Обсудите автоматизацию, обучение и смежные роли.' },
+{ q: 'Чем отличаются траектории после 9 и после 11 класса?', h: 'Сравните колледж и вуз по срокам, баллам и стоимости.' },
+{ q: 'Что нужно проверить на сайте вуза перед подачей документов?', h: 'Перечень экзаменов, проходные баллы, сроки и правила приёма.' },
+{ q: 'Какие профессии из подборки требуют переезда и готовы ли участники к этому?', h: 'Разберите города, общежития и расходы.' },
+{ q: 'Как понять, что профессия подходит, если опыта ещё нет?', h: 'Пробы, кружки, стажировки, разговоры с практиками.' }
+];
+app.innerHTML = '<div class="view teacher-page">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел · Для урока</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Урок о профессиях <em>будущего</em></h1>' +
+'<p class="lead">Готовый сценарий на 25–30 минут для 8–11 классов: разобрать спрос, зарплату, предметы ЕГЭ и реальные варианты поступления. Без регистрации и без передачи ответов.</p>' +
+'<div class="hero-cta"><button class="btn btn-primary" type="button" data-print="1">Распечатать сценарий</button>' +
+'<a class="btn" href="#/professions">Открыть каталог</a></div>' +
+'<div class="lesson-meta"><span>25–30 минут</span><span>8–11 класс</span><span>Групповая работа</span><span>Нужен проектор</span></div>' +
+'</section>' +
+'<div class="lesson-board">' +
+'<section class="lesson-plan reveal" aria-labelledby="planTitle">' +
+'<div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Ход занятия</p><h2 class="sec" id="planTitle">Шесть шагов</h2></div></div>' +
+steps.map(function (s) {
+return '<article class="lesson-step">' +
+'<span class="lesson-time">' + h(s.t) + '</span>' +
+'<div class="lesson-body"><h3>' + h(s.h) + '</h3><p>' + h(s.d) + '</p>' +
+'<a class="lesson-link" href="' + h(s.href) + '">' + h(s.link) + ' →</a></div></article>';
+}).join('') +
+'</section>' +
+'<aside class="lesson-side reveal">' +
+'<div class="panel lesson-card"><p class="label">Что подготовить</p>' +
+'<ul class="lesson-list">' +
+'<li>Проектор или большой экран и стабильный интернет.</li>' +
+'<li>Три профессии из разных сфер для входа.</li>' +
+'<li>Распечатанную таблицу сравнения или доступ к ней.</li>' +
+'<li>Листы для записей и таймер на 30 минут.</li>' +
+'<li>Запасной вариант: standalone-файл атласа на флешке.</li>' +
+'</ul></div>' +
+'<div class="panel lesson-card"><p class="label">Материалы</p>' +
+'<div class="lesson-links">' +
+'<a href="#/professions">Каталог профессий</a>' +
+'<a href="#/compare">Сравнение до трёх профессий</a>' +
+'<a href="#/quiz">Опросник по ЕГЭ</a>' +
+'<a href="#/quiz-oge">Подбор после 9 класса</a>' +
+'<a href="#/favorites">Печатная подборка</a>' +
+'<a href="#/methodology">Методология и границы данных</a>' +
+'</div></div>' +
+'<div class="panel lesson-card lesson-note"><p class="label">Важно</p>' +
+'<p>Проходные баллы приведены по приёмным кампаниям 2024–2025 годов и служат ориентиром. Даты кампании 2026–2027 и точные правила приёма уточняйте на сайте вуза или колледжа.</p>' +
+'</div>' +
+'</aside>' +
+'</div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Обсуждение</p><h2 class="sec">Восемь вопросов для класса</h2></div>' +
+'<p class="muted" style="max-width:42ch;margin:0">Выберите 4–5 вопросов под возраст и оставьте время на аргументы, а не на быстрые ответы.</p></section>' +
+'<div class="q-grid reveal">' + questions.map(function (q, i) {
+return '<article class="q-card"><span class="q-num">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span>' +
+'<p class="q-text">' + h(q.q) + '</p><p class="q-hint">' + h(q.h) + '</p></article>';
+}).join('') + '</div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Родителям</p><h2 class="sec">Разговор дома</h2></div></section>' +
+'<div class="panel reveal lesson-home">' +
+'<div><h3>Три вопроса без давления</h3><p>Что в профессии кажется интересным? Что пугает? Какой один шаг можно сделать на этой неделе?</p></div>' +
+'<div><h3>Что проверить вместе</h3><p>Набор экзаменов, минимальный балл, стоимость обучения и сроки подачи. Эти данные меняются каждый год.</p></div>' +
+'<div><h3>Чем помочь</h3><p>Не выбирать за подростка, а помочь собрать факты и сравнить два-три варианта. Атлас хранит ответы только в браузере.</p></div>' +
+'</div>' +
+'<div class="panel reveal lesson-cta">' +
+'<div><p class="label">Следующий шаг</p><p class="lesson-cta-title">Соберите подборку для класса</p>' +
+'<p class="muted">Отметьте профессии звёздочкой в каталоге, затем распечатайте список с шапкой и датой данных.</p></div>' +
+'<div class="hero-cta" style="margin:0"><a class="btn btn-primary btn-sm" href="#/professions">В каталог →</a>' +
+'<a class="btn btn-sm" href="#/favorites">Избранное</a></div>' +
+'</div>' +
+'</div>';
 }
 function salaryChartHtml(list) {
 var rows = [];
@@ -5767,10 +5867,57 @@ navigator.serviceWorker.register(swUrl).catch(function () {});
 });
 }
 /* Переход между разделами: новая страница мягко проявляется.
-   Реализовано через CSS-анимацию .view — она работает везде и не требует
-   поддержки View Transitions API. */
+   Если браузер поддерживает View Transitions, карточка профессии
+   превращается в заголовок страницы — это и есть shared-element переход.
+   При reduced-motion и в старых браузерах остаётся обычная смена раздела. */
+function canViewTransition() {
+return !!(document.startViewTransition && !noMotion);
+}
+function clearVTNames() {
+document.querySelectorAll('[data-vt-shared]').forEach(function (el) {
+el.style.viewTransitionName = '';
+el.removeAttribute('data-vt-shared');
+});
+document.documentElement.classList.remove('vt-active');
+}
+function vtSharedSource(link) {
+if (!link) return null;
+var card = link.closest('.fcard, .prof-row, .mini-row');
+if (!card) return null;
+return card.querySelector('h3, .t-cell > .t, .mini-row > a');
+}
+function routeWithTransition(nav, sharedEl) {
+if (!canViewTransition()) { nav(); return; }
+clearVTNames();
+if (sharedEl) {
+sharedEl.style.viewTransitionName = 'atlas-shared';
+sharedEl.setAttribute('data-vt-shared', '');
+}
+document.documentElement.classList.add('vt-active');
+var vt;
+try {
+vt = document.startViewTransition(function () {
+nav();
+if (sharedEl) {
+var target = app.querySelector('.detail-head h1');
+if (target) {
+target.style.viewTransitionName = 'atlas-shared';
+target.setAttribute('data-vt-shared', '');
+}
+}
+});
+} catch (e) {
+clearVTNames();
+nav();
+return;
+}
+var done = function () { clearVTNames(); };
+if (vt.finished) vt.finished.then(done, done);
+else setTimeout(done, 520);
+if (vt.ready) vt.ready.catch(function () {});
+}
 function routeAnimated() {
-  route();
+routeWithTransition(route);
 }
 window.addEventListener('hashchange', routeAnimated);
 try {
@@ -5778,21 +5925,25 @@ var pagesPath = sessionStorage.getItem('atlas:redirect');
 sessionStorage.removeItem('atlas:redirect');
 if (window.__ATLAS_STANDALONE__) {
 /* В одностраничной копии адрес всегда остаётся на текущем файле. */
-} else if (pagesPath && /^\/(map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(pagesPath)) {
+} else if (pagesPath && /^\/(map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology|teacher)(?:\?.*)?$/.test(pagesPath)) {
 history.replaceState(null, '', '/atlas-2030' + pagesPath);
 } else if (!location.hash && location.pathname.indexOf('/atlas-2030/') === 0) {
 var directPath = location.pathname.slice('/atlas-2030'.length) || '/';
-if (/^\/(map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
+if (/^\/(map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology|teacher)\/?$/.test(directPath)) history.replaceState(null, '', '/atlas-2030' + directPath.replace(/\/$/, ''));
 }
 } catch (e) {}
 document.addEventListener('click', function (e) {
 var a = e.target.closest && e.target.closest('a[href^="#/"]');
 if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
 var dest = a.getAttribute('href').slice(1);
-if (!/^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology)(?:\?.*)?$/.test(dest) && dest !== '/') return;
+if (!/^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology|teacher)(?:\?.*)?$/.test(dest) && dest !== '/') return;
 e.preventDefault();
+var shared = /^\/professions\/[^/]+$/.test(dest) ? vtSharedSource(a) : null;
+routeWithTransition(function () {
 history.pushState(null, '', '/atlas-2030' + (dest === '/' ? '/' : dest));
-route(); window.scrollTo(0, 0);
+route();
+window.scrollTo(0, 0);
+}, shared);
 });
 window.addEventListener('popstate', route);
 if ((!location.hash || location.hash === '#') && (location.pathname === '/' || location.pathname === '/atlas-2030/' || location.pathname === '/atlas-2030')) {

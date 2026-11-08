@@ -130,6 +130,39 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 .teach-card b{font-size:14.5px;font-weight:600}
 .teach-card span{font-size:13.5px;color:var(--ink-3);line-height:1.5}
 .teach-card i{font-family:var(--mono);font-size:11px;font-style:normal;color:var(--violet);letter-spacing:.08em;text-transform:uppercase}
+/* ---- страница сценария урока ---- */
+.lesson-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.lesson-meta span{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);border:1px solid var(--rule);border-radius:999px;padding:6px 10px}
+.lesson-board{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:26px;align-items:start;margin-top:8px}
+.lesson-plan{padding:26px;border:1px solid var(--rule);border-radius:16px;background:linear-gradient(150deg,rgba(16,29,38,.72),rgba(9,17,22,.42))}
+.lesson-step{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;padding:18px 0;border-top:1px solid var(--rule)}
+.lesson-step:first-of-type{border-top:0;padding-top:4px}
+.lesson-time{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--violet);padding-top:4px}
+.lesson-body h3{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.25;margin-bottom:6px}
+.lesson-body p{font-size:14px;line-height:1.65;color:var(--ink-2)}
+.lesson-link{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--violet)}
+.lesson-link:hover{text-decoration:underline;text-underline-offset:3px}
+.lesson-side{position:sticky;top:84px;display:grid;gap:12px}
+.lesson-card{padding:18px}
+.lesson-list{list-style:none;display:grid;gap:8px;margin:10px 0 0;padding:0}
+.lesson-list li{position:relative;padding-left:16px;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.lesson-list li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--violet)}
+.lesson-links{display:grid;gap:7px;margin-top:10px}
+.lesson-links a{font-size:13.5px;color:var(--ink-2)}
+.lesson-links a:hover{color:var(--violet)}
+.lesson-note p{font-size:12.5px;line-height:1.55;color:var(--ink-3);margin-top:6px}
+.q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.q-card{position:relative;padding:18px 18px 16px;border:1px solid var(--rule);border-radius:12px;background:rgba(16,29,38,.45)}
+.q-num{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--violet)}
+.q-text{font-size:14.5px;line-height:1.55;color:var(--ink);margin-top:6px}
+.q-hint{font-size:12px;line-height:1.5;color:var(--ink-4);margin-top:8px}
+.lesson-home{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;padding:24px}
+.lesson-home h3{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.25}
+.lesson-home p{font-size:13.5px;line-height:1.6;color:var(--ink-3);margin-top:6px}
+.lesson-cta{display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:22px;margin-top:20px}
+.lesson-cta-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-top:6px}
+@media (max-width:900px){.lesson-board{grid-template-columns:1fr}.lesson-side{position:static}}
+@media (max-width:560px){.lesson-step{grid-template-columns:1fr;gap:6px}.lesson-time{padding-top:0}}
 main{min-height:60vh;padding-bottom:80px}
 .view{animation:viewIn .4s var(--ease) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -1348,8 +1381,16 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 ::view-transition-new(root){animation:vtIn .3s var(--ease) both}
 @keyframes vtOut{to{opacity:0}}
 @keyframes vtIn{from{opacity:0}}
+/* Общий элемент: карточка профессии переходит в заголовок страницы. */
+::view-transition-old(atlas-shared){animation:vtSharedOut .22s var(--ease) both}
+::view-transition-new(atlas-shared){animation:vtSharedIn .32s var(--ease) both}
+@keyframes vtSharedOut{to{opacity:0;transform:translateY(-6px)}}
+@keyframes vtSharedIn{from{opacity:0;transform:translateY(6px)}}
+.vt-active .view{animation:none}
 @media (prefers-reduced-motion: reduce){
-::view-transition-old(root),::view-transition-new(root){animation:none}
+::view-transition-old(root),::view-transition-new(root),
+::view-transition-old(atlas-shared),::view-transition-new(atlas-shared){animation:none}
+.vt-active .view{animation:none}
 }
 /* ---- рост столбиков зарплаты по этапам карьеры ---- */
 .salary-fill{transform-origin:left center;animation:salGrow .85s var(--ease) both}
@@ -1593,6 +1634,17 @@ a{text-decoration:none;color:#111}
 .res-top h3{font-size:15px}
 .tip{border-color:#e5c76b;background:#fdf6e3;color:#6b5518}
 .status.ok{color:#1a7f37}.status.warn{color:#9a6700}.status.bad{color:#b42318}
+}
+@media print{
+.teacher-page .hero{display:block!important;padding:0 0 16px!important}
+.teacher-page .hero-cta,.teacher-page .lesson-meta,.teacher-page [data-print],.teacher-page .lesson-side,.teacher-page .lesson-cta{display:none!important}
+.teacher-page .lesson-board{grid-template-columns:1fr;gap:0}
+.teacher-page .lesson-plan{border:0;padding:0;background:#fff}
+.teacher-page .lesson-step{break-inside:avoid;page-break-inside:avoid}
+.teacher-page .q-card,.teacher-page .lesson-home{break-inside:avoid;page-break-inside:avoid;border-color:#ddd;background:#fff}
+.teacher-page .q-hint{color:#555}
+.teacher-page .sec-head{margin:24px 0 12px}
+.teacher-page .display{font-size:26px}
 }
 @media (prefers-reduced-motion: reduce){
 html{scroll-behavior:auto}

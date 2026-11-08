@@ -10,6 +10,8 @@
 <link rel="icon" href="/atlas-2030/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/lora-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/onest-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="manifest" href="/atlas-2030/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/atlas-2030/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +35,13 @@
 <meta name="twitter:title" content="Профессии·2030 — атлас востребованных профессий">
 <meta name="twitter:description" content="Опросник, профессии, вузы и колледжи России с маршрутами поступления.">
 <meta name="twitter:image" content="https://comesee10.github.io/atlas-2030/og.png">
-<link rel="stylesheet" href="styles.css?v=20261107-9">
+<link rel="stylesheet" href="styles.css?v=20261108-1">
+<link rel="preload" href="data-core.js?v=20261104-1" as="script" fetchpriority="high">
+<link rel="preload" href="data-universities-1.js?v=20261104-1" as="script">
+<link rel="preload" href="data-universities-2.js?v=20261104-1" as="script">
+<link rel="preload" href="data-universities-3.js?v=20261104-1" as="script">
+<link rel="preload" href="catalog-expansion.js?v=20261104-1" as="script">
+<link rel="preload" href="app.js?v=20261108-1" as="script" fetchpriority="high">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none';">
 <script type="application/ld+json">
 {
@@ -100,6 +108,7 @@
           <a href="#/map" data-route="/map">Карта России</a>
           <a href="#/compare" data-route="/compare">Сравнение</a>
           <a href="#/favorites" data-route="/favorites">Избранное</a>
+          <a href="#/teacher" data-route="/teacher">Учителю и родителю</a>
           <a href="#/methodology" data-route="/methodology">Методология</a>
           <a href="#/about" data-route="/about">О проекте</a>
         </div>
@@ -172,6 +181,7 @@
       <a href="#/admission">Бюджетные места</a>
       <a href="#/calendar">Календарь приёма</a>
       <a href="#/favorites">Избранное</a>
+      <a href="#/teacher">Учителю и родителю</a>
       <a href="#/map">Карта России</a>
       <a href="#/compare">Сравнение</a>
       <a href="#/colleges">Колледжи</a>
@@ -226,6 +236,6 @@
 <script defer src="data-universities-2.js?v=20261104-1"></script>
 <script defer src="data-universities-3.js?v=20261104-1"></script>
 <script defer src="catalog-expansion.js?v=20261104-1"></script>
-<script defer src="app.js?v=20261107-9"></script>
+<script defer src="app.js?v=20261108-1"></script>
 </body>
 </html>
