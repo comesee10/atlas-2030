@@ -1894,7 +1894,7 @@ main .view>section+section{animation:none}
 @page{margin:20mm 17mm}
 .print-cover{display:flex;flex-direction:column;justify-content:space-between;min-height:22cm;page-break-after:always;color:#000}
 .print-cover .pc-brand{font-family:var(--serif);font-weight:700;font-size:15pt}
-.print-cover .pc-date{font-size:9.5pt;color:#444;margin-top:4pt}
+.print-cover .pc-tag{font-size:9.5pt;color:#444;margin-top:4pt}
 .print-cover .pc-title{font-family:var(--serif);font-weight:700;font-size:32pt;line-height:1.05;margin:0}
 .print-cover .pc-url{font-family:var(--mono);font-size:9.5pt;margin-top:10pt}
 .print-cover .pc-rule{border-top:.75pt solid #000;padding-top:6pt}
@@ -1948,7 +1948,7 @@ h2.sec[id^="rail-"]{scroll-margin-top:170px}
 gap:9mm;min-height:186mm;padding-top:10mm;page-break-after:always;color:#000}
 .report-cover .rc-top{display:flex;justify-content:space-between;align-items:baseline;
 gap:8mm;border-bottom:.75pt solid #000;padding-bottom:5pt}
-.report-cover .rc-top .pc-date{margin-top:3pt}
+.report-cover .rc-top .pc-tag{margin-top:3pt}
 .report-cover .rc-pg{font-family:var(--mono);font-size:8pt;letter-spacing:.14em;
 text-transform:uppercase;color:#444;margin:0;white-space:nowrap}
 .report-cover .rc-kicker{font-family:var(--mono);font-size:8pt;letter-spacing:.16em;
