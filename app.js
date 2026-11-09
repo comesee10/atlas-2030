@@ -48,6 +48,10 @@ return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
 return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
 });
 }
+/* Битый процент в адресе (#/professions/%) не должен ронять раздел. */
+function safeDecode(s) {
+try { return decodeURIComponent(s); } catch (e) { return String(s == null ? '' : s); }
+}
 function norm(s) {
 return String(s || '').toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim();
 }
@@ -895,11 +899,11 @@ var items = [{ t: 'Главная', u: '#/' }];
 if (!PAGE_TITLES[root]) return null;
 items.push({ t: PAGE_TITLES[root], u: root === 'professions' ? catalogBackHref() : '#/' + root });
 if (root === 'professions' && seg[1]) {
-var p = PROF_BY_SLUG[decodeURIComponent(seg[1])];
+var p = PROF_BY_SLUG[safeDecode(seg[1])];
 if (!p) return null;
 items.push({ t: p.title, u: null });
 } else if (root === 'colleges' && seg[1]) {
-var slug = decodeURIComponent(seg[1]);
+var slug = safeDecode(seg[1]);
 var c = null;
 for (var i = 0; i < C.length; i++) if (C[i].slug === slug) { c = C[i]; break; }
 if (!c || !CD[slug]) return null;
@@ -949,7 +953,7 @@ g.push(datasetLd('Профессии 2027–2030 — Профессии·2030',
 P.length + ' востребованных профессий с индексом спроса, ростом вакансий и зарплатным диапазоном.',
 'профессии, индекс спроса, вакансии, зарплата'));
 } else if (root === 'professions' && path.split('/').filter(Boolean)[1] && crumbs) {
-var p = PROF_BY_SLUG[decodeURIComponent(path.split('/').filter(Boolean)[1])];
+var p = PROF_BY_SLUG[safeDecode(path.split('/').filter(Boolean)[1])];
 if (p) {
 g.push({
 '@type': 'Course',
@@ -1109,13 +1113,13 @@ var ROUTES = [
 [/^\/quiz$/, renderQuiz],
 [/^\/quiz-oge$/, renderQuizOge],
 [/^\/professions$/, renderProfessions],
-[/^\/professions\/([^/]+)$/, function (m) { renderProfession(decodeURIComponent(m[1])); }],
+[/^\/professions\/([^/]+)$/, function (m) { renderProfession(safeDecode(m[1])); }],
 [/^\/universities$/, renderUniversities],
 [/^\/admission$/, renderAdmission],
 [/^\/calendar$/, renderCalendar],
 [/^\/favorites$/, renderFavorites],
 [/^\/colleges$/, renderColleges],
-[/^\/colleges\/([^/]+)$/, function (m) { renderCollege(decodeURIComponent(m[1])); }],
+[/^\/colleges\/([^/]+)$/, function (m) { renderCollege(safeDecode(m[1])); }],
 [/^\/specialties$/, renderSpecialties],
 [/^\/regions$/, renderRegions],
 [/^\/about$/, renderAbout],
