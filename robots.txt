@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://comesee10.github.io/atlas-2030/sitemap.xml
