@@ -1898,6 +1898,10 @@ main .view>section+section{animation:none}
 .print-cover .pc-title{font-family:var(--serif);font-weight:700;font-size:32pt;line-height:1.05;margin:0}
 .print-cover .pc-url{font-family:var(--mono);font-size:9.5pt;margin-top:10pt}
 .print-cover .pc-rule{border-top:.75pt solid #000;padding-top:6pt}
+/* страница профессии: адрес с титула убран, поэтому заголовок держится
+   у нижней трети листа — обложка не «проваливается» без нижнего блока */
+#printCover{justify-content:flex-start}
+#printCover .pc-title{margin-top:auto;margin-bottom:3cm}
 .print-run{display:flex;justify-content:space-between;align-items:baseline;position:fixed;top:0;left:0;right:0;
 padding:0 0 5pt;border-bottom:.5pt solid #000;font-size:8pt;letter-spacing:.06em;text-transform:uppercase;color:#000;background:#fff}
 html,body{filter:grayscale(1) contrast(1.08);background:#fff}
