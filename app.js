@@ -163,6 +163,12 @@ function photoCredit(code) {
   if (!c) return '';
   return '<a class="photo-credit" href="' + h(c.src) + '" target="_blank" rel="noopener noreferrer">Фото: ' + h(c.by) + ' · ' + h(c.lic) + ' · Wikimedia Commons</a>';
 }
+var ES_SEARCH = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><path d="M16 16c8 6 6 16 14 20M30 12c6 8 2 18 10 24" opacity=".35"/><path d="M104 14c-8 5-6 15-15 18" opacity=".35"/><circle class="acc" cx="68" cy="30" r="13"/><path class="acc" d="m78 40 9 9"/><path d="M62 30h12" opacity=".8"/></svg>';
+var ES_FAV = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><path d="M16 44c10-4 8-16 18-18" opacity=".35"/><path class="acc" d="m60 15 4.9 10 11 1.6-8 7.7 1.9 11-9.8-5.2-9.8 5.2 1.9-11-8-7.7 11-1.6z" stroke-dasharray="5 4"/><path d="M92 50h12M92 45h6" opacity=".35"/></svg>';
+var ES_COMPASS = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><circle class="acc" cx="60" cy="32" r="15"/><path class="acc" d="M60 20 66 32 60 44 54 32z"/><circle cx="60" cy="32" r="1.5" fill="currentColor" stroke="none"/><path d="M60 12v4M60 50v4M40 32h-4M84 32h-4" opacity=".45"/></svg>';
+var ES_SEARCH = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><path d="M16 16c8 6 6 16 14 20M30 12c6 8 2 18 10 24" opacity=".35"/><path d="M104 14c-8 5-6 15-15 18" opacity=".35"/><circle class="acc" cx="68" cy="30" r="13"/><path class="acc" d="m78 40 9 9"/><path d="M62 30h12" opacity=".8"/></svg>';
+var ES_FAV = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><path d="M16 44c10-4 8-16 18-18" opacity=".35"/><path class="acc" d="m60 15 4.9 10 11 1.6-8 7.7 1.9 11-9.8-5.2-9.8 5.2 1.9-11-8-7.7 11-1.6z" stroke-dasharray="5 4"/><path d="M92 50h12M92 45h6" opacity=".35"/></svg>';
+var ES_COMPASS = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><circle class="acc" cx="60" cy="32" r="15"/><path class="acc" d="M60 20 66 32 60 44 54 32z"/><circle cx="60" cy="32" r="1.5" fill="currentColor" stroke="none"/><path d="M60 12v4M60 50v4M40 32h-4M84 32h-4" opacity=".45"/></svg>';
 /* Карточка сферы с фотографией: фото лежит фоном, текст — поверх затемнения. */
 function sphereCard(code, href, extraClass) {
   var img = spherePhoto(code, '800');
@@ -1786,7 +1792,8 @@ res = palIntents(q).concat(PAL_INDEX.filter(function (x) { return norm(x.title +
 palItems = res;
 if (!res.length) {
 palSel = -1;
-palList.innerHTML = '<div class="p-empty">Ничего не нашлось. Попробуйте «после 9 класса», «биология», «Москва бюджет» или название профессии.</div>';
+palList.innerHTML = '<div class="p-empty">' + ES_SEARCH +
+'<b>Ничего не нашлось</b><span>Попробуйте «после 9 класса», «биология», «Москва бюджет» или название профессии.</span></div>';
 return;
 }
 var out = '';
@@ -2206,7 +2213,7 @@ var searchEl = document.getElementById('profSearch');
 function repaint() {
 var list = filteredProfessions(st);
 listEl.innerHTML = list.length ? list.map(profRow).join('') :
-'<li class="empty"><b>Ничего не найдено</b>' +
+'<li class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>' +
 (st.exams.length
 ? 'Под фильтр «Мой выбор» не подошла ни одна профессия. Измените предметы в опроснике или сбросьте фильтр.'
 : 'Попробуйте другой запрос или сбросьте фильтр сферы.') +
@@ -2653,7 +2660,7 @@ app.innerHTML = '<div class="view">' +
 ? '<div class="fgrid fav-grid">' + list.map(fcard).join('') + '</div>' +
 '<p class="mono tiny" style="margin-top:16px;color:var(--ink-4)">' + list.length + ' ' +
 plural(list.length, 'профессия', 'профессии', 'профессий') + ' в избранном. Отметки сохраняются после перезагрузки страницы.</p>'
-: '<div class="empty"><b>Пока пусто</b>Добавляйте профессии звёздочкой в каталоге или на странице профессии. <a href="#/professions">Перейти в каталог</a></div>') +
+: '<div class="empty">' + ES_FAV + '<b>Пока пусто</b>Добавляйте профессии звёздочкой в каталоге или на странице профессии. <a href="#/professions">Перейти в каталог</a></div>') +
 '</div>';
 var clear = document.getElementById('favClear');
 if (clear) clear.addEventListener('click', function () {
@@ -2731,7 +2738,7 @@ var minAvgEl = document.getElementById('minAvgSelect');
 function repaint() {
 var list = filteredUnis(st);
 grid.innerHTML = list.length ? groupedUnis(list, st) :
-'<div class="empty"><b>Ничего не найдено</b>Измените запрос или выберите другой федеральный округ.</div>';
+'<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Измените запрос или выберите другой федеральный округ.</div>';
 var regionCount = [];
 var districtCount = [];
 list.forEach(function (u) {
@@ -2865,7 +2872,7 @@ var searchEl = document.getElementById('colSearch');
 function repaint() {
 var list = filteredColleges(st);
 grid.innerHTML = list.length ? list.map(collegeCard).join('') :
-'<div class="empty"><b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
+'<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
 countEl.textContent = 'Найдено ' + list.length + ' ' + plural(list.length, 'специальность', 'специальности', 'специальностей');
 var params = new URLSearchParams();
 if (st.q) params.set('q', st.q);
@@ -2953,7 +2960,7 @@ var searchEl = document.getElementById('specSearch');
 function repaint() {
 var list = filteredSpecialties(st);
 grid.innerHTML = list.length ? list.map(specCard).join('') :
-'<div class="empty"><b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
+'<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
 countEl.textContent = 'Найдено ' + list.length + ' ' + plural(list.length, 'специальность', 'специальности', 'специальностей');
 var params = new URLSearchParams();
 if (st.q) params.set('q', st.q);
@@ -3933,7 +3940,7 @@ var tags = '<div class="report-sum"><span class="tag">ЕГЭ: ' + h(st.exams.joi
 '<span class="tag">Сумма: ' + st.sum + ' из 300</span>' +
 '<span class="tag">Сфера: ' + h(sphereObj ? sphereObj.name : 'любая') + '</span></div>';
 if (!top.length) {
-return head + tags + '<div class="report-empty"><b>Подходящих программ не нашлось</b>' +
+return head + tags + '<div class="report-empty">' + ES_COMPASS + '<b>Подходящих программ не нашлось</b>' +
 '<p>Попробуйте добавить предмет, снизить ожидаемую сумму или выбрать другую сферу.</p>' +
 '<div class="hero-cta" style="justify-content:center"><button class="btn btn-sm" id="adjust">Изменить ответы</button></div></div>';
 }
@@ -4278,7 +4285,7 @@ var tags = '<div class="report-sum">' +
 '<span class="tag">Аттестат: ' + st.grade.toFixed(2).replace('.', ',') + '</span>' +
 '<span class="tag">Сфера: ' + h(sph ? sph.name : 'любая') + '</span></div>';
 if (!top.length) {
-return head + tags + '<div class="report-empty"><b>Подходящих специальностей не нашлось</b>' +
+return head + tags + '<div class="report-empty">' + ES_COMPASS + '<b>Подходящих специальностей не нашлось</b>' +
 '<p>Попробуйте выбрать другие предметы по выбору или снизить ожидаемый средний балл аттестата.</p>' +
 '<div class="hero-cta" style="justify-content:center"><button class="btn btn-sm" id="adjust">Изменить ответы</button></div></div>';
 }
