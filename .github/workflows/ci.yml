@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Данные и ссылки
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Синтаксис JS
+        run: |
+          for f in app.js data-core.js data-universities-1.js data-universities-2.js data-universities-3.js catalog-expansion.js sw.js; do
+            node --check "$f" || exit 1
+          done
+
+      - name: Валидация данных атласа
+        run: node scripts/validate-data.js
+
+      - name: Smoke-тест ссылок и ассетов
+        run: node scripts/smoke-links.js
