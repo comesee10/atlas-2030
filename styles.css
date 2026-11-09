@@ -1918,3 +1918,18 @@ main .view>section+section{padding-top:10pt;margin-top:8pt}
 .p-empty span{display:block;font-size:13px;line-height:1.55;max-width:34ch;margin:0 auto}
 .empty,.report-empty{padding:44px 20px}
 @media (max-width:560px){.es-ico{width:92px}}
+
+/* ============================================================
+   A1 — липкое мини-оглавление списочных страниц (вузы, колледжи)
+   ============================================================ */
+.rail-sticky{position:sticky;top:58px;z-index:45;margin-top:14px;
+background:color-mix(in oklab,var(--bg) 88%,transparent);
+-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+border-bottom:1px solid var(--rule)}
+.rail-sticky .toc{position:relative;padding:10px 0 9px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.rail-sticky .toc::-webkit-scrollbar{display:none}
+.rail-sticky .toc-story{background:transparent}
+.district-head{scroll-margin-top:190px}
+h2.sec[id^="rail-"]{scroll-margin-top:170px}
+@media (max-width:760px){.rail-sticky{top:52px}.rail-sticky .toc a{padding:5px 9px;font-size:9.5px}}
+@media print{.rail-sticky{display:none}}
