@@ -1908,22 +1908,8 @@ main .view>section+section{padding-top:10pt;margin-top:8pt}
 }
 
 /* ============================================================
-   A2 — бирюзовый дуотон фото и схемы пустых состояний
+   A2 — схемы пустых состояний
    ============================================================ */
-.photo-fig img{filter:grayscale(1) contrast(1.12) brightness(.94)}
-.cover-img::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.6;
-background:linear-gradient(140deg,color-mix(in oklab,var(--accent-deep) 90%,#03221f),color-mix(in oklab,var(--accent) 45%,#0a3b36));
-mix-blend-mode:color}
-.sph-card.has-photo .sph-ph{filter:grayscale(1) contrast(1.14) brightness(.86)}
-.theme-light .photo-fig img,.theme-light .sph-card.has-photo .sph-ph{filter:grayscale(1) contrast(1.05) brightness(1.03)}
-.theme-light .cover-img::after{opacity:.38;
-background:linear-gradient(140deg,color-mix(in oklab,var(--accent-deep) 75%,#fff),color-mix(in oklab,var(--accent) 35%,#fff))}
-@media (prefers-color-scheme: light){
-:root:not(.theme-light):not(.theme-dark) .photo-fig img,:root:not(.theme-light):not(.theme-dark) .sph-card.has-photo .sph-ph{filter:grayscale(1) contrast(1.05) brightness(1.03)}
-:root:not(.theme-light):not(.theme-dark) .cover-img::after{opacity:.38;background:linear-gradient(140deg,color-mix(in oklab,var(--accent-deep) 75%,#fff),color-mix(in oklab,var(--accent) 35%,#fff))}
-}
-@media print{.cover-img::after{mix-blend-mode:normal;opacity:.14}}
-
 .es-ico{display:block;margin:0 auto 14px;width:112px;height:auto;color:var(--ink-4)}
 .es-ico .acc{stroke:var(--accent)}
 .empty .es-ico,.report-empty .es-ico{opacity:.9}
