@@ -1134,6 +1134,7 @@ var ROUTES = [
 ];
 function route() {
 if (storyCleanup) { storyCleanup(); storyCleanup = null; }
+if (railCleanup) { railCleanup(); railCleanup = null; }
 if (BUBBLE_ANIM && BUBBLE_ANIM.raf) { cancelAnimationFrame(BUBBLE_ANIM.raf); BUBBLE_ANIM.raf = 0; }
 if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[a-z0-9-]+)?|specialties|universities|colleges(?:\/[a-z0-9-]+)?|regions|about|methodology|teacher)(?:\?.*)?$/.test(location.hash.slice(1))) {
 var legacyRoute = location.hash.slice(1);
@@ -2761,6 +2762,7 @@ if (st.minAvg) params.set('minAvg', st.minAvg);
 if (st.sort !== 'avg') params.set('sort', st.sort);
 syncUrl('/universities', params);
 initReveal(grid);
+buildRail(grid);
 }
 var timer;
 searchEl.addEventListener('input', function () {
@@ -2864,15 +2866,27 @@ SPHERES.map(function (s) { return sphereChip(s.code, s.code + ' · ' + s.name, s
 '</div>' +
 '<p class="mono tiny" id="colCount" style="margin-top:18px;color:var(--ink-4)"></p>' +
 '<h2 class="sr-only">Список специальностей</h2>' +
-'<div class="card-grid" id="colGrid"></div>' +
+'<div id="colGrid"></div>' +
 '</div>';
 var grid = document.getElementById('colGrid');
 var countEl = document.getElementById('colCount');
 var searchEl = document.getElementById('colSearch');
 function repaint() {
 var list = filteredColleges(st);
-grid.innerHTML = list.length ? list.map(collegeCard).join('') :
-'<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
+if (list.length) {
+var byS = {};
+list.forEach(function (c) { (byS[c.sphereCode] = byS[c.sphereCode] || []).push(c); });
+grid.innerHTML = Object.keys(byS).sort().map(function (code) {
+var sp = null;
+for (var i = 0; i < SPHERES.length; i++) if (SPHERES[i].code === code) { sp = SPHERES[i]; break; }
+return '<section class="district-block">' +
+'<div class="district-head"><div><p class="eyebrow">' + h(code) + '</p><h2 class="sec">' + h(sp ? sp.name : code) + '</h2></div>' +
+'<p class="mono tiny">' + byS[code].length + ' ' + plural(byS[code].length, 'специальность', 'специальности', 'специальностей') + '</p></div>' +
+'<div class="card-grid">' + byS[code].map(collegeCard).join('') + '</div></section>';
+}).join('');
+} else {
+grid.innerHTML = '<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
+}
 countEl.textContent = 'Найдено ' + list.length + ' ' + plural(list.length, 'специальность', 'специальности', 'специальностей');
 var params = new URLSearchParams();
 if (st.q) params.set('q', st.q);
@@ -2880,6 +2894,7 @@ if (st.sphere) params.set('sphere', st.sphere);
 if (st.sort !== 'count') params.set('sort', st.sort);
 syncUrl('/colleges', params);
 initReveal(grid);
+buildRail(grid);
 }
 var timer;
 searchEl.addEventListener('input', function () {
@@ -3418,6 +3433,67 @@ window.removeEventListener('scroll', onStoryScroll);
 window.removeEventListener('resize', onStoryScroll);
 };
 updateStory();
+}
+/* A1: липкое мини-оглавление с прогрессом для списочных страниц (вузы, колледжи).
+   Механика та же, что у .toc на странице профессии: чипы-ссылки + тонкая шкала. */
+var railCleanup = null;
+function buildRail(root) {
+if (railCleanup) { railCleanup(); railCleanup = null; }
+var old = document.getElementById('atlasRail');
+if (old) old.remove();
+if (!root) return;
+var h2s = root.querySelectorAll('h2.sec');
+if (h2s.length < 2) return;
+var rail = document.createElement('div');
+rail.className = 'rail-sticky'; rail.id = 'atlasRail';
+var toc = document.createElement('div');
+toc.className = 'toc toc-story';
+toc.innerHTML = Array.prototype.map.call(h2s, function (x2, i) {
+var id = 'rail-' + (i + 1);
+x2.id = id;
+return '<a href="#' + id + '" data-toc="' + id + '">' + h(x2.textContent.replace(/^\d+\.\s*/, '')) + '</a>';
+}).join('') + '<i class="toc-progress" aria-hidden="true"></i>';
+rail.appendChild(toc);
+root.parentNode.insertBefore(rail, root);
+toc.addEventListener('click', function (e) {
+var a = e.target.closest('a[data-toc]');
+if (!a) return;
+e.preventDefault();
+var t = document.getElementById(a.getAttribute('data-toc'));
+if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 168, behavior: noMotion ? 'auto' : 'smooth' });
+});
+var links = toc.querySelectorAll('a[data-toc]');
+var progress = toc.querySelector('.toc-progress');
+var ticking = false;
+function updateRail() {
+ticking = false;
+var line = 200;
+var current = null;
+for (var i = 0; i < h2s.length; i++) {
+if (h2s[i].getBoundingClientRect().top <= line) current = h2s[i];
+}
+for (var j = 0; j < links.length; j++) {
+links[j].classList.toggle('active', !!current && links[j].getAttribute('data-toc') === current.id);
+}
+if (progress) {
+var start = root.getBoundingClientRect().top + window.scrollY - 220;
+var total = Math.max(1, root.offsetHeight - window.innerHeight * 0.4);
+var p = Math.max(0, Math.min(1, (window.scrollY - start) / total));
+progress.style.transform = 'scaleX(' + p.toFixed(3) + ')';
+}
+}
+function onRailScroll() {
+if (ticking) return;
+ticking = true;
+requestAnimationFrame(updateRail);
+}
+window.addEventListener('scroll', onRailScroll, { passive: true });
+window.addEventListener('resize', onRailScroll);
+railCleanup = function () {
+window.removeEventListener('scroll', onRailScroll);
+window.removeEventListener('resize', onRailScroll);
+};
+updateRail();
 }
 function refreshStudyTable(root, slug, title) {
 var list = (PROG[slug] || []).slice().sort(function (a, b) {
