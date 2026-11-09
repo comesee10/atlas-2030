@@ -1873,25 +1873,72 @@ return '<div class="stat"><div class="v" data-count="' + v + '">' + v + '</div><
 function keyfig(v, k) {
 return '<div><dd class="kf-v" data-count="' + v + '">' + v + '</dd><dt class="kf-k">' + k + '</dt></div>';
 }
+/* Общая печать: фирменный титул (лист 1) и колонтитул на всех листах.
+   Для профессии титул строится перед печатью, для отчёта подбора он уже
+   отрендерен в разметке (.report-cover) и скрыт на экране. */
+function printDate() {
+return new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+function addPrintRun(title) {
+if (document.getElementById('printRun')) return;
+var run = document.createElement('div');
+run.className = 'print-run'; run.id = 'printRun'; run.setAttribute('aria-hidden', 'true');
+run.innerHTML = '<span>' + h(title) + '</span><span>Профессии·2030</span>';
+document.body.appendChild(run);
+}
+/* Фирменный титул печатного отчёта подбора: ответы, легенда статусов,
+   что делать дальше и ссылка, по которой подбор открывается целиком. */
+function reportCover(o) {
+var ans = o.answers.map(function (a) {
+return '<div class="rc-row"><span class="rc-k">' + a[0] + '</span><span class="rc-v">' + a[1] + '</span></div>';
+}).join('');
+var leg = o.legend.map(function (l) {
+return '<li><b>' + l[0] + '</b><span>' + l[1] + '</span></li>';
+}).join('');
+var steps = o.steps.map(function (s, i) {
+return '<li><span class="rc-n">' + (i + 1) + '</span><span>' + s + '</span></li>';
+}).join('');
+/* Ссылку на титуле читают с бумаги глазами, поэтому без %2C и %D0%9A… */
+var url = safeDecode(o.url);
+return '<div class="print-cover report-cover" data-report-title="' + h(o.title) + '">' +
+'<div class="rc-top"><div><p class="pc-brand">Профессии·2030</p>' +
+'<p class="pc-date">Атлас востребованных профессий · сформирован ' + printDate() + '</p></div>' +
+'<p class="rc-pg">Лист 1 из 2</p></div>' +
+'<div class="rc-title"><p class="rc-kicker">Результат подбора · распечатайте и обсудите</p>' +
+'<p class="pc-title">' + h(o.title) + '</p>' +
+'<p class="rc-sub">' + o.sub + '</p></div>' +
+'<div class="rc-grid">' +
+'<section class="rc-card"><p class="label">Ваши ответы</p><div class="rc-ans">' + ans + '</div></section>' +
+'<section class="rc-card"><p class="label">Как читать статусы</p><ul class="rc-legend">' + leg + '</ul></section>' +
+'<section class="rc-card rc-wide"><p class="label">Что делать с этим отчётом</p><ol class="rc-steps">' + steps + '</ol></section>' +
+'</div>' +
+'<div class="pc-rule"><p class="pc-url">Этот же подбор со всеми ссылками на вузы, баллы и сроки приёма:</p>' +
+'<p class="pc-url rc-link">' + h(url) + '</p>' +
+'<p class="pc-url rc-src">' + o.src + '</p></div>' +
+'</div>';
+}
 window.addEventListener('beforeprint', function () {
-if (!/^#\/professions\/[\w-]+/.test(location.hash) || document.getElementById('printCover')) return;
+var rep = app.querySelector('.report-cover');
+if (rep) {
+addPrintRun(rep.getAttribute('data-report-title') || 'Результат подбора');
+return;
+}
+/* Атлас живёт и по хеш-адресу, и по чистому пути /atlas-2030/…,
+   поэтому маршрут берём из parseHash, а не из location.hash. */
+var rt = parseHash();
+if (!/^\/professions\/[\w-]+$/.test(rt.path) || document.getElementById('printCover')) return;
 var head = app.querySelector('.detail-head h1');
 if (!head) return;
-var slug = location.hash.split('/')[2] || '';
-var d = new Date();
+var slug = rt.path.split('/')[2] || '';
 var cov = document.createElement('div');
 cov.className = 'print-cover'; cov.id = 'printCover';
 cov.innerHTML = '<div><p class="pc-brand">Профессии·2030</p>' +
-'<p class="pc-date">Атлас востребованных профессий · печать: ' +
-d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) + '</p></div>' +
+'<p class="pc-date">Атлас востребованных профессий · печать: ' + printDate() + '</p></div>' +
 '<h1 class="pc-title">' + h(head.textContent) + '</h1>' +
 '<div class="pc-rule"><p class="pc-url">Полная версия со ссылками на вузы и баллы:</p>' +
 '<p class="pc-url">comesee10.github.io/atlas-2030/#/professions/' + h(slug) + '</p></div>';
 app.insertBefore(cov, app.firstChild);
-var run = document.createElement('div');
-run.className = 'print-run'; run.id = 'printRun'; run.setAttribute('aria-hidden', 'true');
-run.innerHTML = '<span>' + h(head.textContent) + '</span><span>Профессии·2030</span>';
-document.body.appendChild(run);
+addPrintRun(head.textContent);
 });
 window.addEventListener('afterprint', function () {
 ['printCover', 'printRun'].forEach(function (id) {
@@ -3096,6 +3143,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">9 ноября 2026</span><div><b>Отчёт подбора на двух листах.</b> Результат опросника печатается фирменным титулом: первый лист — ответы, как читать статусы, порядок действий и ссылка, открывающая этот же подбор; второй лист — пять рекомендованных профессий (или шесть специальностей колледжей) с вузами, баллами и статусами. Так же печатается подбор после 9 класса. Титул теперь появляется и при печати профессии после перехода по ссылке — маршрут стали читать из адреса целиком, а не только из хеша.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Чистка и защита.</b> Удалены правила стилей для классов, которых больше нет в разметке (−1,8 КБ). Service worker стал устойчивее: сбой записи в кэш и отсутствие отдельных файлов больше не роняют офлайн-режим. Добавлены политики Content-Security-Policy для автономной копии, страницы 404 и офлайн-страницы, а также referrer-политика.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Полоса прокрутки.</b> У графиков и таблиц полоса прокрутки стала светлой с бирюзовым бегунком — в обеих темах.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Фото и подпись.</b> Снимок обрезается по своей рамке, поэтому параллакс не заходит на подпись «Фото: …» под ним и не оставляет полосу у края.</div></li>' +
@@ -3964,6 +4012,16 @@ if (sum >= budget) return { cls: 'ok', text: 'Бюджет вероятен' };
 if (sum >= budget - 10) return { cls: 'warn', text: 'Пограничная зона' };
 return { cls: 'bad', text: 'Платное обучение' };
 }
+/* Три программы с лучшими шансами для карточки результата: сначала те,
+   где бюджета хватает, внутри группы — по среднему баллу вуза. */
+function fitTop(r, st) {
+return r.fit.slice().sort(function (a, b) {
+var sa = a.budget && a.budget <= st.sum ? 2 : (a.budget && a.budget <= st.sum + 10 ? 1 : 0);
+var sb = b.budget && b.budget <= st.sum ? 2 : (b.budget && b.budget <= st.sum + 10 ? 1 : 0);
+if (sa !== sb) return sb - sa;
+return b.uni.avg - a.uni.avg;
+}).slice(0, 3);
+}
 function computeReport(st) {
 var exams = st.exams;
 var sum = st.sum;
@@ -4005,12 +4063,48 @@ var res = computeReport(st);
 var top = res.filter(function (r) { return r.fit.length; }).slice(0, 6);
 var total = res.filter(function (r) { return r.fit.length; }).length;
 var sphereObj = SPHERES.filter(function (s) { return s.code === st.sphere; })[0];
+var link = quizParams(st);
+link.set('step', '4');
+/* На бумаге умещается пять карточек, шестая остаётся на экране */
+var printed = Math.min(top.length, 5);
+var uniSeen = {};
+top.slice(0, printed).forEach(function (r) {
+fitTop(r, st).forEach(function (pr) { uniSeen[pr.uni.short] = 1; });
+});
+var cover = reportCover({
+title: 'Подбор профессий по ЕГЭ',
+sub: 'Проверено ' + res.length + ' профессий атласа: у <b>' + total + '</b> ' +
+plural(total, 'нашлась программа', 'нашлись программы', 'нашлись программы') +
+' под ваш набор экзаменов. На втором листе — ' + printed + ' ' +
+plural(printed, 'лучшее совпадение', 'лучших совпадения', 'лучших совпадений') +
+' и по три вуза с ориентировочным проходным баллом.',
+answers: [
+['Экзамены ЕГЭ', h(st.exams.map(function (s) { return SUBJ_FULL[s] || s; }).join(' · '))],
+['Уровень математики', st.exams.indexOf('Мат') >= 0 ? (st.mathLevel === 'basic' ? 'базовый' : 'профильный') : 'математика не выбрана'],
+['Ожидаемая сумма', st.sum + ' из 300'],
+['Сфера интереса', h(sphereObj ? sphereObj.name : 'любая')],
+['Вузов в списке', String(Object.keys(uniSeen).length)]
+],
+legend: [
+['Бюджет вероятен', 'сумма не ниже проходного балла 2024–2025'],
+['Пограничная зона', 'не более 10 баллов ниже проходного'],
+['Платное обучение', 'бюджета, скорее всего, не хватит']
+],
+steps: [
+'Покажите лист классному руководителю и отметьте 2–3 профессии, которые интересны.',
+'Откройте паспорт профессии по ссылке — там все вузы, направления и вступительные испытания.',
+'Сверьте перечень ЕГЭ и минимальные баллы на сайте приёмной комиссии: правила меняются каждый год.',
+'Сохраните ссылку с титула — она открывает этот же подбор с теми же ответами.'
+],
+url: absUrl('#/quiz?' + link.toString()),
+src: 'Данные атласа: ' + P.length + ' профессий, ' + U.length + ' вузов · баллы приёмных кампаний 2024–2025. Ориентир, а не гарантия.'
+});
 var head = '<div class="report-head"><div><p class="eyebrow">Результат подбора</p>' +
 '<h2 class="big">' + (total
 ? 'Найдено <b>' + total + '</b> ' + plural(total, 'профессия', 'профессии', 'профессий')
 : 'Пока ничего не нашлось') + '</h2></div>' +
 '<div class="report-actions"><button class="btn btn-sm" id="copyLink">Скопировать ссылку</button>' +
-'<button class="btn btn-sm" id="printBtn">Печать / PDF</button>' +
+'<button class="btn btn-sm" id="printBtn">Печать / PDF · 2 листа</button>' +
 '<button class="btn btn-sm btn-ghost" id="restart">Заново</button></div></div>';
 var tags = '<div class="report-sum"><span class="tag">ЕГЭ: ' + h(st.exams.join(' · ')) + '</span>' +
 '<span class="tag">Математика: ' + (st.mathLevel === 'basic' ? 'базовый уровень' : 'профильный уровень') + '</span>' +
@@ -4023,12 +4117,7 @@ return head + tags + '<div class="report-empty">' + ES_COMPASS + '<b>Подхо�
 }
 var tip = '<div class="tip"><b>Как читать статусы.</b> «Бюджет вероятен» — сумма баллов не ниже проходного 2024–2025. «Пограничная зона» — не более 10 баллов ниже. «Платное обучение» — бюджета, скорее всего, не хватит. Это ориентир, а не гарантия: конкурс меняется каждый год.</div>';
 var cards = top.map(function (r) {
-var list = r.fit.slice().sort(function (a, b) {
-var sa = a.budget && a.budget <= st.sum ? 2 : (a.budget && a.budget <= st.sum + 10 ? 1 : 0);
-var sb = b.budget && b.budget <= st.sum ? 2 : (b.budget && b.budget <= st.sum + 10 ? 1 : 0);
-if (sa !== sb) return sb - sa;
-return b.uni.avg - a.uni.avg;
-}).slice(0, 3);
+var list = fitTop(r, st);
 return '<article class="panel res reveal">' +
 '<div class="res-top"><div><a href="#/professions/' + r.p.slug + '"><h3>' + h(r.p.title) + '</h3></a>' +
 '<span class="label">' + h(r.p.sphereCode) + ' · ' + h(r.p.sphere) + '</span></div>' +
@@ -4045,7 +4134,8 @@ return '<div class="res-uni"><span class="u"><b>' + h(pr.uni.short) + '</b> · '
 '<a class="res-more" href="#/professions/' + r.p.slug + '">Паспорт профессии →</a>' +
 '</article>';
 }).join('');
-return head + tags + tip + '<div class="res-grid">' + cards + '</div>' +
+return cover + head + tags + tip + '<div class="res-grid">' + cards + '</div>' +
+'<p class="res-print-note">На листе — 5 совпадений из ' + total + '. Остальные программы, баллы и сроки приёма открываются по ссылке с титула.</p>' +
 '<p class="quiz-note">Показаны 6 лучших совпадений из ' + total + '. Ссылка на результат сохраняет ответы — её можно отправить родителям или другу.</p>' +
 '<div class="quiz-foot"><span class="quiz-count">Шаг 4 из 4 · результат</span>' +
 '<div class="quiz-nav"><button class="btn" id="adjust">Изменить ответы</button>' +
@@ -4205,7 +4295,7 @@ if (st.step === 4) bindReport(st);
 function paintQuiz(st) {
 var root = document.getElementById('quizRoot');
 if (!root) return;
-root.innerHTML = '<div class="quiz panel">' + quizSteps(st.step) + quizStepBody(st) + '</div>';
+root.innerHTML = '<div class="quiz panel quiz-report-ege' + (st.step === 4 ? ' quiz-report' : '') + '">' + quizSteps(st.step) + quizStepBody(st) + '</div>';
 bindQuiz(st);
 quizSync(st);
 initReveal(root);
@@ -4350,12 +4440,41 @@ var res = computeOgeReport(st);
 var hits = res.filter(function (r) { return r.coverage > 0 || r.sphereMatch; });
 var top = hits.slice(0, 6);
 var sph = SPHERES.filter(function (s) { return s.code === st.sphere; })[0];
+var link = ogeParams(st);
+link.set('step', '4');
+var cover = reportCover({
+title: 'Подбор специальностей после 9 класса',
+sub: 'Проверено ' + res.length + ' специальностей колледжей из атласа: <b>' + hits.length + '</b> ' +
+plural(hits.length, 'подходит', 'подходят', 'подходят') +
+' под ваши предметы ОГЭ. На втором листе — ' + top.length + ' ' +
+plural(top.length, 'лучшее совпадение', 'лучших совпадения', 'лучших совпадений') +
+' с ориентиром по среднему баллу аттестата.',
+answers: [
+['ОГЭ по выбору', h(st.exams.map(function (s) { return OGE_FULL[s] || s; }).join(' · '))],
+['Средний балл аттестата', st.grade.toFixed(2).replace('.', ',')],
+['Сфера интереса', h(sph ? sph.name : 'любая')],
+['Совпало специальностей', String(hits.length)]
+],
+legend: [
+['Аттестат проходит', 'средний балл не ниже ориентира приёма'],
+['Пограничная зона', 'не более 0,15 балла ниже ориентира'],
+['Нужен балл выше', 'смотреть менее конкурсные специальности или платное']
+],
+steps: [
+'Выберите 2–3 специальности и найдите колледжи своего округа в разделе «Колледжи».',
+'Откройте карточку специальности — там сроки обучения, нужные ОГЭ и число колледжей.',
+'Уточните проходной средний балл аттестата на сайте колледжа: конкурс идёт по нему, а не по экзаменам.',
+'Соберите документы заранее: аттестат, СНИЛС, медицинскую справку 086/у и фото 3×4.'
+],
+url: absUrl('#/quiz-oge?' + link.toString()),
+src: 'Данные атласа: ' + C.length + ' специальностей колледжей · ориентиры приёма 2024–2025. Ориентир, а не гарантия.'
+});
 var head = '<div class="report-head"><div><p class="eyebrow">Результат подбора · после 9 класса</p>' +
 '<h2 class="big">' + (hits.length
 ? 'Найдено <b>' + hits.length + '</b> ' + plural(hits.length, 'специальность', 'специальности', 'специальностей')
 : 'Пока ничего не нашлось') + '</h2></div>' +
 '<div class="report-actions"><button class="btn btn-sm" id="copyLink">Скопировать ссылку</button>' +
-'<button class="btn btn-sm" id="printBtn">Печать / PDF</button>' +
+'<button class="btn btn-sm" id="printBtn">Печать / PDF · 2 листа</button>' +
 '<button class="btn btn-sm btn-ghost" id="restart">Заново</button></div></div>';
 var tags = '<div class="report-sum">' +
 '<span class="tag">ОГЭ: ' + h(st.exams.map(function (s) { return OGE_FULL[s]; }).join(' · ')) + '</span>' +
@@ -4398,7 +4517,8 @@ r.c.count + ' ' + plural(r.c.count, 'колледж', 'колледжа', 'ко�
 '<a class="res-more" href="#/colleges/' + h(r.c.slug) + '">Специальность в колледжах →</a>' +
 '</article>';
 }).join('');
-return head + tags + tip + '<div class="res-grid">' + cards + '</div>' +
+return cover + head + tags + tip + '<div class="res-grid">' + cards + '</div>' +
+'<p class="res-print-note">На листе — ' + top.length + ' ' + plural(top.length, 'совпадение', 'совпадения', 'совпадений') + ' из ' + hits.length + '. Полный список колледжей и сроки приёма открываются по ссылке с титула.</p>' +
 '<p class="quiz-note">Показаны 6 лучших совпадений из ' + hits.length + '. Ссылка на результат сохраняет ответы — её можно отправить родителям.</p>' +
 '<div class="quiz-foot"><span class="quiz-count">Шаг 4 из 4 · результат</span>' +
 '<div class="quiz-nav"><button class="btn" id="adjust">Изменить ответы</button>' +
@@ -4542,7 +4662,7 @@ if (adj) adj.addEventListener('click', function () { st.step = 1; paintQuizOge(s
 function paintQuizOge(st) {
 var root = document.getElementById('quizRoot');
 if (!root) return;
-root.innerHTML = '<div class="quiz panel">' + quizSteps(st.step) + ogeStepBody(st) + '</div>';
+root.innerHTML = '<div class="quiz panel quiz-report-oge' + (st.step === 4 ? ' quiz-report' : '') + '">' + quizSteps(st.step) + ogeStepBody(st) + '</div>';
 bindOgeQuiz(st);
 ogeSync(st);
 initReveal(root);

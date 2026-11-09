@@ -1933,3 +1933,77 @@ border-bottom:1px solid var(--rule)}
 h2.sec[id^="rail-"]{scroll-margin-top:170px}
 @media (max-width:760px){.rail-sticky{top:52px}.rail-sticky .toc a{padding:5px 9px;font-size:9.5px}}
 @media print{.rail-sticky{display:none}}
+
+/* ============================================================
+   A4 — печатный отчёт подбора: лист 1 титул, лист 2 рекомендации
+   ============================================================ */
+.report-cover,.res-print-note{display:none}
+@media print{
+/* лист 1 — фирменный титул. Отступ сверху оставляет место колонтитулу */
+.print-cover.report-cover{display:flex;flex-direction:column;justify-content:space-between;
+gap:9mm;min-height:186mm;padding-top:10mm;page-break-after:always;color:#000}
+.report-cover .rc-top{display:flex;justify-content:space-between;align-items:baseline;
+gap:8mm;border-bottom:.75pt solid #000;padding-bottom:5pt}
+.report-cover .rc-top .pc-date{margin-top:3pt}
+.report-cover .rc-pg{font-family:var(--mono);font-size:8pt;letter-spacing:.14em;
+text-transform:uppercase;color:#444;margin:0;white-space:nowrap}
+.report-cover .rc-kicker{font-family:var(--mono);font-size:8pt;letter-spacing:.16em;
+text-transform:uppercase;color:#444;margin:0 0 9pt}
+.report-cover .pc-title{max-width:24ch}
+.report-cover .rc-sub{font-size:11pt;line-height:1.5;color:#222;margin:9pt 0 0;max-width:66ch}
+.report-cover .rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 9mm}
+.report-cover .rc-card{border-top:.75pt solid #888;padding-top:7pt;break-inside:avoid}
+.report-cover .rc-wide{grid-column:1/-1;margin-top:9pt}
+.report-cover .rc-card .label{font-family:var(--mono);font-size:7.5pt;letter-spacing:.14em;
+text-transform:uppercase;color:#444;margin:0 0 6pt}
+.report-cover .rc-ans{display:grid}
+.report-cover .rc-row{display:flex;justify-content:space-between;align-items:baseline;gap:6mm;
+padding:3.5pt 0;border-top:.5pt solid #ddd;font-size:9.5pt}
+.report-cover .rc-row:first-child{border-top:0;padding-top:0}
+.report-cover .rc-k{color:#555;flex:none}
+.report-cover .rc-v{font-weight:600;text-align:right;color:#000}
+.report-cover .rc-legend{list-style:none;margin:0;padding:0;font-size:9.5pt;line-height:1.4}
+.report-cover .rc-legend li{display:grid;grid-template-columns:minmax(0,auto) 1fr;gap:8pt;
+padding:3.5pt 0;border-top:.5pt solid #ddd}
+.report-cover .rc-legend li:first-child{border-top:0;padding-top:0}
+.report-cover .rc-legend b{white-space:nowrap}
+.report-cover .rc-legend span{color:#333}
+.report-cover .rc-steps{list-style:none;margin:0;padding:0;font-size:9.5pt;line-height:1.45;
+display:grid;grid-template-columns:1fr 1fr;gap:0 9mm}
+.report-cover .rc-steps li{display:grid;grid-template-columns:13pt 1fr;gap:7pt;padding:2.5pt 0}
+.report-cover .rc-n{font-family:var(--mono);font-size:7.5pt;width:11pt;height:11pt;
+border:.5pt solid #000;border-radius:50%;text-align:center;line-height:10.5pt}
+.report-cover .rc-link{font-size:10.5pt;font-weight:600;word-break:break-all;margin-top:4pt}
+.report-cover .rc-src{font-size:8pt;color:#555;margin-top:5pt}
+/* лист 2 — только рекомендации: всё интерактивное и повторное убрано */
+.quiz-modes,.quiz-report .quiz-steps,.quiz-report .report-sum,.quiz-report .tip,
+.quiz-report .report-actions,.quiz-report .quiz-foot,.quiz-report .res-more,
+.quiz-report .quiz-note{display:none!important}
+.res-print-note{display:block;font-size:8.5pt;color:#555;margin:8pt 0 0;line-height:1.4}
+/* печать — 5 карточек, шестая остаётся на экране */
+.quiz-report-ege .res-grid>.res:nth-child(n+6){display:none!important}
+.quiz-report{border:0!important;background:#fff!important;box-shadow:none!important;
+padding:0!important;border-radius:0!important;margin:0!important}
+.quiz-report .report-head{display:block;margin:0 0 9pt;padding-top:2mm}
+.quiz-report .report-head .eyebrow{font-size:8pt;margin:0}
+.quiz-report .report-head .eyebrow::after{content:" · лист 2 из 2"}
+.quiz-report .report-head .big{font-size:17pt;margin:4pt 0 0}
+.quiz-report .res-grid{display:block!important}
+.quiz-report .res{display:block;border:1px solid #bbb!important;border-radius:0!important;
+background:#fff!important;padding:5pt 7pt;margin:0 0 4pt;gap:0;box-shadow:none!important}
+.quiz-report .res-top{align-items:baseline;gap:8pt}
+.quiz-report .res-top a,.quiz-report .res-top h3{display:inline}
+.quiz-report .res-top h3{font-size:11pt;line-height:1.2}
+.quiz-report .res-top .label{display:inline-block;margin:0 0 0 6pt;font-size:7.5pt;letter-spacing:.1em}
+.quiz-report .res-score .v{font-size:13pt;color:#000}
+.quiz-report .res-unis{margin-top:3pt}
+.quiz-report .res-uni{font-size:8pt;padding:2.5pt 0;border-top:.5pt solid #ddd}
+.quiz-report .res-uni .u{line-height:1.3}
+.quiz-report .res-uni .u br{display:none}
+.quiz-report .res-uni .status{margin-left:5pt}
+.quiz-report .res-uni .status::before{content:"· "}
+/* на бумаге строка «подходит программ из» шумит: общее число есть на титуле;
+   у отчёта после 9 класса она объясняет совпадение предметов, её оставляем */
+.quiz-report-ege .res-why{display:none}
+.quiz-report-oge .res-why{font-size:8pt;padding-top:3pt;margin-top:3pt;line-height:1.35}
+}
