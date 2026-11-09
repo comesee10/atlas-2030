@@ -3140,6 +3140,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">9 ноября 2026</span><div><b>Полоса содержания стала глухой.</b> Липкое мини-оглавление на страницах вузов и колледжей больше не полупрозрачное и без блюра: заголовки разделов, которые проходят под полосой, перестали накладываться на её подпись. Длинные названия округов в полосе сокращены («Центральный федеральный округ» → «Центральный», полное название — в подсказке), на широком экране чипы переносятся в строки, а не обрезаются по краю страницы, и отступ при переходе по чипу считается по реальной высоте полосы.</div></li>' +
 '<li><span class="mono">9 ноября 2026</span><div><b>Без даты на листе.</b> Строка «печать: такого-то числа» убрана и с титула профессии, и с титула отчёта подбора: точные дату и время ставит браузер в верхнем колонтитуле страницы, на листе осталось только название атласа. Класс pc-date переименован в pc-tag — он больше не про дату.</div></li>' +
 '<li><span class="mono">9 ноября 2026</span><div><b>Печать профессии без адреса.</b> Со страницы профессии убрана строка с ссылкой на титуле: на бумаге такой адрес набирают вручную, а набор предметов и правила приёма устаревают быстрее, чем доезжает распечатка. Колонтитул «Профессии·2030» на каждом листе остался, заголовок титула прижат к нижней трети листа.</div></li>' +
 '<li><span class="mono">9 ноября 2026</span><div><b>Отчёт подбора на двух листах.</b> Результат опросника печатается фирменным титулом: первый лист — ответы, как читать статусы, порядок действий и ссылка, открывающая этот же подбор; второй лист — пять рекомендованных профессий (или шесть специальностей колледжей) с вузами, баллами и статусами. Так же печатается подбор после 9 класса. Титул теперь появляется и при печати профессии после перехода по ссылке — маршрут стали читать из адреса целиком, а не только из хеша.</div></li>' +
@@ -3498,8 +3499,12 @@ var toc = document.createElement('div');
 toc.className = 'toc toc-story';
 toc.innerHTML = Array.prototype.map.call(h2s, function (x2, i) {
 var id = 'rail-' + (i + 1);
+var full = x2.textContent.replace(/^\d+\.\s*/, '');
+/* «Центральный федеральный округ» в тесной полосе — «Центральный»:
+   восемь длинных чипов не умещались и обрезались по краю страницы */
+var brief = full.replace(/ федеральный округ$/i, '');
 x2.id = id;
-return '<a href="#' + id + '" data-toc="' + id + '">' + h(x2.textContent.replace(/^\d+\.\s*/, '')) + '</a>';
+return '<a href="#' + id + '" data-toc="' + id + '" title="' + h(full) + '">' + h(brief) + '</a>';
 }).join('') + '<i class="toc-progress" aria-hidden="true"></i>';
 rail.appendChild(toc);
 root.parentNode.insertBefore(rail, root);
@@ -3508,7 +3513,9 @@ var a = e.target.closest('a[data-toc]');
 if (!a) return;
 e.preventDefault();
 var t = document.getElementById(a.getAttribute('data-toc'));
-if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 168, behavior: noMotion ? 'auto' : 'smooth' });
+/* Смещение считаем по высоте самой полосы: на средней ширине чипы
+   переносятся в две строки и фиксированные 168 px уже не хватает */
+if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - rail.offsetHeight - 70, behavior: noMotion ? 'auto' : 'smooth' });
 });
 var links = toc.querySelectorAll('a[data-toc]');
 var progress = toc.querySelector('.toc-progress');

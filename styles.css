@@ -1926,16 +1926,27 @@ main .view>section+section{padding-top:10pt;margin-top:8pt}
 /* ============================================================
    A1 — липкое мини-оглавление списочных страниц (вузы, колледжи)
    ============================================================ */
+/* Подложка глухая, без полупрозрачности и блюра: под полосой идут
+   заголовки разделов, и сквозь 88% они читались как наложение. */
 .rail-sticky{position:sticky;top:58px;z-index:45;margin-top:14px;
-background:color-mix(in oklab,var(--bg) 88%,transparent);
--webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-border-bottom:1px solid var(--rule)}
-.rail-sticky .toc{position:relative;padding:10px 0 9px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+background:var(--bg);border-bottom:1px solid var(--rule-2);
+box-shadow:0 10px 18px -16px rgba(0,0,0,.55)}
+/* на широком экране чипы переносим — последний не должен обрезаться
+   по краю страницы; на телефоне остаётся горизонтальная прокрутка */
+/* внутри полосы own «toc-story» наследует sticky-смещение top:64px —
+   с ним чипы уползают ниже подложки и ложатся на контент страницы */
+.rail-sticky .toc{position:relative;top:auto;padding:10px 0 9px;flex-wrap:wrap;overflow:visible;
+background:transparent;margin:0;box-shadow:none;z-index:auto}
+.rail-sticky .toc a{color:var(--ink-2)}
 .rail-sticky .toc::-webkit-scrollbar{display:none}
-.rail-sticky .toc-story{background:transparent}
 .district-head{scroll-margin-top:190px}
 h2.sec[id^="rail-"]{scroll-margin-top:170px}
-@media (max-width:760px){.rail-sticky{top:52px}.rail-sticky .toc a{padding:5px 9px;font-size:9.5px}}
+@media (max-width:760px){
+.rail-sticky{top:52px}
+.rail-sticky .toc{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent)}
+.rail-sticky .toc a{padding:5px 9px;font-size:9.5px}
+}
 @media print{.rail-sticky{display:none}}
 
 /* ============================================================
