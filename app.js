@@ -914,6 +914,7 @@ more.classList.toggle('is-current', active);
 var SITE_URL = 'https://comesee10.github.io/atlas-2030/';
 var PAGE_TITLES = {
 quiz: 'Опросник', 'quiz-oge': 'Опросник после 9 класса', professions: 'Профессии', universities: 'Вузы',
+simulator: 'Симулятор баллов',
 colleges: 'Колледжи', specialties: 'Специальности', regions: 'Регионы',
 admission: 'Бюджетные места', calendar: 'Календарь приёма', favorites: 'Избранное',
 map: 'Карта', compare: 'Сравнение', about: 'О проекте', methodology: 'Методология',
@@ -928,8 +929,8 @@ return SITE_URL + String(u).replace(/^#?\//, '').replace(/^/, '');
    настоящие URL, а не на hash. Интерактивные разделы (опросник, карта, избранное,
    сравнение) остаются на hash: у них нет смысла в отдельной статической копии. */
 var BASE = '/atlas-2030';
-var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar)(?:\/[-a-z0-9-]+)?$/;
-var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
+var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar|simulator)(?:\/[-a-z0-9-]+)?$/;
+var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|simulator|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
 function cleanPath(path) {
 var p = String(path == null ? '/' : path).split('?')[0];
 if (!p) p = '/';
@@ -1149,6 +1150,20 @@ url: absUrl('#/calendar'),
 inLanguage: 'ru',
 isAccessibleForFree: true
 });
+} else if (path === '/simulator') {
+g.push({
+'@type': 'WebApplication',
+name: 'Симулятор баллов ЕГЭ — Профессии·2030',
+applicationCategory: 'EducationalApplication',
+operatingSystem: 'Любой браузер',
+inLanguage: 'ru',
+url: absUrl('#/simulator'),
+description: 'Сколько программ и вузов откроется, если допустить несколько баллов к профильному предмету ЕГЭ: ' +
+TOTAL_PROGRAMS + ' программ, ' + U.length + ' вузов, ориентировочные проходные баллы 2024–2025.',
+featureList: ['Подбор программ по баллам трёх ЕГЭ', 'Что открывается при добавке +1…+20 баллов',
+'Какой предмет даёт максимум новых программ', 'Ближайшие проходные пороги'],
+offers: { '@type': 'Offer', price: '0', priceCurrency: 'RUB' }
+});
 } else if (path === '/quiz') {
 g.push({
 '@type': 'Course',
@@ -1200,6 +1215,7 @@ var ogUrl = document.querySelector('meta[property="og:url"]');
 var q = parseHash().q;
 var shareUrl = pageUrl;
 if (path === '/quiz' && (q.has('e') || q.has('s') || q.has('b') || q.has('mlevel'))) shareUrl += '?' + q.toString();
+if (path === '/simulator' && (q.has('e') || q.has('s'))) shareUrl += '?' + q.toString();
 if (ogUrl) ogUrl.content = shareUrl;
 var report = path === '/quiz' && q.get('step') === '4';
 var socialTitle = report ? 'Мой результат опросника — Профессии·2030' : (path === '/quiz' ? 'Опросник: куда поступать — Профессии·2030' : document.title);
@@ -1246,6 +1262,7 @@ var ROUTES = [
 [/^\/quiz-oge$/, renderQuizOge],
 [/^\/professions$/, renderProfessions],
 [/^\/professions\/([^/]+)$/, function (m) { renderProfession(safeDecode(m[1])); }],
+[/^\/simulator$/, renderSimulator],
 [/^\/universities$/, renderUniversities],
 [/^\/universities\/([^/]+)$/, function (m) { renderUniversity(safeDecode(m[1])); }],
 [/^\/admission$/, renderAdmission],
@@ -2262,6 +2279,7 @@ return '<div class="bar-row"><a class="n" href="#/professions/' + p.slug + '">' 
 '<span class="v">' + p.index + '</span></div>';
 }).join('') +
 '</div></div>' +
+simTeaserHtml() +
 '<div class="cta-block reveal"><a class="btn btn-primary" href="#/quiz">Пройти опросник и подобрать программы →</a></div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Рост к 2030</p><h2 class="sec">Профессии с самым быстрым ростом</h2></div>' +
 '<a class="sec-link" href="#/professions?sort=growth">Весь каталог →</a></section>' +
@@ -2650,6 +2668,7 @@ h(d.code + ' · ' + d.short) + '</option>';
 '<p class="quiz-note">Показаны 40 программ из ' + rows.length + '. Сортировка и округ сохраняются в ссылке — ' +
 'результат можно отправить.</p>' +
 '<div class="hero-cta" style="margin-top:20px"><a class="btn btn-primary" href="#/universities">Все вузы и направления</a>' +
+'<a class="btn" href="#/simulator">Симулятор: что дадут +5 баллов</a>' +
 '<a class="btn" href="#/methodology">Как считаются оценки</a></div>' +
 '</div>';
 document.getElementById('admSort').addEventListener('click', function (e) {
@@ -3414,6 +3433,7 @@ return '<article class="lesson-step">' +
 '<a href="#/professions">Каталог профессий</a>' +
 '<a href="#/compare">Сравнение до трёх профессий</a>' +
 '<a href="#/quiz">Опросник по ЕГЭ</a>' +
+'<a href="#/simulator">Симулятор баллов</a>' +
 '<a href="#/quiz-oge">Подбор после 9 класса</a>' +
 '<a href="#/favorites">Печатная подборка</a>' +
 '<a href="#/methodology">Методология и границы данных</a>' +
@@ -4210,6 +4230,568 @@ return '<a class="panel reveal" href="' + h(pageHref('/specialties/' + x.slug)) 
 }).join('') + '</div>' : '') +
 '</div>';
 }
+/* ---------- симулятор баллов ----------
+   «Докуплю +5 к профильному предмету — куда попаду?» Перебираются все программы
+   атласа: для каждой находится допустимый набор ЕГЭ, сумма баллов с допуском
+   сравнивается с проходным. Второй вопрос — «а если сдать другой предмет»:
+   замена профильного экзамена пересчитывает весь выбор. Так атлас отвечает на то,
+   чего не делает ни одна профориентация по вакансиям. */
+var SIM_KEY = 'atlas:sim';
+var SIM_CACHE = null;
+var SIM_LADDER = [1, 3, 5, 10, 15, 20];
+/* Дательный падеж: «+5 к информатике», а не «к „информатика“». */
+var SUBJ_DAT = {
+'Рус': 'русскому', 'Мат': 'математике', 'Инф': 'информатике', 'Физ': 'физике',
+'Хим': 'химии', 'Био': 'биологии', 'Общ': 'обществознанию', 'Ист': 'истории',
+'Лит': 'литературе', 'Ин.яз': 'иностранному языку', 'Гео': 'географии'
+};
+var SIM_DEFAULT = { exams: ['Рус', 'Мат', 'Инф'], scores: { 'Рус': 78, 'Мат': 80, 'Инф': 74 }, boost: 'Инф', delta: 5, sphere: '' };
+
+function simPool() {
+if (SIM_CACHE) return SIM_CACHE;
+var out = [];
+U.forEach(function (u) {
+(u.programs || []).forEach(function (pr) {
+var b = num(pr.budget);
+if (!b) return;
+var combos = parseEge(pr.ege);
+if (!combos.length) return;
+out.push({
+u: u, pr: pr, budget: b, combos: combos,
+prof: pr.professionSlug ? PROF_BY_SLUG[pr.professionSlug] : null,
+places: progStats(pr, u).places
+});
+});
+});
+SIM_CACHE = out;
+return out;
+}
+/* Лучший из допустимых наборов ЕГЭ: вариант не считается, если одного предмета
+   школьник не сдаёт. Добавка d идёт к предмету boost (или ко всем), потолок —
+   100 баллов за экзамен, поэтому «докупать» к 98 баллам бессмысленно. */
+function simSetTotal(item, scores, boost, delta) {
+var best = -1;
+item.combos.forEach(function (combo) {
+var t = 0;
+for (var i = 0; i < combo.length; i++) {
+var v = scores[combo[i]];
+if (v == null) { t = -1; break; }
+t += Math.min(100, v + (boost === 'all' || boost === combo[i] ? delta : 0));
+}
+if (t > best) best = t;
+});
+return best;
+}
+function simCount(st, scores, boost, delta) {
+var n = 0, unis = {}, places = 0;
+simPool().forEach(function (item) {
+if (st.sphere && (!item.prof || item.prof.sphereCode !== st.sphere)) return;
+if (simSetTotal(item, scores, boost, delta) >= item.budget) {
+n++;
+unis[item.u.slug] = 1;
+places += item.places;
+}
+});
+return { n: n, unis: Object.keys(unis).length, places: places };
+}
+/* Замена одного из предметов другим с тем же баллом: что изменится в выборе. */
+function simSwapList(st) {
+if (st.boost === 'all') return [];
+var slot = st.boost;
+var base = simCount(st, st.scores, slot, st.delta).n;
+var out = [];
+SUBJECTS.forEach(function (x) {
+if (x === slot || st.exams.indexOf(x) >= 0) return;
+var scores = {};
+st.exams.forEach(function (s) { if (s !== slot) scores[s] = st.scores[s]; });
+scores[x] = st.scores[slot];
+var c = simCount(st, scores, x, st.delta);
+out.push({ subj: x, n: c.n, unis: c.unis, diff: c.n - base });
+});
+return out.sort(function (a, b) { return b.n - a.n || b.unis - a.unis; });
+}
+function simNormalize(st) {
+st = st || {};
+var exams = [], scores = {};
+(st.exams || []).forEach(function (s) {
+if (SUBJECTS.indexOf(s) < 0 || exams.indexOf(s) >= 0 || exams.length >= 3) return;
+exams.push(s);
+var v = num(st.scores && st.scores[s]);
+scores[s] = Math.max(20, Math.min(100, v || 60));
+});
+if (!exams.length) {
+exams = SIM_DEFAULT.exams.slice();
+scores = {};
+SIM_DEFAULT.exams.forEach(function (s) { scores[s] = SIM_DEFAULT.scores[s]; });
+}
+var boost = st.boost === 'all' ? 'all' : (exams.indexOf(st.boost) >= 0 ? st.boost : exams[exams.length - 1]);
+var delta = st.delta === undefined ? SIM_DEFAULT.delta : Math.max(0, Math.min(25, num(st.delta)));
+var sphere = SPHERES.some(function (x) { return x.code === st.sphere; }) ? st.sphere : '';
+return { exams: exams, scores: scores, boost: boost, delta: delta, sphere: sphere, demo: !!st.demo };
+}
+/* Значения по умолчанию — это пример, чтобы на статической копии раздела
+   было видно и распаковку расчёта, и сам интерфейс. */
+function simExample() {
+return {
+exams: SIM_DEFAULT.exams.slice(),
+scores: { 'Рус': SIM_DEFAULT.scores['Рус'], 'Мат': SIM_DEFAULT.scores['Мат'], 'Инф': SIM_DEFAULT.scores['Инф'] },
+boost: SIM_DEFAULT.boost, delta: SIM_DEFAULT.delta, sphere: '', demo: true
+};
+}
+/* В опроснике балл — одна сумма: раскладываем её на предметы поровну,
+   остаток достаётся последнему (обычно профильному). */
+function simOfQuiz(q) {
+if (!q || !q.exams || q.exams.length < 2) return null;
+var exams = q.exams.slice(0, 3);
+var base = Math.floor(q.sum / exams.length);
+var scores = {};
+exams.forEach(function (s) { scores[s] = Math.max(20, Math.min(100, base)); });
+var rest = q.sum - base * exams.length;
+if (rest > 0) scores[exams[exams.length - 1]] = Math.min(100, scores[exams[exams.length - 1]] + rest);
+return { exams: exams, scores: scores, boost: exams[exams.length - 1], delta: SIM_DEFAULT.delta, sphere: q.sphere || '' };
+}
+function simFromQuiz() {
+var s = simOfQuiz(loadQuiz());
+return s ? simNormalize(s) : null;
+}
+/* Ссылка из результата опросника: те же предметы и баллы. */
+function simLinkFromQuiz(q) {
+var sim = simOfQuiz(q);
+if (!sim) return pageHref('/simulator');
+return pageHref('/simulator', simParams(simNormalize(sim)).toString());
+}
+function simFromUrl(q) {
+if (!q.has('e') && !q.has('s')) {
+var saved = simLoad();
+if (saved) return saved;
+var fromQuiz = simFromQuiz();
+if (fromQuiz) return fromQuiz;
+return simNormalize(simExample());
+}
+var exams = (q.get('e') || '').split(',').filter(function (s) { return SUBJECTS.indexOf(s) >= 0; });
+if (!exams.length) exams = SIM_DEFAULT.exams.slice();
+var vals = (q.get('s') || '').split(',').map(function (v) { return parseInt(v, 10); });
+var scores = {};
+exams.forEach(function (s, i) { scores[s] = isNaN(vals[i]) ? SIM_DEFAULT.scores[s] || 70 : vals[i]; });
+return simNormalize({
+exams: exams, scores: scores,
+boost: q.get('b') || exams[exams.length - 1],
+delta: q.has('d') ? q.get('d') : undefined,
+sphere: q.get('sp') || ''
+});
+}
+function simParams(st) {
+var p = new URLSearchParams();
+p.set('e', st.exams.join(','));
+p.set('s', st.exams.map(function (s) { return st.scores[s]; }).join(','));
+p.set('b', st.boost);
+if (st.delta !== SIM_DEFAULT.delta) p.set('d', st.delta);
+if (st.sphere) p.set('sp', st.sphere);
+return p;
+}
+function simLoad() {
+try {
+var raw = localStorage.getItem(SIM_KEY);
+if (!raw) return null;
+var o = JSON.parse(raw);
+if (!o || !o.exams || !o.exams.length) return null;
+return simNormalize(o);
+} catch (e) { return null; }
+}
+function simSave(st) {
+try {
+var d = SIM_DEFAULT;
+var same = st.exams.join(',') === d.exams.join(',') && st.boost === d.boost && st.delta === d.delta &&
+st.sphere === d.sphere && d.exams.every(function (s) { return st.scores[s] === d.scores[s]; });
+if (same) localStorage.removeItem(SIM_KEY);
+else localStorage.setItem(SIM_KEY, JSON.stringify(st));
+} catch (e) {}
+}
+function simAnalyze(st) {
+var rows = [];
+simPool().forEach(function (item) {
+if (st.sphere && (!item.prof || item.prof.sphereCode !== st.sphere)) return;
+var now = simSetTotal(item, st.scores, '', 0);
+if (now < 0) return;
+var after = simSetTotal(item, st.scores, st.boost, st.delta);
+rows.push({ item: item, now: now, after: after, open: now >= item.budget, unlocked: now < item.budget && after >= item.budget });
+});
+var opened = rows.filter(function (r) { return r.open; });
+var fresh = rows.filter(function (r) { return r.unlocked; });
+var uniq = function (list, pick) {
+var seen = {};
+list.forEach(function (r) { seen[pick(r)] = 1; });
+return Object.keys(seen).length;
+};
+var sum = function (list, pick) { return list.reduce(function (n, r) { return n + pick(r); }, 0); };
+var ladder = SIM_LADDER.map(function (d) {
+var n = 0, unis = {};
+rows.forEach(function (r) {
+if (r.open) return;
+if (simSetTotal(r.item, st.scores, st.boost, d) >= r.item.budget) { n++; unis[r.item.u.slug] = 1; }
+});
+return { delta: d, count: n, unis: Object.keys(unis).length };
+});
+var near = rows.filter(function (r) { return !r.open && r.after < r.item.budget; })
+.map(function (r) { return { item: r.item, after: r.after, need: r.item.budget - r.after }; })
+.sort(function (a, b) { return a.need - b.need || b.item.u.avg - a.item.u.avg; });
+return {
+rows: rows, opened: opened, fresh: fresh, ladder: ladder, near: near,
+swaps: simSwapList(st),
+swapBase: simCount(st, st.scores, st.boost, st.delta).n,
+unis: uniq(fresh, function (r) { return r.item.u.slug; }),
+places: sum(fresh, function (r) { return r.item.places; })
+};
+}
+function simUniCell(item) {
+var u = item.u;
+return '<a href="#/universities/' + h(u.slug) + '">' + h(u.short) + '</a>' +
+'<span class="code">' + h(u.city) + ' · ≈' + u.avg + '</span>';
+}
+function simProgCell(item) {
+var sp = specKeyFor(item.pr);
+return (sp ? '<a href="#/specialties/' + h(sp.slug) + '">' + h(item.pr.direction) + '</a>' : h(item.pr.direction)) +
+'<span class="code">' + h(item.pr.code) +
+(item.prof ? ' · <a href="#/professions/' + h(item.prof.slug) + '">' + h(item.prof.title) + '</a>' : '') + '</span>';
+}
+/* «Куда попаду» группировкой по вузам: школьник мыслит списком институтов,
+   куда его возьмут, а не строками таблицы. */
+function simUniGroups(list) {
+var byUni = [];
+var index = {};
+list.slice().sort(function (a, b) {
+return b.item.u.avg - a.item.u.avg || b.item.budget - a.item.budget;
+}).forEach(function (r) {
+var slug = r.item.u.slug;
+if (!index[slug]) { index[slug] = { u: r.item.u, rows: [] }; byUni.push(index[slug]); }
+index[slug].rows.push(r);
+});
+return '<div class="uni-grid">' + byUni.slice(0, 10).map(function (g) {
+var places = g.rows.reduce(function (n, r) { return n + r.item.places; }, 0);
+return '<section class="panel sim-uni reveal">' +
+'<div class="sim-uni-head"><h3><a href="#/universities/' + h(g.u.slug) + '">' + h(g.u.short) + '</a></h3>' +
+'<span class="sim-uni-meta">' + h(g.u.city) + ' · ' + h(g.u.district) + '</span>' +
+'<span class="sim-uni-avg">средний балл ≈' + g.u.avg + '</span></div>' +
+g.rows.slice(0, 3).map(function (r) {
+var sp = specKeyFor(r.item.pr);
+return '<div class="sim-prog-row"><div class="l">' +
+'<a class="d" href="' + h(pageHref(sp ? '/specialties/' + sp.slug : '/universities/' + g.u.slug)) + '">' + h(r.item.pr.direction) + '</a>' +
+'<span class="code">' + h(r.item.pr.code) + (r.item.prof ? ' · ' + h(r.item.prof.title) : '') + ' · ЕГЭ: ' + h(r.item.pr.ege) + '</span></div>' +
+'<div class="r"><span class="sum">≈' + r.item.budget + ' → ' + r.after + '</span>' +
+'<span class="e status ok">+' + (r.after - r.item.budget) + '</span></div></div>';
+}).join('') +
+(g.rows.length > 3 ? '<p class="sim-uni-note">и ещё ' + (g.rows.length - 3) + ' ' +
+plural(g.rows.length - 3, 'направление', 'направления', 'направлений') + ' в этом вузе</p>' : '') +
+'<p class="sim-uni-note">≈' + places + ' ' + plural(places, 'бюджетное место', 'бюджетных места', 'бюджетных мест') + ' на открытых программах</p>' +
+'<a class="sim-uni-more" href="#/universities/' + h(g.u.slug) + '">Все программы вуза →</a>' +
+'</section>';
+}).join('') + '</div>';
+}
+function simBoostLabel(st) {
+return st.boost === 'all'
+? '+' + st.delta + ' ко всем трём предметам'
+: '+' + st.delta + ' к ' + (SUBJ_DAT[st.boost] || st.boost);
+}
+function simSwapHtml(st, res) {
+if (!res.swaps.length) {
+return '<div class="panel sim-none"><p class="label">Замена предмета не считается</p>' +
+'<p>Сейчас добавка идёт сразу ко всем трём предметам. Выберите один предмет — и атлас покажет, что было бы, если бы вместо него школьник сдавал другой экзамен при том же балле.</p></div>';
+}
+var best = res.swaps.filter(function (x) { return x.diff > 0; }).slice(0, 6);
+var worst = res.swaps[res.swaps.length - 1];
+var max = res.swaps[0].n || 1;
+return '<section class="sec-head reveal"><div><p class="eyebrow">Альтернатива</p>' +
+'<h2 class="sec">А если сдать другой профильный предмет</h2></div></section>' +
+'<p class="muted" style="max-width:60ch;margin:-8px 0 14px">Тот же балл (' + st.scores[st.boost] + '), но вместо выбранного профильного предмета — другой экзамен. ' +
+'Набор ЕГЭ и число доступных программ пересчитываются целиком.</p>' +
+'<div class="panel sim-swap">' +
+res.swaps.slice(0, 8).map(function (x) {
+return '<div class="sim-swap-row' + (x.diff > 0 ? ' is-good' : '') + '">' +
+'<span class="n">' + h(SUBJ_FULL[x.subj] || x.subj) + '</span>' +
+'<div class="bar-track"><div class="bar-fill" data-v="' + (x.n / max).toFixed(3) + '"></div></div>' +
+'<span class="v">' + x.n + '</span>' +
+'<span class="d status ' + (x.diff > 0 ? 'ok' : x.diff < 0 ? 'bad' : 'warn') + '">' + (x.diff > 0 ? '+' + x.diff : x.diff === 0 ? '±0' : x.diff) + '</span>' +
+'<button class="btn btn-sm" type="button" data-sim-swap="' + h(x.subj) + '">Попробовать</button>' +
+'</div>';
+}).join('') +
+'</div>' +
+'<p class="quiz-note">Сейчас профильный предмет — «' + h(SUBJ_FULL[st.boost]) + '» (' + st.scores[st.boost] + ' баллов), с допуском +' + st.delta + ' доступно ' + res.swapBase + ' ' +
+plural(res.swapBase, 'программа', 'программы', 'программ') + '. ' +
+(best.length
+? 'Сильнейшая замена — «' + h(SUBJ_FULL[best[0].subj]) + '»: +' + best[0].diff + ' ' + plural(best[0].diff, 'программа', 'программы', 'программ') +
+' и ' + best[0].unis + ' ' + plural(best[0].unis, 'вуз', 'вуза', 'вузов') + '.'
+: 'Ни одна замена не добавляет программ: в этом наборе «' + h(SUBJ_FULL[st.boost]) + '» — лучший профильный предмет из ' + res.swaps.length + ' доступных.') +
+(worst && worst.diff < 0 ? ' Худший вариант — «' + h(SUBJ_FULL[worst.subj]) + '»: ' + worst.diff + '.' : '') +
+' Балл при замене сохраняется, поэтому речь о структуре набора ЕГЭ, а не о подготовке.</p>';
+}
+function simOutHtml(st, res) {
+var head = '<div class="adm-kpi">' +
+'<div class="kpi"><span class="v">' + res.opened.length + '</span><span class="k">программ проходите сейчас</span></div>' +
+'<div class="kpi"><span class="v">+' + res.fresh.length + '</span><span class="k">откроется с допуском +' + st.delta + '</span></div>' +
+'<div class="kpi"><span class="v">' + res.unis + '</span><span class="k">' + plural(res.unis, 'новый вуз', 'новых вуза', 'новых вузов') + '</span></div>' +
+'<div class="kpi"><span class="v">≈' + res.places + '</span><span class="k">бюджетных мест в них</span></div>' +
+'</div>';
+var tip = '<div class="tip"><b>Что считает.</b> «Проходите» — сумма трёх ЕГЭ не ниже ориентировочного проходного 2024–2025. ' +
+'Добавка применяется к выбранному предмету и упирается в потолок 100 баллов: к 98 баллам добавлять поздно. ' +
+'Проходные баллы и перечень ЕГЭ устанавливает приёмная комиссия каждый год — считайте это коридором вариантов, а не обещанием.</div>';
+var empty = !res.rows.length
+? '<div class="panel sim-empty"><p class="label">Такого набора ЕГЭ нет в атласе</p>' +
+'<p>Ни одно из ' + TOTAL_PROGRAMS + ' направлений не требует ровно эту тройку предметов. Замените один из них — ' +
+'раздел «А если сдать другой профильный предмет» ниже — или вернитесь к опроснику.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary btn-sm" href="#/quiz">Пройти опросник</a>' +
+'<a class="btn btn-sm" href="#/specialties">Все специальности</a></div></div>'
+: '';
+var freshBlock = !res.fresh.length ? '' :
+'<section class="sec-head reveal"><div><p class="eyebrow">Результат допущения</p>' +
+'<h2 class="sec">Открывается при допуске ' + simBoostLabel(st) + '</h2></div>' +
+'<a class="sec-link" href="#/admission">История баллов →</a></section>' +
+simUniGroups(res.fresh) +
+(res.unis > 10 ? '<p class="quiz-note">Показаны 10 вузов из ' + res.unis + ': полные списки направлений — на страницах вузов.</p>' : '');
+var noneBlock = res.rows.length && !res.fresh.length
+? '<div class="panel sim-none"><p class="label">При такой добавке не открывается ничего</p><p>' +
+(res.opened.length
+? 'Ваши баллы уже закрывают все ' + res.opened.length + ' доступных программ этого набора ЕГЭ: дальше решает не добавка, а замена предмета — см. ниже.'
+: 'Даже с допуском проходных программ в этом наборе ЕГЭ нет: ближайшие пороги — в разделе «Ближе всего к допуску».') +
+'</p></div>'
+: '';
+var ladderBlock = '<section class="sec-head reveal"><div><p class="eyebrow">Шаг за шагом</p><h2 class="sec">Как растёт выбор с добавкой</h2></div>' +
+'<p class="muted" style="max-width:52ch">Сколько программ открывается при допуске в 1, 3, 5, 10, 15 и 20 балла к выбранному предмету.</p></section>' +
+'<div class="sim-ladder">' + res.ladder.map(function (x) {
+return '<div class="sim-step"><span class="mono sim-step-d">+' + x.delta + '</span>' +
+'<span class="sim-step-n">' + x.count + ' ' + plural(x.count, 'программа', 'программы', 'программ') + '</span>' +
+'<span class="sim-step-u">' + (x.unis ? x.unis + ' ' + plural(x.unis, 'вуз', 'вуза', 'вузов') : 'без новых вузов') + '</span></div>';
+}).join('') + '</div>';
+var nearBlock = !res.near.length ? '' :
+'<section class="sec-head reveal"><div><p class="eyebrow">Запас</p><h2 class="sec">Ближе всего к допуску</h2></div>' +
+'<a class="sec-link" href="#/universities">Каталог вузов →</a></section>' +
+'<div class="panel adm-panel"><div class="tbl-wrap"><table class="data"><thead><tr><th>Вуз</th><th>Направление</th><th>ЕГЭ</th><th>Проходной</th><th>Ваши баллы</th><th>Нужно ещё</th></tr></thead>' +
+'<tbody>' + res.near.slice(0, 12).map(function (x) {
+return '<tr><td data-label="Вуз">' + simUniCell(x.item) + '</td>' +
+'<td data-label="Направление">' + simProgCell(x.item) + '</td>' +
+'<td data-label="ЕГЭ">' + h(x.item.pr.ege) + '</td>' +
+'<td data-label="Проходной" class="b">≈' + x.item.budget + '</td>' +
+'<td data-label="Ваши баллы" class="p">' + x.after + '</td>' +
+'<td data-label="Нужно ещё"><span class="status ' + (x.need <= 5 ? 'warn' : 'bad') + '">+' + x.need + '</span></td></tr>';
+}).join('') + '</tbody></table></div></div>';
+var byProf = {};
+res.fresh.forEach(function (r) {
+var slug = r.item.prof ? r.item.prof.slug : '';
+if (!slug) return;
+(byProf[slug] = byProf[slug] || { p: r.item.prof, n: 0 }).n++;
+});
+var profs = Object.keys(byProf).map(function (k) { return byProf[k]; }).sort(function (a, b) { return b.n - a.n; }).slice(0, 12);
+var profBlock = !profs.length ? '' :
+'<section class="sec-head reveal"><div><p class="eyebrow">Профессии</p><h2 class="sec">Куда ведут открытые программы</h2></div></section>' +
+'<div class="chips">' + profs.map(function (x) {
+return '<a class="chip" href="#/professions/' + h(x.p.slug) + '">' + h(x.p.title) + ' · ' + x.n + '</a>';
+}).join('') + '</div>';
+return head + tip + empty + freshBlock + noneBlock + ladderBlock + simSwapHtml(st, res) + nearBlock + profBlock;
+}
+function simScoreCells(st) {
+return st.exams.map(function (s, i) {
+var opts = SUBJECTS.map(function (x) {
+return '<option value="' + h(x) + '"' + (x === s ? ' selected' : '') + '>' + h(SUBJ_FULL[x] || x) + '</option>';
+}).join('');
+var v = st.scores[s];
+return '<div class="sim-cell">' +
+'<label class="select-field" for="simSubj' + i + '"><span class="label">' + (i === 2 ? 'Профильный предмет' : 'Предмет ' + (i + 1)) + '</span>' +
+'<select id="simSubj' + i + '" data-sim-subj="' + i + '">' + opts + '</select></label>' +
+'<div class="slider-box"><div class="row"><span class="big" data-sim-val="' + i + '">' + v + '</span>' +
+'<span class="hint">баллов ЕГЭ</span></div>' +
+'<input type="range" min="20" max="100" step="1" value="' + v + '" data-sim-score="' + i + '" style="--p:' + Math.round((v - 20) / 80 * 100) + '%" ' +
+'aria-label="Балл: ' + h(SUBJ_FULL[s] || s) + '"></div></div>';
+}).join('');
+}
+/* Тизер на главной: тот же расчёт на типовом примере. */
+function simTeaserHtml() {
+var st = simNormalize(simExample());
+var res = simAnalyze(st);
+var swap = res.swaps.filter(function (x) { return x.diff > 0; })[0];
+return '<section class="sec-head reveal"><div><p class="eyebrow">Симулятор</p>' +
+'<h2 class="sec">Что дадут <em>+5 баллов</em> к профильному предмету</h2></div>' +
+'<a class="sec-link" href="#/simulator">Открыть симулятор →</a></section>' +
+'<div class="panel sim-teaser reveal">' +
+'<p class="muted">Пример: русский 78, математика 80, информатика 74. Атлас пересчитывает все ' + TOTAL_PROGRAMS +
+' программ и показывает, сколько из них открывается от допущения в несколько баллов.</p>' +
+'<div class="fact-strip">' +
+'<div><span class="k">Программ сейчас</span><span class="v">' + res.opened.length + '</span></div>' +
+'<div><span class="k">Откроется с +5</span><span class="v">+' + res.fresh.length + '</span></div>' +
+'<div><span class="k">Вузов в новом списке</span><span class="v">' + res.unis + '</span></div>' +
+'<div><span class="k">Бюджетных мест</span><span class="v">≈' + res.places + '</span></div>' +
+'</div>' +
+(swap ? '<p class="tiny muted">Там же видно, что даёт замена предмета: «' + h(SUBJ_FULL[st.boost]) + '» на «' +
+h(SUBJ_FULL[swap.subj]) + '» — ' + swap.diff + ' ' + plural(Math.abs(swap.diff), 'программа', 'программы', 'программ') + '.</p>' : '') +
+'<div class="hero-cta" style="margin-top:14px"><a class="btn btn-primary btn-sm" href="#/simulator">Ввести свои баллы →</a>' +
+'<a class="btn btn-sm" href="#/admission">Откуда взяты проходные баллы</a></div>' +
+'</div>';
+}
+function renderSimulator(m, q) {
+paintSim(simFromUrl(q));
+}
+function paintSim(st) {
+setTitle('Симулятор баллов ЕГЭ: куда поступить с вашими баллами — Профессии·2030');
+setDescription('Симулятор приёма: баллы трёх ЕГЭ, допущение +3, +5 или +10 к профильному предмету и замена предмета — ' +
+'какие из ' + TOTAL_PROGRAMS + ' программ в ' + U.length + ' вузах открываются и до чего не хватает нескольких баллов.');
+var res = simAnalyze(st);
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел II · Симулятор</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Симулятор баллов: <em>+5 к профилю</em> — и что дальше?</h1>' +
+'<p class="lead">Три предмета ЕГЭ, ваши баллы и допущение «докуплю несколько баллов». Атлас пересчитывает ' +
+TOTAL_PROGRAMS + ' программ в ' + U.length + ' вузах: какие направления открываются, какой предмет выгоднее сдать ' +
+'и до чего не хватает меньше всего баллов.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Не знаю свои предметы — пройти опросник</a>' +
+'<a class="btn" href="#/admission">Как считались баллы</a></div>' +
+'</section>' +
+'<div class="panel sim-form">' +
+(st.demo
+? '<div class="tip sim-demo"><b>Это пример, а не ваши баллы.</b> Подставьте свои предметы и баллы: расчёт пересчитается сразу и останется только в этом браузере.</div>'
+: '') +
+'<div class="sim-cells" id="simCells">' + simScoreCells(st) + '</div>' +
+'<div class="sim-boost">' +
+'<div class="sim-boost-pick"><p class="label">Куда направляем добавку</p>' +
+'<div class="chips" id="simBoost">' +
+st.exams.map(function (s) {
+return '<button class="chip" type="button" data-sim-boost="' + h(s) + '" aria-pressed="' + (st.boost === s ? 'true' : 'false') + '">' + h(SUBJ_FULL[s] || s) + '</button>';
+}).join('') +
+'<button class="chip" type="button" data-sim-boost="all" aria-pressed="' + (st.boost === 'all' ? 'true' : 'false') + '">Ко всем трём</button>' +
+'</div></div>' +
+'<div class="sim-delta"><p class="label">Размер допущения</p>' +
+'<div class="slider-box"><div class="row"><span class="big" id="simDeltaVal">+' + st.delta + '</span><span class="hint">баллов</span></div>' +
+'<input id="simDelta" type="range" min="0" max="25" step="1" value="' + st.delta + '" style="--p:' + Math.round(st.delta / 25 * 100) + '%" aria-label="Добавка к баллам"></div>' +
+'<div class="quick">' + [3, 5, 10, 15].map(function (v) {
+return '<button type="button" data-sim-delta="' + v + '">' + (v === st.delta ? '✓ +' + v : '+' + v) + '</button>';
+}).join('') + '</div></div>' +
+'</div>' +
+'<div class="sim-foot">' +
+'<div class="chips" id="simSphere">' +
+'<button class="chip" type="button" data-sim-sphere="" aria-pressed="' + (st.sphere === '' ? 'true' : 'false') + '">Все сферы</button>' +
+SPHERES.map(function (s) {
+return '<button class="chip" type="button" data-sim-sphere="' + h(s.code) + '" aria-pressed="' + (st.sphere === s.code ? 'true' : 'false') + '">' + h(s.code + ' · ' + s.name) + '</button>';
+}).join('') + '</div>' +
+'<div class="sim-acts"><button class="btn btn-sm" id="simCopy">Скопировать ссылку</button>' +
+'<button class="btn btn-sm btn-ghost" id="simReset">Сбросить</button></div>' +
+'</div>' +
+'</div>' +
+'<div id="simOut">' + simOutHtml(st, res) + '</div>' +
+'</div>';
+bindSimulator(st);
+if (!st.demo) {
+syncUrl('/simulator', simParams(st));
+simSave(st);
+}
+}
+function simRepaint(st) {
+var out = document.getElementById('simOut');
+if (!out) return;
+st.demo = false;
+var hint = app.querySelector('.sim-demo');
+if (hint) hint.remove();
+out.innerHTML = simOutHtml(st, simAnalyze(st));
+initReveal(out);
+animateBars(out);
+syncUrl('/simulator', simParams(st));
+simSave(st);
+}
+/* Пересчёт делаем сразу: requestAnimationFrame в фоновой вкладке не выполняется,
+   а без него интерфейс оставался бы с устаревшими цифрами. 1558 программ ×
+   несколько проходов считаются за миллисекунды. */
+function simUpdate(st) {
+simRepaint(st);
+}
+function simSetLabel(el, delta) {
+if (el) el.textContent = '+' + delta;
+}
+function bindSimulator(st) {
+var cells = document.getElementById('simCells');
+if (cells) cells.addEventListener('input', function (e) {
+var r = e.target.closest('[data-sim-score]');
+if (!r) return;
+var i = Number(r.getAttribute('data-sim-score'));
+st.scores[st.exams[i]] = Number(r.value);
+var label = cells.querySelector('[data-sim-val="' + i + '"]');
+if (label) label.textContent = r.value;
+r.style.setProperty('--p', Math.round((Number(r.value) - 20) / 80 * 100) + '%');
+simUpdate(st);
+});
+if (cells) cells.addEventListener('change', function (e) {
+var sel = e.target.closest('[data-sim-subj]');
+if (!sel) return;
+var i = Number(sel.getAttribute('data-sim-subj'));
+var old = st.exams[i];
+var next = sel.value;
+if (st.exams.indexOf(next) >= 0) { toast('Такой предмет уже выбран'); sel.value = old; return; }
+st.scores[next] = st.scores[old];
+delete st.scores[old];
+st.exams[i] = next;
+if (st.boost === old) st.boost = next;
+paintSim(st);
+});
+var boostBox = document.getElementById('simBoost');
+if (boostBox) boostBox.addEventListener('click', function (e) {
+var b = e.target.closest('[data-sim-boost]');
+if (!b) return;
+st.boost = b.getAttribute('data-sim-boost');
+boostBox.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+simUpdate(st);
+});
+var delta = document.getElementById('simDelta');
+if (delta) delta.addEventListener('input', function () {
+st.delta = Number(delta.value);
+simSetLabel(document.getElementById('simDeltaVal'), st.delta);
+delta.style.setProperty('--p', Math.round(st.delta / 25 * 100) + '%');
+simUpdate(st);
+});
+var quick = app.querySelector('.sim-boost .quick');
+if (quick) quick.addEventListener('click', function (e) {
+var b = e.target.closest('[data-sim-delta]');
+if (!b) return;
+st.delta = Number(b.getAttribute('data-sim-delta'));
+if (delta) {
+delta.value = st.delta;
+delta.style.setProperty('--p', Math.round(st.delta / 25 * 100) + '%');
+}
+simSetLabel(document.getElementById('simDeltaVal'), st.delta);
+quick.querySelectorAll('button').forEach(function (x) {
+var v = Number(x.getAttribute('data-sim-delta'));
+x.textContent = (v === st.delta ? '✓ +' + v : '+' + v);
+});
+simUpdate(st);
+});
+var sph = document.getElementById('simSphere');
+if (sph) sph.addEventListener('click', function (e) {
+var b = e.target.closest('[data-sim-sphere]');
+if (!b) return;
+st.sphere = b.getAttribute('data-sim-sphere');
+sph.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+simUpdate(st);
+});
+var out = document.getElementById('simOut');
+if (out) out.addEventListener('click', function (e) {
+var b = e.target.closest('[data-sim-swap]');
+if (!b) return;
+var slot = st.boost === 'all' ? st.exams[st.exams.length - 1] : st.boost;
+var next = b.getAttribute('data-sim-swap');
+if (st.exams.indexOf(next) >= 0) return;
+st.scores[next] = st.scores[slot];
+delete st.scores[slot];
+st.exams[st.exams.indexOf(slot)] = next;
+st.boost = next;
+paintSim(st);
+toast('Меняем «' + (SUBJ_FULL[slot] || slot) + '» на «' + (SUBJ_FULL[next] || next) + '»');
+});
+var copy = document.getElementById('simCopy');
+if (copy) copy.addEventListener('click', function () {
+copyLink(pageHref('/simulator', simParams(st).toString()));
+});
+var reset = document.getElementById('simReset');
+if (reset) reset.addEventListener('click', function () {
+try { localStorage.removeItem(SIM_KEY); } catch (e) {}
+syncUrl('/simulator', new URLSearchParams());
+paintSim(simNormalize(simExample()));
+toast('Показан пример, а не ваши баллы');
+});
+}
 function quizFromUrl(q) {
 var st = { step: 1, exams: ['Рус', 'Мат', 'Инф'], sphere: '', sum: 240, mathLevel: 'profile' };
 var has = q.has('e') || q.has('s') || q.has('b') || q.has('step') || q.has('mlevel');
@@ -4351,6 +4933,7 @@ var head = '<div class="report-head"><div><p class="eyebrow">Результат 
 ? 'Найдено <b>' + total + '</b> ' + plural(total, 'профессия', 'профессии', 'профессий')
 : 'Пока ничего не нашлось') + '</h2></div>' +
 '<div class="report-actions"><button class="btn btn-sm" id="copyLink">Скопировать ссылку</button>' +
+'<a class="btn btn-sm" href="' + h(simLinkFromQuiz(st)) + '">Симулятор: что даст +5</a>' +
 '<button class="btn btn-sm" id="printBtn">Печать / PDF · 2 листа</button>' +
 '<button class="btn btn-sm btn-ghost" id="restart">Заново</button></div></div>';
 var tags = '<div class="report-sum"><span class="tag">ЕГЭ: ' + h(st.exams.join(' · ')) + '</span>' +
@@ -6535,7 +7118,9 @@ var pagesQi = pagesPath.indexOf('?');
 history.replaceState(null, '', pageHref(pagesQi < 0 ? pagesPath : pagesPath.slice(0, pagesQi), pagesQi < 0 ? '' : pagesPath.slice(pagesQi + 1)));
 } else if (!location.hash && location.pathname.indexOf(BASE + '/') === 0) {
 var directPath = location.pathname.slice(BASE.length) || '/';
-if (KNOWN_ROUTE.test(directPath.replace(/\/$/, '') || '/')) history.replaceState(null, '', pageHref(directPath));
+if (KNOWN_ROUTE.test(directPath.replace(/\/$/, '') || '/')) {
+history.replaceState(null, '', pageHref(directPath, location.search.replace(/^\?/, '')));
+}
 }
 } catch (e) {}
 document.addEventListener('click', function (e) {

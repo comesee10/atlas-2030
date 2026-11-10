@@ -1,11 +1,12 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v44';
+const VERSION = 'atlas-2030-v45';
 const SHELL = [
   './',
   './index.html',
   './professions/',
+  './simulator/',
   './universities/',
   './specialties/',
   './colleges/',

@@ -129,7 +129,7 @@ if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xm
       if (fs.existsSync(file)) pages.push({ route: '/' + dir + '/' + name, file });
     }
   }
-  for (const s of ['professions', 'universities', 'specialties', 'colleges', 'regions', 'admission',
+  for (const s of ['professions', 'simulator', 'universities', 'specialties', 'colleges', 'regions', 'admission',
     'calendar', 'teacher', 'about', 'methodology']) {
     const file = path.join(ROOT, s, 'index.html');
     if (!fs.existsSync(file)) err('нет статической копии раздела /' + s + '/');
@@ -142,6 +142,7 @@ if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xm
   for (const page of pages) {
     const html = fs.readFileSync(page.file, 'utf8');
     if (html.indexOf('<title>') < 0) err(page.route + '/: нет <title>');
+    if (html.indexOf('<title>') > html.indexOf('<body')) err(page.route + '/: <title> оказался вне <head>');
     const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
     if (canonical !== SITE + BASE + page.route + '/') err(page.route + '/: canonical ' + canonical);
     const blocks = html.match(/<main id="app"[\s\S]*?<\/main>/) || [''];

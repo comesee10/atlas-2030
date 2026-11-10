@@ -20,6 +20,12 @@
   ],
   "shortcuts": [
     {
+      "name": "Симулятор баллов",
+      "short_name": "Симулятор",
+      "url": "/atlas-2030/simulator/",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
       "name": "Бюджетные места",
       "short_name": "Приём",
       "url": "/atlas-2030/#/admission",

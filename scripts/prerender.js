@@ -27,6 +27,7 @@ const DATA_FILES = ['data-core.js', 'data-universities-1.js', 'data-universities
    в app.js; совпадение проверяет scripts/smoke-links.js. */
 const SECTIONS = [
   { route: '/professions', priority: '0.9', changefreq: 'monthly' },
+  { route: '/simulator', priority: '0.9', changefreq: 'monthly' },
   { route: '/universities', priority: '0.8', changefreq: 'monthly' },
   { route: '/specialties', priority: '0.7', changefreq: 'monthly' },
   { route: '/colleges', priority: '0.8', changefreq: 'monthly' },
@@ -44,7 +45,8 @@ quiet.on('jsdomError', (e) => {
 });
 
 function read(file) {
-  return fs.readFileSync(path.join(ROOT, file), 'utf8');
+/* BOM в начале файла сбивает парсер jsdom: разметка уезжает из <head> в <body>. */
+return fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, '');
 }
 
 /* Данные атласа считаем один раз и клонируем на каждую страницу. */
@@ -93,6 +95,10 @@ function renderPage(route, atlas) {
   const doc = win.document;
   const view = doc.querySelector('#app .view');
   if (!view) throw new Error(route + ': app.js не отрисовал страницу');
+  /* Заголовок и мета должны остаться в <head>: так статическая копия
+       читается поисковикам и соцсетям до загрузки скриптов. */
+  const head = doc.head ? doc.head.innerHTML : '';
+  if (!/<title>/.test(head)) throw new Error(route + ': <title> потерял голову страницы');
   /* Ошибка рендера превращается в 404-экран: такую страницу нельзя публиковать. */
   if (view.querySelector('.cube404') || /Страница не найдена/.test(doc.title)) {
     throw new Error(route + ': страница отрисовалась как 404');
