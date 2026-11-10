@@ -1,0 +1,13 @@
+{
+  "name": "atlas-2030",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Профессии·2030 — атлас профессий, вузов и специальностей. Статические страницы собираются из app.js.",
+  "scripts": {
+    "build": "node scripts/prerender.js",
+    "check": "node scripts/prerender.js --check && node scripts/validate-data.js && node scripts/smoke-links.js"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.0"
+  }
+}

@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Данные и ссылки
+    name: Данные, страницы и ссылки
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,15 +21,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
+      - name: Зависимости сборщика
+        run: npm ci --omit=optional
 
       - name: Синтаксис JS
         run: |
-          for f in app.js data-core.js data-universities-1.js data-universities-2.js data-universities-3.js catalog-expansion.js sw.js; do
+          for f in app.js data-core.js data-universities-1.js data-universities-2.js data-universities-3.js catalog-expansion.js sw.js scripts/prerender.js; do
             node --check "$f" || exit 1
           done
 
       - name: Валидация данных атласа
         run: node scripts/validate-data.js
+
+      - name: Пререндер актуален
+        run: node scripts/prerender.js --check
 
       - name: Smoke-тест ссылок и ассетов
         run: node scripts/smoke-links.js

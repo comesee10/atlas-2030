@@ -8,7 +8,7 @@
 
 Основной адрес: **<https://comesee10.github.io/atlas-2030/>**
 
-Сайт размещён на GitHub Pages из репозитория <https://github.com/comesee10/atlas-2030>: файлы раздаются как статика, без сборки и сервера. Хеш-маршруты работают: например, <https://comesee10.github.io/atlas-2030/#/professions/ml-engineer>, <https://comesee10.github.io/atlas-2030/#/regions> и <https://comesee10.github.io/atlas-2030/#/about>.
+Сайт размещён на GitHub Pages из репозитория <https://github.com/comesee10/atlas-2030>: файлы раздаются как статика, без сервера. У контентных разделов есть настоящие адреса: <https://comesee10.github.io/atlas-2030/professions/ml-engineer/>, <https://comesee10.github.io/atlas-2030/universities/mgu-moskva/>, <https://comesee10.github.io/atlas-2030/specialties/01-03-02-prikladnaya-matematika-i-informatika/>. Старые хеш-адреса вроде <https://comesee10.github.io/atlas-2030/#/professions/ml-engineer> перенаправляются на новые.
 
 Резервная одностраничная копия: <https://html.cafe/xaa936a27> — тот же атлас, собранный в один файл `atlas-2030-standalone.html`.
 
@@ -16,17 +16,22 @@
 
 ## Как посмотреть локально
 
-Откройте `index.html` двойным щелчком — сайт работает и через `file://`, потому что навигация на хешах (`#/professions`).
-
-Если нужен локальный сервер:
+Страницы ссылаются на ассеты по абсолютным путям от корня домена, поэтому нужен локальный сервер (двойной щелчок по `index.html` покажет страницу без стилей и скриптов).
 
 ```powershell
-# из папки atlas-2030
+# из корня репозитория
+npm install
+npm run build          # пересобрать статические страницы и sitemap.xml
 python -m http.server 8777
-# или любой другой статический сервер
 ```
 
-Затем откройте `http://localhost:8777/`.
+Затем откройте <http://localhost:8777/index.html>. Корень сайта в GitHub Pages — `/atlas-2030/`, на локальном сервере из папки репозитория он совпадает с `/`. Чтобы адреса вида `/atlas-2030/professions/ml-engineer/` работали и локально, запустите сервер на уровень выше:
+
+```powershell
+# из папки, в которой лежит atlas-2030
+python -m http.server 8777
+# открыть http://localhost:8777/atlas-2030/
+```
 
 ## Как опубликовать
 
@@ -59,6 +64,34 @@ powershell -ExecutionPolicy Bypass -File .\publish-github.ps1
 - Проверьте прямые ссылки с хешем, например `/#/professions/ml-engineer`.
 - При желании подключите свой домен в настройках репозитория (раздел Pages).
 
+## Статические страницы (пререндер)
+
+Контентные маршруты собираются в настоящие папки с `index.html`:
+
+```
+professions/ml-engineer/index.html
+universities/mgu-moskva/index.html
+specialties/01-03-02-prikladnaya-matematika-i-informatika/index.html
+colleges/<slug>/index.html
+professions/ universities/ specialties/ colleges/ regions/ admission/ calendar/ teacher/ about/ methodology/
+```
+
+Всего 439 страниц: 47 профессий, 181 вуз, 174 специальности, 27 колледжей и 10 разделов. Разметку генерирует тот же `app.js`, что работает в браузере (`scripts/prerender.js` поднимает jsdom), поэтому статическая копия и клиентский рендер не расходятся, а ссылки внутри страниц уже указывают на настоящие URL. После загрузки скриптов приложение гидрирует страницу и дальше навигирует без перезагрузки.
+
+```powershell
+npm install
+npm run build    # пересобрать страницы и sitemap.xml
+npm run check    # проверить, что страницы не устарели, + валидация данных и ссылок
+```
+
+Правила:
+
+- Меняете `app.js`, данные или `index.html` — запускайте `npm run build`, иначе CI (`prerender --check`) упадёт.
+- Новый маршрут добавляется в `ROUTES` и в `STATIC_ROUTE` (`app.js`), в список разделов `SECTIONS` (`scripts/prerender.js`) и в allow-list `404.html`.
+- Удалённые профессии, вузы и специальности вычищаются из репозитория автоматически при сборке.
+- `sitemap.xml` генерируется из данных: руками не правится.
+- Интерактивные разделы (`/#/quiz`, `/#/compare`, `/#/favorites`, `/#/map`) остаются на хеш-адресах: у них нет смысла в статической копии.
+
 ## Структура
 
 ```
@@ -66,6 +99,10 @@ atlas-2030/
 ├── index.html              оболочка: шапка, навигация, поиск, подвал
 ├── styles.css              дизайн-система, шрифты и адаптив
 ├── app.js                  роутер, страницы, поиск, сравнение, опросник, графики
+├── scripts/prerender.js    сборка статических страниц и sitemap.xml (jsdom)
+├── scripts/validate-data.js  проверка данных атласа
+├── scripts/smoke-links.js    проверка ссылок, ассетов и пререндера
+├── package.json            devDependency jsdom и команды build/check
 ├── data-core.js            профессии, колледжи, методология, тексты
 ├── data-universities-1.js  вузы, чанк 1 из 3
 ├── data-universities-2.js  вузы, чанк 2 из 3
@@ -77,6 +114,10 @@ atlas-2030/
 ├── icons/                  PNG-иконки 192, 512, maskable, apple-touch
 ├── photos/                  фотобанк сфер: 12 снимков WebP (1600 и 800 px) и credits.json
 ├── fonts/                  Onest и Lora, woff2, латиница и кириллица
+├── professions/            статические страницы профессий (47)
+├── universities/           статические страницы вузов (181)
+├── specialties/            статические страницы специальностей (174)
+├── colleges/               статические страницы колледжей (27)
 ├── atlas-data.json         те же данные в JSON — для правок и проверки
 ├── atlas-2030-standalone.html  всё в одном файле (резервная публикация)
 ├── build-standalone.ps1        сборка одностраничной версии
@@ -89,6 +130,8 @@ atlas-2030/
 ```
 
 ## Что внутри
+
+Контентные разделы и карточки открываются по настоящим адресам (`/professions/ml-engineer/`, `/universities/mgu-moskva/`, `/specialties/01-03-02-prikladnaya-matematika-i-informatika/`). Ниже — хеш-маршруты: они остаются для интерактивных разделов и старых ссылок.
 
 | Маршрут | Страница |
 | --- | --- |

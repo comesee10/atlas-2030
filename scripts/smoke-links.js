@@ -117,7 +117,53 @@ const rob = read('robots.txt');
 if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xml/i.test(rob))
   err('robots.txt: нет (или некорректна) строка Sitemap:');
 
+/* ---- 6) prerender: статические копии страниц ---- */
+{
+  const pageDirs = ['professions', 'universities', 'specialties', 'colleges'];
+  const pages = [];
+  for (const dir of pageDirs) {
+    const abs = path.join(ROOT, dir);
+    if (!fs.existsSync(abs)) { err('нет папки ' + dir + '/ — запустите npm run build'); continue; }
+    for (const name of fs.readdirSync(abs)) {
+      const file = path.join(abs, name, 'index.html');
+      if (fs.existsSync(file)) pages.push({ route: '/' + dir + '/' + name, file });
+    }
+  }
+  for (const s of ['professions', 'universities', 'specialties', 'colleges', 'regions', 'admission',
+    'calendar', 'teacher', 'about', 'methodology']) {
+    const file = path.join(ROOT, s, 'index.html');
+    if (!fs.existsSync(file)) err('нет статической копии раздела /' + s + '/');
+  }
+
+  const SITE = 'https://comesee10.github.io';
+  const existsRoute = (route) => fs.existsSync(path.join(ROOT, route.replace(/^\/|\/$/g, ''), 'index.html'))
+    || (route === '/' && fs.existsSync(path.join(ROOT, 'index.html')));
+
+  for (const page of pages) {
+    const html = fs.readFileSync(page.file, 'utf8');
+    if (html.indexOf('<title>') < 0) err(page.route + '/: нет <title>');
+    const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
+    if (canonical !== SITE + BASE + page.route + '/') err(page.route + '/: canonical ' + canonical);
+    const blocks = html.match(/<main id="app"[\s\S]*?<\/main>/) || [''];
+    const body = blocks[0];
+    if (body.length < 2000) err(page.route + '/: слишком мало разметки — страница не отрендерена');
+    const re = /href="([^"]+)"/g;
+    let m;
+    while ((m = re.exec(body))) {
+      const u = m[1];
+      if (!u.startsWith(BASE + '/')) continue;
+      const rel = u.slice(BASE.length).split('?')[0];
+      if (!rel || rel === '/') continue;
+      if (!existsRoute(rel.replace(/\/+$/, ''))) err(page.route + '/: ссылка на несуществующую страницу ' + u);
+    }
+  }
+  if (!pages.length) err('prerender: не найдено ни одной статической карточки');
+  console.log('prerender: проверено ' + pages.length + ' статических карточек');
+}
+
 console.log('---');
+
+
 warns.forEach((w) => console.log('WARN  ' + w));
 errors.forEach((e) => console.error('ERROR ' + e));
 console.log('smoke-links: ' + (errors.length ? 'FAIL (' + errors.length + ')' : 'OK'));

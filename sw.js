@@ -1,10 +1,20 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v43';
+const VERSION = 'atlas-2030-v44';
 const SHELL = [
   './',
   './index.html',
+  './professions/',
+  './universities/',
+  './specialties/',
+  './colleges/',
+  './regions/',
+  './admission/',
+  './calendar/',
+  './teacher/',
+  './about/',
+  './methodology/',
   './styles.css',
   './data-core.js',
   './data-universities-1.js',
@@ -68,11 +78,12 @@ self.addEventListener('fetch', (event) => {
           if (res && res.ok) {
             const copy = res.clone();
             /* квота кэша может быть исчерпана — не даём promise отклониться */
-            caches.open(VERSION).then((cache) => cache.put('./index.html', copy)).catch(() => {});
+            caches.open(VERSION).then((cache) => cache.put(req, copy)).catch(() => {});
           }
           return res;
         })
-        .catch(() => caches.match('./index.html', { ignoreSearch: true })
+        .catch(() => caches.match(req, { ignoreSearch: true })
+          .then((hit) => hit || caches.match('./index.html', { ignoreSearch: true }))
           .then((hit) => hit || caches.match('./offline.html', { ignoreSearch: true })))
     );
     return;

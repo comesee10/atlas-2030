@@ -5,7 +5,7 @@
   var path = location.pathname + location.search;
   var base = '/atlas-2030/';
   if (path.indexOf(base) === 0) path = path.slice(base.length - 1) || '/';
-  var allowed = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties|universities|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology|teacher)(?:\?.*)?$/;
+  var allowed = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9]+)?|specialties(?:\/[-a-z0-9]+)?|universities(?:\/[-a-z0-9]+)?|colleges(?:\/[-a-z0-9]+)?|regions|about|methodology|teacher)(?:\?.*)?$/;
   try {
     sessionStorage.setItem('atlas:redirect', allowed.test(path) ? path : '/');
   } catch (e) {
