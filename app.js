@@ -929,7 +929,7 @@ return SITE_URL + String(u).replace(/^#?\//, '').replace(/^/, '');
    сравнение) остаются на hash: у них нет смысла в отдельной статической копии. */
 var BASE = '/atlas-2030';
 var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar)(?:\/[-a-z0-9-]+)?$/;
-var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)(?:\?.*)?$/;
+var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
 function cleanPath(path) {
 var p = String(path == null ? '/' : path).split('?')[0];
 if (!p) p = '/';
