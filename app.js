@@ -6490,9 +6490,13 @@ sharedEl.style.viewTransitionName = 'atlas-shared';
 sharedEl.setAttribute('data-vt-shared', '');
 }
 document.documentElement.classList.add('vt-active');
-var vt;
-try {
-vt = document.startViewTransition(function () {
+/* Переход может не начаться: вкладка в фоне, троттлинг рендера, отмена
+   анимации. Навигация не должна от этого зависеть, поэтому запускаем
+   её ещё и по таймеру. */
+var ran = false;
+function run() {
+if (ran) return;
+ran = true;
 nav();
 if (sharedEl) {
 var target = app.querySelector('.detail-head h1');
@@ -6501,12 +6505,16 @@ target.style.viewTransitionName = 'atlas-shared';
 target.setAttribute('data-vt-shared', '');
 }
 }
-});
+}
+var vt;
+try {
+vt = document.startViewTransition(run);
 } catch (e) {
 clearVTNames();
-nav();
+run();
 return;
 }
+setTimeout(run, 300);
 var done = function () { clearVTNames(); };
 if (vt.finished) vt.finished.then(done, done);
 else setTimeout(done, 520);
