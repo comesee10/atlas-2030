@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Профессии·2030 — атлас профессий, вузов и специальностей. Статические страницы собираются из app.js.",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "node scripts/prerender.js",
     "check": "node scripts/prerender.js --check && node scripts/validate-data.js && node scripts/smoke-links.js"
