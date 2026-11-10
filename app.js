@@ -945,9 +945,11 @@ return BASE + tail + (s ? '?' + s : '');
 }
 function pageHref(path, params) {
 var p = cleanPath(path);
-if (p === '/') return '#/';
 var s = params == null ? '' : String(params).replace(/^\?/, '');
-return STATIC_ROUTE.test(p) ? realUrl(p, s) : '#/' + p.slice(1) + (s ? '?' + s : '');
+if (window.__ATLAS_STANDALONE__ && p !== '/') return '#/' + p.slice(1) + (s ? '?' + s : '');
+if (p === '/' || STATIC_ROUTE.test(p)) return realUrl(p, s);
+/* Интерактивный раздел: хеш от корня сайта, чтобы ссылка работала с любой страницы. */
+return BASE + '/#/' + p.slice(1) + (s ? '?' + s : '');
 }
 /* После рендера превращаем hash-ссылки в настоящие URL: иначе «открыть в новой
    вкладке», копирование адреса и обход поисковым роботом уводят на редирект. */
@@ -1234,12 +1236,7 @@ if (path.charAt(0) !== '/') path = '/' + path;
 return { path: path, q: q };
 }
 function syncUrl(path, params) {
-var s = params.toString();
-if (window.__ATLAS_STANDALONE__) {
-history.replaceState(null, '', '#/' + (path === '/' ? '' : path.slice(1)) + (s ? '?' + s : ''));
-return;
-}
-history.replaceState(null, '', realUrl(path, s));
+history.replaceState(null, '', pageHref(path, params.toString()));
 }
 var ROUTES = [
 [/^\/$/, renderHome],
@@ -1267,15 +1264,19 @@ function route() {
 if (storyCleanup) { storyCleanup(); storyCleanup = null; }
 if (railCleanup) { railCleanup(); railCleanup = null; }
 if (BUBBLE_ANIM && BUBBLE_ANIM.raf) { cancelAnimationFrame(BUBBLE_ANIM.raf); BUBBLE_ANIM.raf = 0; }
-if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0 && KNOWN_ROUTE.test(location.hash.slice(1))) {
+if (!window.__ATLAS_STANDALONE__ && location.hash.indexOf('#/') === 0) {
 var legacyRoute = location.hash.slice(1);
 var legacyQi = legacyRoute.indexOf('?');
-history.replaceState(null, '', realUrl(legacyQi < 0 ? legacyRoute : legacyRoute.slice(0, legacyQi), legacyQi < 0 ? '' : legacyRoute.slice(legacyQi + 1)));
+var legacyPath = cleanPath(legacyQi < 0 ? legacyRoute : legacyRoute.slice(0, legacyQi));
+/* Контентный хеш-адрес переписываем на настоящий, интерактивный не трогаем. */
+if (KNOWN_ROUTE.test(legacyRoute) && STATIC_ROUTE.test(legacyPath)) {
+history.replaceState(null, '', pageHref(legacyPath, legacyQi < 0 ? '' : legacyRoute.slice(legacyQi + 1)));
+}
 }
 var r = parseHash();
 if (r.path.indexOf('/professions') !== 0) clearCatalogState();
 if (r.path === '/siberia') {
-history.replaceState(null, '', '#/universities?district=' + encodeURIComponent('СФО'));
+history.replaceState(null, '', pageHref('/universities', 'district=' + encodeURIComponent('СФО')));
 r = parseHash();
 }
 var found = false;
@@ -6531,10 +6532,10 @@ if (window.__ATLAS_STANDALONE__) {
 /* В одностраничной копии адрес всегда остаётся на текущем файле. */
 } else if (pagesPath && KNOWN_ROUTE.test(pagesPath)) {
 var pagesQi = pagesPath.indexOf('?');
-history.replaceState(null, '', realUrl(pagesQi < 0 ? pagesPath : pagesPath.slice(0, pagesQi), pagesQi < 0 ? '' : pagesPath.slice(pagesQi + 1)));
+history.replaceState(null, '', pageHref(pagesQi < 0 ? pagesPath : pagesPath.slice(0, pagesQi), pagesQi < 0 ? '' : pagesPath.slice(pagesQi + 1)));
 } else if (!location.hash && location.pathname.indexOf(BASE + '/') === 0) {
 var directPath = location.pathname.slice(BASE.length) || '/';
-if (KNOWN_ROUTE.test(directPath.replace(/\/$/, '') || '/')) history.replaceState(null, '', realUrl(directPath));
+if (KNOWN_ROUTE.test(directPath.replace(/\/$/, '') || '/')) history.replaceState(null, '', pageHref(directPath));
 }
 } catch (e) {}
 document.addEventListener('click', function (e) {
@@ -6549,8 +6550,12 @@ dest = href.slice(1);
 var parsed;
 try { parsed = new URL(a.href, location.href); } catch (err) { return; }
 if (parsed.origin !== location.origin) return;
+if (parsed.hash.indexOf('#/') === 0) {
+dest = parsed.hash.slice(1);
+} else {
 if (parsed.pathname !== BASE && parsed.pathname.indexOf(BASE + '/') !== 0) return;
 dest = (parsed.pathname === BASE ? '/' : parsed.pathname.slice(BASE.length)) + parsed.search;
+}
 }
 if (dest === null) return;
 var qi = dest.indexOf('?');
@@ -6560,13 +6565,13 @@ if (destPath !== '/' && !KNOWN_ROUTE.test(destPath + (destQuery ? '?' + destQuer
 e.preventDefault();
 var shared = /^\/professions\/[^/]+$/.test(destPath) ? vtSharedSource(a) : null;
 routeWithTransition(function () {
-history.pushState(null, '', realUrl(destPath, destQuery));
+history.pushState(null, '', pageHref(destPath, destQuery));
 route();
 window.scrollTo(0, 0);
 }, shared);
 });
 window.addEventListener('popstate', route);
-if ((!location.hash || location.hash === '#') && (location.pathname === '/' || location.pathname === '/atlas-2030/' || location.pathname === '/atlas-2030')) {
+if (window.__ATLAS_STANDALONE__ && (!location.hash || location.hash === '#')) {
 history.replaceState(null, '', '#/');
 }
 updateChoice();

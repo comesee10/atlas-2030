@@ -154,6 +154,8 @@ if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xm
       if (!u.startsWith(BASE + '/')) continue;
       const rel = u.slice(BASE.length).split('?')[0];
       if (!rel || rel === '/') continue;
+      /* Интерактивные разделы живут на хеш-адресах: /atlas-2030/#/quiz-oge */
+      if (rel.startsWith('/#')) continue;
       if (!existsRoute(rel.replace(/\/+$/, ''))) err(page.route + '/: ссылка на несуществующую страницу ' + u);
     }
   }
