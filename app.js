@@ -144,18 +144,6 @@ var SPHERE_DESC = {
 'D-05': 'Люди, право, экономика',
 'D-06': 'Тексты, медиа, перевод'
 };
-/* Линейные иконки сфер: один стиль, толщина 1,7, без заливки. */
-var SPHERE_ICON = {
-'D-01': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>',
-'D-02': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>',
-'D-03': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>',
-'D-04': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21c5-3.5 7-7 7-11a7 7 0 0 0-14 0c0 4 2 7.5 7 11Z"/><path d="M12 21V9"/></svg>',
-'D-05': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20a5 5 0 0 1 7-4.5"/></svg>',
-'D-06': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v18H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path d="M8 7h7M8 11h7"/></svg>'
-};
-function sphereIcon(code) {
-return '<span class="sph-ico" aria-hidden="true">' + (SPHERE_ICON[code] || '') + '</span>';
-}
 /* ---------- фотобанк сфер ----------
    Фотографии лежат рядом с сайтом и подключаются только в полной версии:
    в standalone-файле их нет, поэтому там остаётся градиентная заливка. */
@@ -589,17 +577,27 @@ e.preventDefault();
 e.stopPropagation();
 toggleFavorite(b.getAttribute('data-fav'));
 });
-var cmpBar = document.createElement('div');
+/* Пререндер уже положил панель и модалки в статику — переиспользуем их,
+   иначе на странице два блока с одинаковыми id, и счётчик «N выбрано»
+   обновляет первый, а виден второй. */
+var cmpBar = document.querySelector('.cmp-bar');
+if (!cmpBar) {
+cmpBar = document.createElement('div');
 cmpBar.className = 'cmp-bar';
+document.body.appendChild(cmpBar);
+}
 cmpBar.setAttribute('role', 'region');
 cmpBar.setAttribute('aria-label', 'Панель сравнения профессий');
 cmpBar.innerHTML = '<span class="n"><b id="cmpN">0</b> выбрано</span>' +
 '<button class="btn btn-sm btn-primary" id="cmpOpen">Сравнить</button>' +
 '<button class="clear" id="cmpClear">Очистить</button>';
-document.body.appendChild(cmpBar);
-var cmpModal = document.createElement('div');
+var cmpModal = document.getElementById('cmpModal');
+if (!cmpModal) {
+cmpModal = document.createElement('div');
 cmpModal.className = 'palette';
 cmpModal.id = 'cmpModal';
+document.body.appendChild(cmpModal);
+}
 cmpModal.hidden = true;
 cmpModal.innerHTML = '<div class="palette-backdrop" data-cmpclose></div>' +
 '<div class="palette-box wide" role="dialog" aria-modal="true" aria-label="Сравнение профессий">' +
@@ -608,7 +606,6 @@ cmpModal.innerHTML = '<div class="palette-backdrop" data-cmpclose></div>' +
 '<div class="cmp-foot"><span class="mono tiny">Максимум 3 профессии · данные атласа</span>' +
 '<span class="cmp-hint">Прокрутите таблицу вбок →</span>' +
 '<button class="btn btn-sm" data-cmpclose>Закрыть</button></div></div>';
-document.body.appendChild(cmpModal);
 function updateCompare() {
 var n = compare.size;
 cmpBar.classList.toggle('show', n > 0);
@@ -813,9 +810,13 @@ return '<section class="ch-sec"><p class="label">Опросник · ЕГЭ</p>'
 '<section class="ch-sec"><p class="label">Сравнение · ' + list.length + ' из 3</p>' + cmpHtml + '</section>' +
 '<section class="ch-sec"><p class="label">Сквозной фильтр</p>' + filterHtml + '</section>';
 }
-var choiceModal = document.createElement('div');
+var choiceModal = document.getElementById('choiceModal');
+if (!choiceModal) {
+choiceModal = document.createElement('div');
 choiceModal.className = 'palette';
 choiceModal.id = 'choiceModal';
+document.body.appendChild(choiceModal);
+}
 choiceModal.hidden = true;
 choiceModal.innerHTML = '<div class="palette-backdrop" data-choice-close></div>' +
 '<div class="palette-box mid" role="dialog" aria-modal="true" aria-label="Мой выбор">' +
@@ -824,7 +825,6 @@ choiceModal.innerHTML = '<div class="palette-backdrop" data-choice-close></div>'
 '<div class="cmp-foot"><span class="mono tiny">Хранится только в этом браузере</span>' +
 '<a class="btn btn-sm" href="#/compare">Открыть сравнение</a>' +
 '<button class="btn btn-sm" data-choice-close>Закрыть</button></div></div>';
-document.body.appendChild(choiceModal);
 function refreshChoice() {
 var body = document.getElementById('choiceBody');
 if (body) body.innerHTML = choiceBody();
@@ -1279,13 +1279,6 @@ else if (String(value).length > QUERY_VALUE_MAX) drop.push(key);
 });
 drop.forEach(function (key) { q.delete(key); });
 return q;
-}
-/* Разрешённые маршруты одного списка — он же фильтр для redirect из 404.html. */
-var ROUTE_PATHS = 'map|compare|admission|calendar|favorites|quiz|quiz-oge|specialties|universities|regions|about|methodology|teacher|siberia';
-var ROUTE_RE = new RegExp('^\\/(?:' + ROUTE_PATHS +
-'|professions(?:\\/[-a-z0-9]+)?|colleges(?:\\/[-a-z0-9]+)?)(?:\\?[^#"\'<>\\s]{0,240})?$');
-function isAllowedRoute(p) {
-return p === '/' || p === '' || ROUTE_RE.test(p);
 }
 /* Любая ссылка, открывающая новую вкладку, не даёт window.opener. */
 function hardenBlankLinks(root) {
@@ -1861,6 +1854,7 @@ function glossShow(btn) {
 var key = btn.getAttribute('data-gloss');
 var text = GLOSSARY[key];
 if (!text) return;
+if (!glossTip) glossTip = document.querySelector('.gloss-tip');
 if (!glossTip) {
 glossTip = document.createElement('div');
 glossTip.className = 'gloss-tip';
@@ -2396,7 +2390,7 @@ return '<li class="prof-row">' +
 '<span class="gr" title="Рост вакансий к 2030">+' + p.growth + '%' + sparkline(p.slug, p.growth) + '</span>' +
 '<span class="sal">' + h(p.salary) + '</span></div></div>' +
 '<div class="row-acts">' + favButton(p, 'fav-row') +
-'<button class="cmp" data-slug="' + p.slug + '" aria-pressed="false" aria-label="Сравнить: ' + h(p.title) + '" title="Добавить к сравнению">' +
+'<button class="cmp" type="button" data-slug="' + p.slug + '" aria-pressed="false" aria-label="Сравнить: ' + h(p.title) + '" title="Добавить к сравнению">' +
 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>' +
 '</button></div></li>';
 }
@@ -3533,22 +3527,22 @@ if (rows.length < 2) return '';
 var top = Math.max.apply(null, rows.map(function (r) { return r.max; }));
 top = Math.max(50, Math.ceil(top / 50) * 50);
 var bars = rows.map(function (r) {
-var left = r.min / top * 100;
-var width = Math.max((r.max - r.min) / top * 100, 1.5);
-/* участок диапазона всегда внутри трека, даже у «300+» */
-if (left + width > 100) left = Math.max(0, 100 - width);
+/* Длина столбика — верхняя граница диапазона, риска внутри — нижняя.
+   Шкала общая: 0 … top, поэтому ряды сравнимы между собой. */
+var width = Math.min(Math.max(r.max / top * 100, 2), 100);
+var tick = Math.min(r.min / top * 100, width);
 /* единицы остаются при цифрах: «63 тыс. ₽», «80–150 тыс. ₽» */
 var label = r.pay.replace(/\s*\/\s*мес\.?$/, '');
 return '<div class="salary-row">' +
 '<div class="salary-meta"><span class="salary-stage">' + h(r.stage) + '</span><span class="salary-role">' + h(r.role) + '</span></div>' +
-'<div class="salary-track" aria-hidden="true"><span class="salary-fill" style="left:' + left.toFixed(1) + '%;width:' + width.toFixed(1) + '%"></span></div>' +
+'<div class="salary-track" aria-hidden="true" style="--min:' + tick.toFixed(1) + '%"><span class="salary-fill" style="width:' + width.toFixed(1) + '%"></span></div>' +
 '<span class="salary-val">' + h(label) + '</span></div>';
 }).join('');
 var aria = rows.map(function (r) { return r.stage + ': ' + r.role + ', ' + r.pay; }).join('. ');
 return '<div class="salary-chart" role="img" aria-label="' + h('Зарплаты по этапам карьеры. ' + aria) + '">' +
 '<div class="salary-head"><p class="label">Зарплата по этапам карьеры</p><span class="mono tiny">0–' + top + ' тыс. ₽/мес</span></div>' +
 '<div class="salary-rows">' + bars + '</div>' +
-'<p class="salary-note">Ориентировочные диапазоны из описания профессии. Фактическая зарплата зависит от региона, компании и опыта.</p>' +
+'<p class="salary-note">Ориентировочные диапазоны из описания профессии: длина столбика — верхняя граница, светлая риска — нижняя. Фактическая зарплата зависит от региона, компании и опыта.</p>' +
 '</div>';
 }
 function prepareRich(root) {

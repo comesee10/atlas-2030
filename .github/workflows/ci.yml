@@ -28,7 +28,7 @@ jobs:
 
       - name: Синтаксис JS
         run: |
-          for f in app.js data-core.js data-universities-1.js data-universities-2.js data-universities-3.js catalog-expansion.js sw.js scripts/prerender.js; do
+          for f in app.js theme-boot.js data-core.js data-universities-1.js data-universities-2.js data-universities-3.js catalog-expansion.js sw.js scripts/prerender.js; do
             node --check "$f" || exit 1
           done
 
