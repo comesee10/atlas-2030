@@ -3537,7 +3537,8 @@ var left = r.min / top * 100;
 var width = Math.max((r.max - r.min) / top * 100, 1.5);
 /* участок диапазона всегда внутри трека, даже у «300+» */
 if (left + width > 100) left = Math.max(0, 100 - width);
-var label = r.pay.replace('/мес', '').replace(/\s*тыс\.\s*₽/, '');
+/* единицы остаются при цифрах: «63 тыс. ₽», «80–150 тыс. ₽» */
+var label = r.pay.replace(/\s*\/\s*мес\.?$/, '');
 return '<div class="salary-row">' +
 '<div class="salary-meta"><span class="salary-stage">' + h(r.stage) + '</span><span class="salary-role">' + h(r.role) + '</span></div>' +
 '<div class="salary-track" aria-hidden="true"><span class="salary-fill" style="left:' + left.toFixed(1) + '%;width:' + width.toFixed(1) + '%"></span></div>' +

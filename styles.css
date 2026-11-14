@@ -1573,7 +1573,7 @@ body{overflow-x:clip}
 .salary-chart{margin:16px 0 6px;padding:16px;border:1px solid var(--rule);border-radius:12px;background:linear-gradient(160deg,rgba(23,25,24,.72),rgba(14,15,14,.35))}
 .salary-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:8px}
 .salary-head .mono{color:var(--ink-4);white-space:nowrap}
-.salary-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) 78px;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--rule)}
+.salary-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) 102px;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--rule)}
 .salary-row:first-child{border-top:0;padding-top:2px}
 .salary-meta{display:grid;gap:2px;min-width:0}
 .salary-stage{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
@@ -1609,7 +1609,7 @@ body{overflow-x:clip}
 @media (max-width:760px){
 .cal-grid{grid-template-columns:1fr}
 .cal-extra{grid-template-columns:1fr}
-.salary-row{grid-template-columns:minmax(0,1fr) 70px;grid-template-areas:"meta val" "track track";gap:6px 10px;padding:12px 0}
+.salary-row{grid-template-columns:minmax(0,1fr) 96px;grid-template-areas:"meta val" "track track";gap:6px 10px;padding:12px 0}
 .salary-meta{grid-area:meta}
 .salary-val{grid-area:val}
 .salary-track{grid-area:track;margin-top:2px}
