@@ -1325,10 +1325,60 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .fact-strip>div{display:grid;gap:4px;min-width:118px}
 .fact-strip .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4)}
 .fact-strip .v{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-/* ---- график «спрос по сферам» ---- */
-.plot{position:relative;padding:18px 16px 16px}
-.plot svg{display:block;width:100%;height:auto}
-.plot-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* ---- шкала спроса по сферам ---- */
+.plot{position:relative;padding:0}
+.demand{display:grid;gap:12px;padding:18px 18px 14px}
+.demand-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,300px);gap:2px 24px;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.demand-live{margin:0;font-family:var(--serif);font-size:clamp(21px,2.6vw,27px);font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.demand-live b{color:var(--accent-deep)}
+.demand-lead{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink-3)}
+.demand-slider{display:flex;align-items:center;gap:10px}
+.demand-slider input{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:24px;background:transparent;cursor:pointer;--f:0}
+.demand-slider input::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(to right,var(--accent) calc(10px + (100% - 20px) * var(--f)),var(--rule) 0)}
+.demand-slider input::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-7px;border-radius:50%;background:var(--accent);border:2px solid var(--panel);box-shadow:0 0 0 1px var(--accent)}
+.demand-slider input::-moz-range-track{height:6px;border-radius:999px;background:var(--rule)}
+.demand-slider input::-moz-range-progress{height:6px;border-radius:999px;background:var(--accent)}
+.demand-slider input::-moz-range-thumb{width:16px;height:16px;border:2px solid var(--panel);border-radius:50%;background:var(--accent)}
+.demand-slider input:focus-visible{outline:2px solid var(--accent);outline-offset:8px;border-radius:999px}
+.demand-cut-val{display:inline-grid;place-items:center;min-width:40px;height:28px;border:1px solid var(--rule-2);border-radius:8px;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.demand-head,.demand-row{display:grid;grid-template-columns:minmax(148px,208px) minmax(0,1fr) 56px;gap:16px;align-items:center}
+.demand-head{padding:4px 0 2px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-4)}
+.demand-ticks,.demand-scale{display:flex;justify-content:space-between}
+.demand-head-avg{text-align:right}
+.demand-scale{display:none}
+.demand-rows{position:relative}
+.demand-row{min-height:58px;border-top:1px solid var(--rule)}
+.demand-rows .demand-row:first-child{border-top:none}
+.demand-name{display:grid;gap:1px;min-width:0;text-decoration:none;color:inherit}
+.demand-code{font-family:var(--mono);font-size:10px;letter-spacing:.09em;color:var(--ink-4)}
+.demand-title{font-size:13px;font-weight:600;line-height:1.25;transition:color .15s}
+.demand-n{font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+.demand-name:hover .demand-title{color:var(--accent-deep)}
+.demand-lane{position:relative;height:44px;--c:var(--accent)}
+.demand-lane::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule);transform:translateY(-50%)}
+.demand-span{position:absolute;top:50%;height:9px;transform:translateY(-50%);border-radius:999px;background:var(--c);opacity:.22}
+.demand-cut{position:absolute;top:-4px;bottom:-4px;left:var(--cut,0);border-left:1px dashed var(--accent);opacity:.5;pointer-events:none;transition:left .12s ease-out}
+.demand-dot{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--panel);transition:transform .16s ease,opacity .2s,box-shadow .2s;z-index:2}
+.demand-dot::after{content:"";position:absolute;inset:-9px;border-radius:50%}
+.demand-dot:hover,.demand-dot:focus-visible{transform:scale(1.35);z-index:3;box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent)}
+.demand-dot.is-off{opacity:.14}
+@media (hover:none){.demand-dot:hover{transform:none}}
+.demand-avg{text-align:right;font-family:var(--serif);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.demand-row.is-below .demand-avg{color:var(--ink-4)}
+.demand-note{margin:0;font-size:12px;line-height:1.55;color:var(--ink-3);max-width:92ch}
+@media (max-width:760px){
+.demand{padding:14px 14px 12px}
+.demand-top{grid-template-columns:minmax(0,1fr);gap:10px;padding-bottom:12px}
+.demand-head{display:none}
+.demand-scale{display:flex;font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+.demand-row{grid-template-columns:minmax(0,1fr) 44px;grid-template-areas:"name avg" "lane lane";gap:2px 12px;min-height:0;padding:10px 0}
+.demand-name{grid-area:name}
+.demand-avg{grid-area:avg;font-size:19px}
+.demand-lane{grid-area:lane;height:34px;margin-top:2px}
+.demand-dot{width:10px;height:10px;margin:-5px 0 0 -5px}
+.demand-dot::after{inset:-7px}
+.demand-n{display:none}
+}
 /* ---- светлая полоса прокрутки ----
    Стилизуем через webkit: это даёт классическую полосу с треком нужного цвета.
    Стандартный scrollbar-color здесь не задаётся: в Chrome он переключает
@@ -1341,26 +1391,6 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 @supports not selector(::-webkit-scrollbar){
 *{scrollbar-width:thin;scrollbar-color:var(--accent) var(--rule)}
 }
-.plot-band{fill:var(--panel-2);opacity:.55}
-.plot-grid{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 5}
-.plot-range{stroke:var(--ink-4);stroke-width:1.5;opacity:.55}
-.plot-mean{fill:var(--panel);stroke:var(--ink-2);stroke-width:1.5}
-.plot-code{fill:var(--ink-4);font-family:var(--mono);font-size:10px;letter-spacing:.09em}
-.plot-name{fill:var(--ink);font-family:var(--sans);font-size:13px;font-weight:600}
-.plot-meta{fill:var(--ink-4);font-family:var(--mono);font-size:10px}
-.plot-tick{fill:var(--ink-4);font-family:var(--mono);font-size:10.5px}
-.plot-axis{fill:var(--ink-3);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em}
-.plot-dot circle{stroke:var(--panel);stroke-width:1.5;transition:stroke .15s,stroke-width .15s}
-.plot-dot:hover circle,.plot-dot:focus circle{stroke:var(--accent);stroke-width:2.5}
-.plot-dot.is-key circle{stroke:var(--accent);stroke-width:2.5}
-.plot-dot{outline:none}
-.plot-key{fill:var(--ink);font-family:var(--sans);font-size:12px;font-weight:600;paint-order:stroke;stroke:var(--panel-2);stroke-width:4px;stroke-linejoin:round}
-.plot-legend{margin-top:10px;padding-top:10px;border-top:1px solid var(--rule)}
-.plot-hint{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-3);max-width:96ch}
-.plot-scroll-note{display:none}
-.theme-light .plot-band{fill:#f6f4ee;opacity:1}
-.theme-light .plot-key{stroke:#f6f4ee}
-@media (max-width:960px){.plot-scroll svg{min-width:900px}.plot-scroll-note{display:inline}}
 /* ---- профиль профессии и самопроверка ---- */
 .radar-sec{margin:30px 0 0;padding:26px;border:1px solid var(--rule);border-radius:16px;background:linear-gradient(150deg,rgba(23,25,24,.6),rgba(14,15,14,.4))}
 .radar-grid{display:grid;grid-template-columns:minmax(280px,420px) minmax(0,1fr);gap:32px;align-items:center}
@@ -1521,7 +1551,6 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .theme-light .q-card:hover{background:#fdfcf8}
 .theme-light .toc a{color:var(--ink-2)}
 .theme-light .tbl-hint{color:#5c625e}
-.theme-light .plot-code,.theme-light .plot-meta,.theme-light .plot-tick,.theme-light .plot-axis{fill:#5c625e}
 .theme-light .graph-list .gl-group b,.theme-light .bar-row .v{color:var(--accent-deep)}
 .theme-light .tabbar{background:rgba(255,255,255,.97);border-top-color:var(--rule-2);box-shadow:0 -12px 30px -22px rgba(58,42,32,.6)}
 .theme-light .tabbar a{color:var(--ink-2)}
@@ -1751,6 +1780,7 @@ border-radius:14px;background:linear-gradient(150deg,rgba(22,39,49,.8),rgba(13,2
 .fgrid{gap:10px}
 .fcard{break-inside:avoid;border:1px solid #ddd;background:#fff;color:#111}
 .fcard .d,.fcard .bot,.fav-btn{display:none}
+.demand-slider,.demand-cut{display:none!important}
 }
 @media print{
 :root{
@@ -2038,12 +2068,7 @@ input[type="range"]::-moz-range-thumb{width:22px;height:22px}
 .theme-light :is(.status,.q-num,.more-btn,.lesson-link,.lesson-links a,.sec-link:hover,.chip:hover,.chip[aria-pressed="true"],.chip.is-on,.qm:hover,.qm.on,.crumbs a:hover,.region-links b,.exam .c,.sphere .c,.similar .mono,.res-score .v,.radar-bar-v,.toc a:hover,.gloss,.index-hint,.hi,.radar-bar-track i,.sp-ico){color:#a82f18}
 .theme-light .qm.on,.theme-light .chip[aria-pressed="true"],.theme-light .chip.is-on{background:rgba(196,52,28,.14);border-color:#c4341c}
 .theme-light .btn-primary{color:#1a0f0b}
-.plot-dot .plot-hit{stroke:none;fill:transparent;pointer-events:all}
-.plot-dot:hover .plot-hit,.plot-dot:focus .plot-hit,.plot-dot.is-key .plot-hit{stroke:none}
 body.nav-open{overflow:hidden}
-@media (hover:none){
-.plot-dot:hover circle:not(.plot-hit){stroke-width:1.5}
-}
 
 @media (max-width:760px){
 /* ---- тач-таргеты не меньше 44 px для основных элементов ---- */
@@ -2063,7 +2088,7 @@ body.nav-open{overflow:hidden}
 .math-level-btn{min-height:44px}
 /* ---- мелкий служебный текст: нижний предел читаемости ---- */
 :is(.label,.eyebrow,.status,.hero-meta,.crumbs,.quiz-count,.qstep,.stat .k,.more-btn,.data-date,.uni-city,.cc-top,.p-group,.list-head span,.math-level .label,.pp-k,.rich h3,.exam .c,.sphere .c,.res-more,.tiny,.mono-tiny,.q-num,.lesson-meta span,.res-score .k,.cmp-hint,.tbl-hint){font-size:11px}
-:is(.brand-sub,.plot-tick,.radar-bar-n,.radar-bar-v){font-size:11px}
+:is(.brand-sub,.radar-bar-n,.radar-bar-v){font-size:11px}
 /* ---- безопасные зоны в ландшафте на устройствах с вырезом ---- */
 .wrap{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
 .tabbar{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
