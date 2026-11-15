@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v57';
+const VERSION = 'atlas-2030-v58';
 const SHELL = [
   './',
   './index.html',
@@ -38,7 +38,35 @@ const SHELL = [
   './photos/sphere-d03-800.webp',
   './photos/sphere-d04-800.webp',
   './photos/sphere-d05-800.webp',
-  './photos/sphere-d06-800.webp'
+  './photos/sphere-d06-800.webp',
+  './photos/sphere-d01-alt-800.webp',
+  './photos/sphere-d02-alt-800.webp',
+  './photos/sphere-d03-alt-800.webp',
+  './photos/sphere-d04-alt-800.webp',
+  './photos/sphere-d05-alt-800.webp',
+  './photos/sphere-d06-alt-800.webp',
+  './photos/life-library-800.webp',
+  './photos/life-reading-800.webp',
+  './photos/life-class-800.webp',
+  './photos/life-theatre-800.webp',
+  './photos/uni-mgu-800.webp',
+  './photos/uni-spbgu-800.webp',
+  './photos/uni-itmo-800.webp',
+  './photos/uni-hse-800.webp',
+  './photos/uni-bauman-800.webp',
+  './photos/uni-mipt-800.webp',
+  './photos/uni-urfu-800.webp',
+  './photos/uni-nsu-800.webp',
+  './photos/uni-dsfu-800.webp',
+  './photos/uni-kfu-800.webp',
+  './photos/dist-cfo-800.webp',
+  './photos/dist-nw-800.webp',
+  './photos/dist-south-800.webp',
+  './photos/dist-caucasus-800.webp',
+  './photos/dist-volga-800.webp',
+  './photos/dist-ural-800.webp',
+  './photos/dist-siberia-800.webp',
+  './photos/dist-feast-800.webp'
 ];
 
 self.addEventListener('install', (event) => {

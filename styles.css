@@ -1300,6 +1300,27 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .cover-code,.cover-name{text-shadow:0 1px 3px rgba(0,0,0,.7),0 2px 18px rgba(0,0,0,.5)}
 .cover-code{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:#ff4d2e}
 .cover-name{font-family:var(--serif);font-weight:700;font-size:clamp(17px,2.1vw,26px);line-height:1.15}
+/* ---- фото в карточках разделов и полоса-иллюстрация в шапке ---- */
+.card-ph{display:block;position:relative;height:132px;margin:0 0 12px;border-radius:10px;background-color:var(--panel-2);background-size:cover;background-position:center 35%;box-shadow:inset 0 0 0 1px var(--rule)}
+.card-ph-credit{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:9px;letter-spacing:.02em;color:#ffffff;background:rgba(14,15,14,.68);border-radius:999px;padding:2px 8px}
+.hero-ph{margin:6px 0 26px;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--panel)}
+.hero-ph img{display:block;width:100%;height:clamp(150px,24vw,280px);object-fit:cover;object-position:center 40%}
+.hero-ph figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+.theme-light .card-ph,.theme-light .hero-ph{background-color:var(--panel-2)}
+.theme-light .hero-ph{background:var(--bg-2)}
+/* ---- список фотоматериалов на странице «О проекте» ---- */
+.photo-credits{display:grid;gap:22px;margin:16px 0 4px}
+.pc-group ul{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr))}
+.pc-group li{display:flex;align-items:center;gap:12px;padding:8px;border:1px solid var(--rule);border-radius:10px}
+.pc-group img{flex:none;width:76px;height:52px;object-fit:cover;border-radius:7px}
+.pc-group b{display:block;font-size:13px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.pc-group a{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-decoration:none;border-bottom:1px dashed var(--rule-2)}
+.pc-group a:hover{color:var(--accent-ink)}
+.theme-light .pc-group li{background:var(--bg-2)}
+@media (max-width:760px){
+.card-ph{height:112px}
+.hero-ph figcaption{padding:9px 12px;font-size:12px}
+}
 .fact-strip{display:flex;flex-wrap:wrap;gap:14px 34px;margin-top:24px;padding:16px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
 .fact-strip>div{display:grid;gap:4px;min-width:118px}
 .fact-strip .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4)}
@@ -1769,7 +1790,7 @@ opacity:1!important;transform:none!important;animation:none!important}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{width:auto}
 .wrap{max-width:none;padding:0}
-.photo-fig{display:none!important}
+.photo-fig,.hero-ph,.card-ph{display:none!important}
 .detail-head{padding:0 0 12px}
 .detail-head h1{font-size:21pt;line-height:1.1;max-width:none}
 .detail-head .lead{font-size:10.5pt;line-height:1.45;margin-top:6px}

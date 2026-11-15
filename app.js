@@ -167,6 +167,207 @@ function photoCredit(code) {
   if (!c) return '';
   return '<a class="photo-credit" href="' + h(c.src) + '" target="_blank" rel="noopener noreferrer">Фото: ' + h(c.by) + ' · ' + h(c.lic) + ' · Wikimedia Commons</a>';
 }
+
+/* Фототека разделов: реальные здания вузов, панорамы федеральных округов
+   и учебные сцены. Всё — Wikimedia Commons, автор и лицензия в PHOTO_LIB
+   и в photos/credits.json; подписи обязательны. */
+var PHOTO_LIB = {
+  "sphere-d01": { by: "NASA Scientific Visualization Studio", lic: "Public domain", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Creating_Black_Hole_Jets_With_a_NASA_Supercomputer_(SVS14217).png",
+    alt: "Суперкомпьютерная модель: работа с большими данными", big: 1600 },
+  "sphere-d01-alt": { by: "PiDatacenters", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Racks_Amravati_Data_Center.jpg",
+    alt: "Стойки оборудования дата-центра", big: 1600 },
+  "sphere-d02": { by: "Siyuwj", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Geely_assembly_line_in_Beilun,_Ningbo.JPG",
+    alt: "Сборочная линия автомобильного завода", big: 1600 },
+  "sphere-d02-alt": { by: "Fritzmeier Gruppe", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:2018_Schwei%C3%9Fer_-_Fritzmeier_Group.jpg",
+    alt: "Сварочные работы в цехе", big: 1600 },
+  "sphere-d03": { by: "Shixart1985", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Lab_technitian_looking_through_the_microscope_while_adjusting_coarse_knob.jpg",
+    alt: "Специалист у микроскопа в лаборатории", big: 1600 },
+  "sphere-d03-alt": { by: "Rhoda Baer", lic: "Public domain", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Researchers_in_laboratory.jpg",
+    alt: "Исследователи в лаборатории", big: 1600 },
+  "sphere-d04": { by: "Chrishna", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Wind_turbines_-_Flickr_-_the_russians_are_here.jpg",
+    alt: "Ветропарки: энергетика и экология", big: 1600 },
+  "sphere-d04-alt": { by: "Ronitsunny", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Country%27s_largest_solar_power_plant_inaugurated.png",
+    alt: "Открытие крупной солнечной электростанции", big: 1600 },
+  "sphere-d05": { by: "EU2017EE Estonian Presidency", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Informal_meeting_of_environment_ministers._Round_table_Archie_Young_and_Norbert_Kurilla_(35743458402).jpg",
+    alt: "Заседание за круглым столом", big: 1600 },
+  "sphere-d05-alt": { by: "Crew crew", lic: "CC0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Desks_in_an_open_office_space_(Unsplash).jpg",
+    alt: "Рабочие места в опен-спейсе", big: 1600 },
+  "sphere-d06": { by: "The Smiler", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:TheSmiler2014-158--Fri-Bruk--Foto_Michaela_Klouda_(Urban_Sound_Studios,_taken_on_2014-02-16_13.46.48._uploaded_by_The_Smiler_(band)_@_Flickr_12741125195).jpg",
+    alt: "Студия звукозаписи", big: 1600 },
+  "sphere-d06-alt": { by: "Tom Harpel", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Tom-at-Desk.jpg",
+    alt: "Работа с текстами за компьютером", big: 1600 },
+  "uni-mgu": { by: "Dmitry A. Mottl", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Moscow_State_University_crop.jpg",
+    alt: "Главное здание МГУ на Воробьёвых горах", big: 1600 },
+  "uni-spbgu": { by: "Andrey Korzun", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:2018_SPb_Universitetskaya_01.jpg",
+    alt: "Здание СПбГУ на Университетской набережной", big: 1600 },
+  "uni-itmo": { by: "Университет ИТМО", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:ITMO_University%27s_main_building,_September_2016.jpg",
+    alt: "Главное здание Университета ИТМО", big: 1600 },
+  "uni-hse": { by: "Retired electrician", lic: "CC0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Moscow,_Stremyanny_12-4_June_2022_04.jpg",
+    alt: "Корпус НИУ ВШЭ в Стремяном переулке", big: 1600 },
+  "uni-bauman": { by: "MBH", lic: "CC BY 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Main_building_of_the_Bauman_Moscow_State_Technical_University_04.jpg",
+    alt: "Главное здание МГТУ имени Баумана", big: 1600 },
+  "uni-mipt": { by: "Vmenkov", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:E7347-MFTI-campus-view.jpg",
+    alt: "Корпуса МФТИ в Долгопрудном", big: 1600 },
+  "uni-urfu": { by: "Vyacheslav Bukharov", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Main_Building_of_the_Ural_State_Technical_University_(January_2023)_-_2.jpg",
+    alt: "Главное здание УрФУ в Екатеринбурге", big: 1600 },
+  "uni-nsu": { by: "Sakayama341", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Novosibirsk_State_University.jpg",
+    alt: "Корпус НГУ в новосибирском Академгородке", big: 1600 },
+  "uni-dsfu": { by: "Alexxx1979", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Vladivostok_Russky_Island_Far_Eastern_Federal_University_P8070600_2200.jpg",
+    alt: "Кампус ДВФУ на острове Русский", big: 1600 },
+  "uni-kfu": { by: "Larakir88", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:%D0%9A%D0%A4%D0%A3._%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5.jpg",
+    alt: "Главное здание КФУ в Казани", big: 1600 },
+  "dist-cfo": { by: "Andrew Bossi", lic: "CC BY-SA 2.5", src: "https:\/\/commons.wikimedia.org\/wiki\/File:6564_-_Moscow_-_View_from_apartment.JPG",
+    alt: "Панорама Москвы", big: 1600 },
+  "dist-nw": { by: "Alexey Komarov", lic: "CC BY 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:View_from_Vasilyevsky_Island_-_panoramio_(1).jpg",
+    alt: "Вид на Санкт-Петербург с Васильевского острова", big: 1600 },
+  "dist-south": { by: "Vir2oz", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Promenade_in_Sochi,_Nov._2010.jpg",
+    alt: "Набережная Сочи", big: 1600 },
+  "dist-caucasus": { by: "Ivtorov", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:2016-Alibek.jpg",
+    alt: "Кавказские хребты в Домбае", big: 1600 },
+  "dist-volga": { by: "Untifler", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Qazansu2.JPG",
+    alt: "Панорама Казани", big: 1600 },
+  "dist-ural": { by: "andrijbulba", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Yekaterinburg_-_View_over_Iset.jpg",
+    alt: "Екатеринбург: вид на Исеть", big: 1600 },
+  "dist-siberia": { by: "К.Артём.1", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%BB%D0%B5%D0%B2%D1%8B%D0%B9_%D0%B1%D0%B5%D1%80%D0%B5%D0%B3_%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D0%B8%D0%B1%D0%B8%D1%80%D1%81%D0%BA%D0%B0_1.jpg",
+    alt: "Левый берег Новосибирска", big: 1600 },
+  "dist-feast": { by: "Alexxx1979", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Vladivostok_P8090774_2200.jpg",
+    alt: "Владивосток: вид на бухту", big: 1600 },
+  "life-library": { by: "Tatyana Zayseva", lic: "Public domain", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Khazar_University_Library_Reading_Hall.JPG",
+    alt: "Читальный зал университетской библиотеки", big: 1200 },
+  "life-reading": { by: "John Phelan", lic: "CC BY 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Reading_Room,_Langdell_Hall,_Harvard_University,_Cambridge_MA.jpg",
+    alt: "Читальный зал с книжными стеллажами", big: 1200 },
+  "life-class": { by: "Tulane Public Relations", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Student_in_Class,_Tulane_University,_September_2002.jpg",
+    alt: "Студент на занятии в аудитории", big: 1200 },
+  "life-theatre": { by: "Melisalee", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Lecture_Theatre_of_the_Hive_Building.JPG",
+    alt: "Лекционная аудитория-театр", big: 1200 },
+};
+var UNI_PHOTO = {
+  'mgu-moskva': 'uni-mgu',
+  'spbgu-sankt-peterburg': 'uni-spbgu',
+  'itmo-sankt-peterburg': 'uni-itmo',
+  'niu-vshe-moskva': 'uni-hse',
+  'mgtu-im-baumana-moskva': 'uni-bauman',
+  'mfti-dolgoprudnyy': 'uni-mipt',
+  'urfu-ekaterinburg': 'uni-urfu',
+  'ngu-novosibirsk': 'uni-nsu',
+  'dvfu-vladivostok': 'uni-dsfu',
+  'kfu-kazan': 'uni-kfu'
+};
+var DISTRICT_PHOTO = {
+  'ЦФО': 'dist-cfo', 'СЗФО': 'dist-nw', 'ЮФО': 'dist-south', 'СКФО': 'dist-caucasus',
+  'ПФО': 'dist-volga', 'УФО': 'dist-ural', 'СФО': 'dist-siberia', 'ДФО': 'dist-feast'
+};
+var LIFE_PHOTOS = ['life-library', 'life-reading', 'life-class', 'life-theatre'];
+/* Раздел → сцена: подобрано вручную, чтобы соседние страницы не повторялись. */
+var LIFE_FOR = {
+  universities: 'life-library',
+  regions: 'life-reading',
+  colleges: 'life-class',
+  specialties: 'life-theatre',
+  admission: 'life-reading',
+  calendar: 'life-class',
+  methodology: 'life-library',
+  teacher: 'life-theatre',
+  professions: 'life-theatre',
+  quiz: 'life-class',
+  quizOge: 'life-class',
+  simulator: 'life-reading'
+};
+/* Детерминированный выбор: одна и та же страница всегда получает одно фото. */
+function photoPick(seed, keys) {
+  if (!keys.length) return '';
+  return keys[Math.abs(hash32(String(seed))) % keys.length];
+}
+function photoSrc(key, size) {
+  if (!PHOTOS_ON || !key || !PHOTO_LIB[key]) return '';
+  return ASSET_BASE + 'photos/' + key + '-' + size + '.webp';
+}
+function photoCreditOf(key) {
+  var p = PHOTO_LIB[key];
+  if (!p) return '';
+  return '<a class="photo-credit" href="' + h(p.src) + '" target="_blank" rel="noopener noreferrer">Фото: ' +
+    h(p.by) + ' · ' + h(p.lic) + ' · Wikimedia Commons</a>';
+}
+/* Широкая полоска фото для карточек разделов. Внутри карточек-ссылок
+   ссылка на источник была бы вложенной, поэтому подпись — текст.
+   mark: слово «иллюстрация» для кадров, которые не относятся к карточке напрямую. */
+function photoStrip(key, alt, mark) {
+  var p = PHOTO_LIB[key];
+  var src8 = photoSrc(key, '800');
+  if (!src8 || !p) return '';
+  return '<span class="card-ph" style="background-image:url(&quot;' + src8 + '&quot;)">' +
+    '<span class="sr-only">' + h(alt || p.alt) + '</span>' +
+    '<span class="card-ph-credit">' + (mark ? 'Иллюстрация · ' : '') + 'Фото: ' + h(p.by) + ' · ' + h(p.lic) + '</span></span>';
+}
+/* Большой снимок с подписью: используется на страницах вуза, округа, колледжа. */
+function photoPlate(key, alt, sizes) {
+  var p = PHOTO_LIB[key];
+  var small = photoSrc(key, '800');
+  if (!small || !p) return '';
+  var big = photoSrc(key, String(p.big));
+  return '<figure class="photo-fig cover">' +
+    '<div class="cover-img"><img src="' + h(small) + '" srcset="' + h(small) + ' 800w, ' + h(big) + ' ' + p.big + 'w" ' +
+    'sizes="' + (sizes || '(max-width:760px) 92vw, 1152px') + '" alt="' + h(alt || p.alt) + '" loading="lazy" decoding="async">' +
+    '<div class="cover-ov"><span class="cover-name">' + h(alt || p.alt) + '</span></div></div>' +
+    '<figcaption>' + photoCreditOf(key) + '</figcaption></figure>';
+}
+function uniPhotoKey(u) {
+  /* Свой корпус — если снимок есть; иначе нейтральная учебная сцена.
+     Панораму округа подставлять нельзя: город на кадре не город вуза. */
+  return UNI_PHOTO[u.slug] || photoPick(u.slug, LIFE_PHOTOS);
+}
+function uniPhotoIsOwn(u) { return !!UNI_PHOTO[u.slug]; }
+/* Подпись на странице вуза честно различает свой корпус и иллюстрацию. */
+function uniPlate(u) {
+  var key = uniPhotoKey(u);
+  if (uniPhotoIsOwn(u)) return photoPlate(key);
+  var p = PHOTO_LIB[key];
+  return p ? photoPlate(key, 'Иллюстрация: ' + lower1(p.alt) + '. Это не здание данного вуза') : '';
+}
+/* Группа фото по префиксу ключа: нужна для списка источников. */
+var PHOTO_GROUPS = { sphere: 'Сферы профессий', uni: 'Здания вузов', dist: 'Панорамы федеральных округов', life: 'Учебные сцены' };
+function photoGroupOf(key) { return String(key).split('-')[0]; }
+/* Полный список снимков: превью, сюжет, автор, лицензия, ссылка на Commons. */
+function photoCreditsHtml() {
+  if (!PHOTOS_ON) return '';
+  return Object.keys(PHOTO_GROUPS).map(function (g) {
+    var keys = Object.keys(PHOTO_LIB).filter(function (k) { return photoGroupOf(k) === g; });
+    if (!keys.length) return '';
+    return '<div class="pc-group"><p class="label">' + h(PHOTO_GROUPS[g]) + '</p><ul>' +
+      keys.map(function (k) {
+        var p = PHOTO_LIB[k];
+        return '<li><img src="' + h(photoSrc(k, '800')) + '" alt="" loading="lazy" decoding="async">' +
+          '<span><b>' + h(p.alt) + '</b><a href="' + h(p.src) + '" target="_blank" rel="noopener noreferrer">' +
+          h(p.by) + ' · ' + h(p.lic) + ' · Wikimedia Commons</a></span></li>';
+      }).join('') + '</ul></div>';
+  }).join('');
+}
+/* «Альтернативный» кадр сферы: вторая сцена той же профессии. */
+function sphereAltKey(code) {
+  return code ? 'sphere-' + sphereKey(code) + '-alt' : '';
+}
+function sphereMainKey(code) {
+  return code ? 'sphere-' + sphereKey(code) : '';
+}
+/* Кадр «как выглядит работа»: подпись привязана к конкретной профессии. */
+function workPlate(code, subject) {
+  var key = sphereAltKey(code);
+  var p = PHOTO_LIB[key];
+  return p ? photoPlate(key, subject + ': ' + lower1(p.alt)) : '';
+}
+function lower1(s) { return String(s || '').charAt(0).toLowerCase() + String(s || '').slice(1); }
+/* Широкая полоса-иллюстрация в шапке раздела: сцена учебной жизни. */
+function photoHero(seed, note) {
+  var key = LIFE_FOR[seed] || photoPick(seed, LIFE_PHOTOS);
+  var p = PHOTO_LIB[key];
+  var small = photoSrc(key, '800');
+  if (!small || !p) return '';
+  var big = photoSrc(key, String(p.big));
+  return '<figure class="hero-ph">' +
+    '<img src="' + h(small) + '" srcset="' + h(small) + ' 800w, ' + h(big) + ' ' + p.big + 'w" ' +
+    'sizes="100vw" alt="' + h(note || p.alt) + '" loading="lazy" decoding="async">' +
+    '<figcaption><span>' + h(note || p.alt) + '</span>' + photoCreditOf(key) + '</figcaption></figure>';
+}
 var ES_SEARCH = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><path d="M16 16c8 6 6 16 14 20M30 12c6 8 2 18 10 24" opacity=".35"/><path d="M104 14c-8 5-6 15-15 18" opacity=".35"/><circle class="acc" cx="68" cy="30" r="13"/><path class="acc" d="m78 40 9 9"/><path d="M62 30h12" opacity=".8"/></svg>';
 var ES_FAV = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><path d="M16 44c10-4 8-16 18-18" opacity=".35"/><path class="acc" d="m60 15 4.9 10 11 1.6-8 7.7 1.9 11-9.8-5.2-9.8 5.2 1.9-11-8-7.7 11-1.6z" stroke-dasharray="5 4"/><path d="M92 50h12M92 45h6" opacity=".35"/></svg>';
 var ES_COMPASS = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><circle class="acc" cx="60" cy="32" r="15"/><path class="acc" d="M60 20 66 32 60 44 54 32z"/><circle cx="60" cy="32" r="1.5" fill="currentColor" stroke="none"/><path d="M60 12v4M60 50v4M40 32h-4M84 32h-4" opacity=".45"/></svg>';
@@ -2229,6 +2430,7 @@ function districtCard(d) {
 var top = d.regions.slice(0, 3).map(function (r) { return r.name; }).join(' · ');
 if (d.regions.length > 3) top += ' и другие';
 return '<a class="panel geo-card reveal" href="#/universities?district=' + encodeURIComponent(d.code) + '">' +
+photoStrip(DISTRICT_PHOTO[d.code]) +
 '<div class="geo-top"><span class="geo-code">' + h(d.code) + '</span><span class="mono">' + d.regions.length + ' ' +
 plural(d.regions.length, 'регион', 'региона', 'регионов') + '</span></div>' +
 '<h3>' + h(d.name) + '</h3>' +
@@ -2429,6 +2631,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="lead">' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') +
 ' с оценкой спроса, ростом вакансий и зарплатным диапазоном. Фильтруйте по сфере, ищите по названию и сравнивайте до трёх позиций.</p>' +
 '</section>' +
+photoHero('professions') +
 '<div class="toolbar">' +
 '<label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
 '<input id="profSearch" type="text" placeholder="Найти профессию: инженер, данные, право…" value="' + h(st.q) + '" aria-label="Поиск по профессиям"></label>' +
@@ -2571,6 +2774,7 @@ plural(u.programs.length, 'направление', 'направления', '�
 u.programs.length + ' ' + plural(u.programs.length, 'направление', 'направления', 'направлений') + ' ↓</button>'
 : '';
 return '<section class="panel uni reveal">' +
+photoStrip(uniPhotoKey(u), '', !UNI_PHOTO[u.slug]) +
 '<div class="uni-top"><div><p class="uni-city">' + h(u.region) + ' · ' + h(u.city) + '</p><h3><a href="#/universities/' + h(u.slug) + '">' + h(u.short) + '</a></h3>' +
 '<p class="full">' + h(u.full) + '</p></div>' +
 '<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div></div>' +
@@ -2693,6 +2897,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="lead">Приёмная ёмкость ' + ADM.n + ' программ и динамика проходного балла за 2023–2025 годы. ' +
 'Значения с пометкой «≈» — расчётная оценка атласа для ориентира, а не официальные контрольные цифры приёма.</p>' +
 '</section>' +
+photoHero('admission') +
 '<div class="adm-kpi">' +
 kpi('≈' + places.toLocaleString('ru-RU'), 'бюджетных мест в выборке') +
 kpi(rows.length, 'программ с баллами') +
@@ -2864,6 +3069,7 @@ app.innerHTML = '<div class="view">' +
 '<a class="btn" href="#/admission">Бюджетные места</a>' +
 '<a class="btn" href="#/universities">Вузы и баллы</a></div>' +
 '</section>' +
+photoHero('calendar') +
 '<div class="cal-tabs" role="group" aria-label="Уровень поступления">' +
 '<button type="button" data-cal-tab="11" aria-pressed="' + (level === '11' ? 'true' : 'false') + '">После 11 класса</button>' +
 '<button type="button" data-cal-tab="9" aria-pressed="' + (level === '9' ? 'true' : 'false') + '">После 9 класса</button>' +
@@ -2948,6 +3154,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="source-note">Каталог — выборка вузов с открытыми данными о программах и баллах, а не полный список вузов страны. ' +
 'Условия, льготы и даты приёма всегда уточняйте на сайте вуза.</p>' +
 '</section>' +
+photoHero('universities') +
 '<div class="toolbar">' +
 '<label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
 '<input id="uniSearch" type="text" placeholder="Вуз, регион, город или направление…" value="' + h(st.q) + '" aria-label="Поиск по вузам"></label>' +
@@ -3071,6 +3278,7 @@ repaint();
 }
 function collegeCard(c) {
 return '<a class="panel cc reveal" href="#/colleges/' + c.slug + '">' +
+photoStrip(sphereAltKey(c.sphereCode)) +
 '<div class="cc-top"><span>' + h(c.code) + '</span><span>' + h(c.sphereCode) + '</span></div>' +
 '<h3>' + h(c.title) + '</h3>' +
 '<p>' + h(c.desc) + '</p>' +
@@ -3103,6 +3311,7 @@ app.innerHTML = '<div class="view">' +
 '<div class="hero-cta"><a class="btn btn-primary btn-sm" href="#/quiz-oge">Подобрать по ОГЭ</a>' +
 '<a class="btn btn-sm" href="#/quiz">После 11 класса · ЕГЭ</a></div>' +
 '</section>' +
+photoHero('colleges') +
 '<div class="toolbar">' +
 '<label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
 '<input id="colSearch" type="text" placeholder="Специальность: программирование, медицина…" value="' + h(st.q) + '" aria-label="Поиск по колледжам"></label>' +
@@ -3173,6 +3382,7 @@ function specCard(s) {
 var cities = s.cities.slice(0, 4).join(' · ');
 if (s.cities.length > 4) cities += ' +' + (s.cities.length - 4);
 return '<a class="panel spec-card reveal" href="#/specialties/' + h(s.slug) + '">' +
+photoStrip(sphereMainKey(s.sphereCode)) +
 '<div class="spec-top"><span class="mono">' + h(s.code) + '</span><span class="tag">' + h(s.sphereCode) + '</span></div>' +
 '<h3>' + h(s.direction) + '</h3>' +
 '<p class="spec-prof">' + h(s.profession) + '</p>' +
@@ -3204,6 +3414,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="lead">' + SPECIALTIES.length + ' ' + plural(SPECIALTIES.length, 'специальность', 'специальности', 'специальностей') +
 ' в ' + U.length + ' вузах. Для каждой — код, профессия, набор ЕГЭ, минимальный балл и города, где её преподают.</p>' +
 '</section>' +
+photoHero('specialties') +
 '<div class="toolbar">' +
 '<label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
 '<input id="specSearch" type="text" placeholder="Специальность, код или город…" value="' + h(st.q) + '" aria-label="Поиск по специальностям"></label>' +
@@ -3279,6 +3490,7 @@ statCard(TOTAL_PROGRAMS, 'программ') +
 '</section>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Округа</p><h2 class="sec">Распределение вузов</h2></div>' +
 '<a class="sec-link" href="#/universities">Открыть фильтр →</a></section>' +
+photoHero('regions') +
 '<div class="geo-grid">' + largest.map(districtCard).join('') + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Регионы</p><h2 class="sec">Субъекты Российской Федерации</h2></div></section>' +
 '<p class="muted reveal" style="max-width:72ch;margin-bottom:16px">В списке указано число вузов, включённых в атлас. Переход открывает отфильтрованный список с направлениями и баллами.</p>' +
@@ -3344,8 +3556,13 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div><h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Полной замены приёмной комиссии</h3><p class="muted">Атлас помогает сузить выбор и задать вопросы. Финальную проверку всегда делайте на сайте вуза.</p></div>' +
 '<div><h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Полного списка вузов страны</h3><p class="muted">В каталоге ' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' с открытыми данными о баллах и программах. Это осознанная выборка, а не исчерпывающий реестр: состав и годы кампаний указаны в методологии.</p></div>' +
 '</div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Фотографии</p><h2 class="sec">Снимки и их авторы</h2></div>' +
+'<a class="sec-link" href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer">Wikimedia Commons →</a></section>' +
+'<p class="muted reveal" style="max-width:72ch">Здания вузов показаны только там, где есть подтверждённый снимок конкретного корпуса; вместо остальных — нейтральные учебные сцены, а панорамы городов привязаны к федеральным округам. Все файлы опубликованы под свободными лицензиями, ссылка ведёт на страницу описания в Commons.</p>' +
+'<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">14 ноября 2026</span><div><b>Фототека разделов.</b> У вузов, колледжей, специальностей и округов появились собственные снимки: корпуса конкретных университетов, панорамы городов и учебные сцены. На странице «О проекте» — полный список файлов с авторами и лицензиями Wikimedia Commons.</div></li>' +
 '<li><span class="mono">13 ноября 2026</span><div><b>Редакционный редизайн.</b> Тёплая бумажная база и один акцент — коралл. Плоские поверхности вместо градиентов, единый радиус, крупная типографика Onest без второго шрифта. Профиль профессии — горизонтальные полосы вместо радара, индекс спроса раскрашен по ступеням.</div></li>' +
 '<li><span class="mono">9 ноября 2026</span><div><b>Стиль и печать.</b> Единая палитра и токены, шрифтовая шкала, мера строки и редакционный ритм. Общая система наведения, линейные иконки сфер, компас в пустых состояниях. Режим чтения и печатный титул с колонтитулом на A4.</div></li>' +
 '<li><span class="mono">8 ноября 2026</span><div><b>Чистка и защита.</b> Удалены мёртвые правила CSS. Service worker устойчивее к сбоям кэша. CSP для автономной копии, 404 и офлайн-страницы, referrer-политика.</div></li>' +
@@ -3366,6 +3583,7 @@ app.innerHTML = '<div class="view">' +
 '<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Как формируется <em>атлас</em></h1>' +
 '<p class="lead">Открытые принципы отбора профессий, расчёта индекса спроса и сбора проходных баллов. Если цифра вызывает вопросы — здесь описано, откуда она взялась.</p>' +
 '</section>' +
+photoHero('methodology') +
 '<div class="prose" id="prose">' +
 (A.methodology && A.methodology.html ? sanitizeRichHtml(A.methodology.html) : '<p>Раздел в подготовке.</p>') +
 '</div>' +
@@ -3448,6 +3666,7 @@ app.innerHTML = '<div class="view teacher-page">' +
 '<a class="btn" href="#/professions">Открыть каталог</a></div>' +
 '<div class="lesson-meta"><span>25–30 минут</span><span>8–11 класс</span><span>Групповая работа</span><span>Нужен проектор</span></div>' +
 '</section>' +
+photoHero('teacher') +
 '<div class="lesson-board">' +
 '<section class="lesson-plan reveal" aria-labelledby="planTitle">' +
 '<div class="sec-head" style="margin-top:0"><div><p class="eyebrow">Ход занятия</p><h2 class="sec" id="planTitle">Шесть шагов</h2></div></div>' +
@@ -4136,6 +4355,7 @@ return '<a href="#/professions/' + s.slug + '"><span>' + h(s.title) + '</span><s
 }).join('') + '</div>' : '') +
 '</aside>' +
 '</div>' +
+workPlate(p.sphereCode, p.title) +
 printFoot(p.title) +
 '</div>';
 var rich = document.getElementById('rich');
@@ -4186,6 +4406,7 @@ printCover('Специальность колледжа · ' + c.sphereCode, c.t
 '<a class="btn btn-sm" href="#/colleges?sphere=' + h(c.sphereCode) + '">Ещё в этой сфере</a>' +
 '</div>' +
 '</header>' +
+workPlate(c.sphereCode, c.title) +
 '<div class="detail-body">' +
 '<div><div class="toc" id="toc" aria-label="Содержание"></div><div class="rich" id="rich"></div></div>' +
 '<aside class="passport">' +
@@ -4244,6 +4465,7 @@ app.innerHTML = '<div class="view">' +
 '<a class="btn btn-sm" href="' + h(pageHref('/admission')) + '">Бюджетные места</a>' +
 '</div>' +
 '</header>' +
+uniPlate(u) +
 '<section class="sec-head reveal"><div><p class="eyebrow">Программы</p><h2 class="sec">Направления, ЕГЭ и баллы</h2></div></section>' +
 '<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Профессия</th><th>ЕГЭ</th><th>Бюджет</th><th>Платно</th></tr></thead><tbody>' +
 rows + '</tbody></table></div>' +
@@ -4294,6 +4516,7 @@ plural(s.cities.length, 'городе', 'городах', 'городах') + '.
 '<a class="btn btn-sm" href="' + h(pageHref('/specialties', 'sphere=' + s.sphereCode)) + '">Специальности сферы</a>' +
 '</div>' +
 '</header>' +
+photoPlate(sphereMainKey(s.sphereCode)) +
 '<section class="sec-head reveal"><div><p class="eyebrow">Вузы</p><h2 class="sec">Где учиться</h2></div></section>' +
 '<div class="tbl-wrap"><table class="data"><thead><tr><th>Вуз</th><th>Город</th><th>Бюджет</th><th>Платно</th></tr></thead><tbody>' +
 rows + '</tbody></table></div>' +

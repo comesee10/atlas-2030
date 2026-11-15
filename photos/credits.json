@@ -106,5 +106,297 @@
    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
    "source": "https://commons.wikimedia.org/wiki/File:Tom-at-Desk.jpg"
   }
+ },
+ "universities": {
+  "uni-mgu": {
+   "file": "photos/uni-mgu-800.webp",
+   "files": [
+    "photos/uni-mgu-1600.webp",
+    "photos/uni-mgu-800.webp"
+   ],
+   "title": "File:Moscow State University crop.jpg",
+   "caption": "Главное здание МГУ на Воробьёвых горах",
+   "author": "Dmitry A. Mottl",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Moscow_State_University_crop.jpg"
+  },
+  "uni-spbgu": {
+   "file": "photos/uni-spbgu-800.webp",
+   "files": [
+    "photos/uni-spbgu-1600.webp",
+    "photos/uni-spbgu-800.webp"
+   ],
+   "title": "File:2018 SPb Universitetskaya 01.jpg",
+   "caption": "Здание СПбГУ на Университетской набережной",
+   "author": "Andrey Korzun",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:2018_SPb_Universitetskaya_01.jpg"
+  },
+  "uni-itmo": {
+   "file": "photos/uni-itmo-800.webp",
+   "files": [
+    "photos/uni-itmo-1600.webp",
+    "photos/uni-itmo-800.webp"
+   ],
+   "title": "File:ITMO University's main building, September 2016.jpg",
+   "caption": "Главное здание Университета ИТМО",
+   "author": "Университет ИТМО",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:ITMO_University%27s_main_building,_September_2016.jpg"
+  },
+  "uni-hse": {
+   "file": "photos/uni-hse-800.webp",
+   "files": [
+    "photos/uni-hse-1600.webp",
+    "photos/uni-hse-800.webp"
+   ],
+   "title": "File:Moscow, Stremyanny 12-4 June 2022 04.jpg",
+   "caption": "Корпус НИУ ВШЭ в Стремяном переулке",
+   "author": "Retired electrician",
+   "license": "CC0",
+   "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Moscow,_Stremyanny_12-4_June_2022_04.jpg"
+  },
+  "uni-bauman": {
+   "file": "photos/uni-bauman-800.webp",
+   "files": [
+    "photos/uni-bauman-1600.webp",
+    "photos/uni-bauman-800.webp"
+   ],
+   "title": "File:Main building of the Bauman Moscow State Technical University 04.jpg",
+   "caption": "Главное здание МГТУ имени Баумана",
+   "author": "MBH",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Main_building_of_the_Bauman_Moscow_State_Technical_University_04.jpg"
+  },
+  "uni-mipt": {
+   "file": "photos/uni-mipt-800.webp",
+   "files": [
+    "photos/uni-mipt-1600.webp",
+    "photos/uni-mipt-800.webp"
+   ],
+   "title": "File:E7347-MFTI-campus-view.jpg",
+   "caption": "Корпуса МФТИ в Долгопрудном",
+   "author": "Vmenkov",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:E7347-MFTI-campus-view.jpg"
+  },
+  "uni-urfu": {
+   "file": "photos/uni-urfu-800.webp",
+   "files": [
+    "photos/uni-urfu-1600.webp",
+    "photos/uni-urfu-800.webp"
+   ],
+   "title": "File:Main Building of the Ural State Technical University (January 2023) - 2.jpg",
+   "caption": "Главное здание УрФУ в Екатеринбурге",
+   "author": "Vyacheslav Bukharov",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Main_Building_of_the_Ural_State_Technical_University_(January_2023)_-_2.jpg"
+  },
+  "uni-nsu": {
+   "file": "photos/uni-nsu-800.webp",
+   "files": [
+    "photos/uni-nsu-1600.webp",
+    "photos/uni-nsu-800.webp"
+   ],
+   "title": "File:Novosibirsk State University.jpg",
+   "caption": "Корпус НГУ в новосибирском Академгородке",
+   "author": "Sakayama341",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Novosibirsk_State_University.jpg"
+  },
+  "uni-dsfu": {
+   "file": "photos/uni-dsfu-800.webp",
+   "files": [
+    "photos/uni-dsfu-1600.webp",
+    "photos/uni-dsfu-800.webp"
+   ],
+   "title": "File:Vladivostok Russky Island Far Eastern Federal University P8070600 2200.jpg",
+   "caption": "Кампус ДВФУ на острове Русский",
+   "author": "Alexxx1979",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Vladivostok_Russky_Island_Far_Eastern_Federal_University_P8070600_2200.jpg"
+  },
+  "uni-kfu": {
+   "file": "photos/uni-kfu-800.webp",
+   "files": [
+    "photos/uni-kfu-1600.webp",
+    "photos/uni-kfu-800.webp"
+   ],
+   "title": "File:КФУ. Главное здание.jpg",
+   "caption": "Главное здание КФУ в Казани",
+   "author": "Larakir88",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D0%9A%D0%A4%D0%A3._%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5.jpg"
+  }
+ },
+ "districts": {
+  "dist-cfo": {
+   "file": "photos/dist-cfo-800.webp",
+   "files": [
+    "photos/dist-cfo-1600.webp",
+    "photos/dist-cfo-800.webp"
+   ],
+   "title": "File:6564 - Moscow - View from apartment.JPG",
+   "caption": "Панорама Москвы",
+   "author": "Andrew Bossi",
+   "license": "CC BY-SA 2.5",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+   "source": "https://commons.wikimedia.org/wiki/File:6564_-_Moscow_-_View_from_apartment.JPG"
+  },
+  "dist-nw": {
+   "file": "photos/dist-nw-800.webp",
+   "files": [
+    "photos/dist-nw-1600.webp",
+    "photos/dist-nw-800.webp"
+   ],
+   "title": "File:View from Vasilyevsky Island - panoramio (1).jpg",
+   "caption": "Вид на Санкт-Петербург с Васильевского острова",
+   "author": "Alexey Komarov",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:View_from_Vasilyevsky_Island_-_panoramio_(1).jpg"
+  },
+  "dist-south": {
+   "file": "photos/dist-south-800.webp",
+   "files": [
+    "photos/dist-south-1600.webp",
+    "photos/dist-south-800.webp"
+   ],
+   "title": "File:Promenade in Sochi, Nov. 2010.jpg",
+   "caption": "Набережная Сочи",
+   "author": "Vir2oz",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Promenade_in_Sochi,_Nov._2010.jpg"
+  },
+  "dist-caucasus": {
+   "file": "photos/dist-caucasus-800.webp",
+   "files": [
+    "photos/dist-caucasus-1600.webp",
+    "photos/dist-caucasus-800.webp"
+   ],
+   "title": "File:2016-Alibek.jpg",
+   "caption": "Кавказские хребты в Домбае",
+   "author": "Ivtorov",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:2016-Alibek.jpg"
+  },
+  "dist-volga": {
+   "file": "photos/dist-volga-800.webp",
+   "files": [
+    "photos/dist-volga-1600.webp",
+    "photos/dist-volga-800.webp"
+   ],
+   "title": "File:Qazansu2.JPG",
+   "caption": "Панорама Казани",
+   "author": "Untifler",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+   "source": "https://commons.wikimedia.org/wiki/File:Qazansu2.JPG"
+  },
+  "dist-ural": {
+   "file": "photos/dist-ural-800.webp",
+   "files": [
+    "photos/dist-ural-1600.webp",
+    "photos/dist-ural-800.webp"
+   ],
+   "title": "File:Yekaterinburg - View over Iset.jpg",
+   "caption": "Екатеринбург: вид на Исеть",
+   "author": "andrijbulba",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Yekaterinburg_-_View_over_Iset.jpg"
+  },
+  "dist-siberia": {
+   "file": "photos/dist-siberia-800.webp",
+   "files": [
+    "photos/dist-siberia-1600.webp",
+    "photos/dist-siberia-800.webp"
+   ],
+   "title": "File:Вид на левый берег Новосибирска 1.jpg",
+   "caption": "Левый берег Новосибирска",
+   "author": "К.Артём.1",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%BB%D0%B5%D0%B2%D1%8B%D0%B9_%D0%B1%D0%B5%D1%80%D0%B5%D0%B3_%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D0%B8%D0%B1%D0%B8%D1%80%D1%81%D0%BA%D0%B0_1.jpg"
+  },
+  "dist-feast": {
+   "file": "photos/dist-feast-800.webp",
+   "files": [
+    "photos/dist-feast-1600.webp",
+    "photos/dist-feast-800.webp"
+   ],
+   "title": "File:Vladivostok P8090774 2200.jpg",
+   "caption": "Владивосток: вид на бухту",
+   "author": "Alexxx1979",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Vladivostok_P8090774_2200.jpg"
+  }
+ },
+ "life": {
+  "life-library": {
+   "file": "photos/life-library-800.webp",
+   "files": [
+    "photos/life-library-1200.webp",
+    "photos/life-library-800.webp"
+   ],
+   "title": "File:Khazar University Library Reading Hall.JPG",
+   "caption": "Читальный зал университетской библиотеки",
+   "author": "Tatyana Zayseva",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Khazar_University_Library_Reading_Hall.JPG"
+  },
+  "life-reading": {
+   "file": "photos/life-reading-800.webp",
+   "files": [
+    "photos/life-reading-1200.webp",
+    "photos/life-reading-800.webp"
+   ],
+   "title": "File:Reading Room, Langdell Hall, Harvard University, Cambridge MA.jpg",
+   "caption": "Читальный зал с книжными стеллажами",
+   "author": "John Phelan",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Reading_Room,_Langdell_Hall,_Harvard_University,_Cambridge_MA.jpg"
+  },
+  "life-class": {
+   "file": "photos/life-class-800.webp",
+   "files": [
+    "photos/life-class-1200.webp",
+    "photos/life-class-800.webp"
+   ],
+   "title": "File:Student in Class, Tulane University, September 2002.jpg",
+   "caption": "Студент на занятии в аудитории",
+   "author": "Tulane Public Relations",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Student_in_Class,_Tulane_University,_September_2002.jpg"
+  },
+  "life-theatre": {
+   "file": "photos/life-theatre-800.webp",
+   "files": [
+    "photos/life-theatre-1200.webp",
+    "photos/life-theatre-800.webp"
+   ],
+   "title": "File:Lecture Theatre of the Hive Building.JPG",
+   "caption": "Лекционная аудитория-театр",
+   "author": "Melisalee",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Lecture_Theatre_of_the_Hive_Building.JPG"
+  }
  }
 }
