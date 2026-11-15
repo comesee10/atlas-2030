@@ -240,6 +240,50 @@ var PHOTO_LIB = {
     alt: "Студент на занятии в аудитории", big: 1200 },
   "life-theatre": { by: "Melisalee", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Lecture_Theatre_of_the_Hive_Building.JPG",
     alt: "Лекционная аудитория-театр", big: 1200 },
+  "sphere-d01-2": { by: "BalticServers.com", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:BalticServers_data_center.jpg",
+    alt: "Серверные стойки дата-центра", big: 1600 },
+  "sphere-d01-3": { by: "Mosborne01", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Ashs-digital-technology-suite.jpg",
+    alt: "Компьютерный класс с рабочими местами", big: 1600 },
+  "sphere-d01-4": { by: "Rolf Brink", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Asperitas_AIC24_Immersion_system.jpg",
+    alt: "Коммутация в системе иммерсионного охлаждения", big: 1600 },
+  "sphere-d02-2": { by: "TheGrenzebachGroup", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Automatische_Gep%C3%A4ckverladung.tif",
+    alt: "Робот-манипулятор на автоматической линии", big: 1600 },
+  "sphere-d02-3": { by: "U.S. Air Force photo/Margo Wright", lic: "Public domain", src: "https:\/\/commons.wikimedia.org\/wiki\/File:B1_machining.jpg",
+    alt: "Оператор станка с ЧПУ за пультом", big: 1600 },
+  "sphere-d02-4": { by: "Frank Schwichtenberg", lic: "CC BY 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:3D_Drucker_%E2%80%93_CeBIT_2016_03.jpg",
+    alt: "3D-печать деталей на производстве", big: 1600 },
+  "sphere-d03-2": { by: "Artur Bergman", lic: "CC BY-SA 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:CPMC_Surgery_(412142792).jpg",
+    alt: "Хирург у монитора во время операции", big: 1600 },
+  "sphere-d03-3": { by: "Oncocir S.A.P.", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Equipo_Oncocir.jpg",
+    alt: "Операционная бригада за работой", big: 1600 },
+  "sphere-d03-4": { by: "Maxim Bilovitskiy", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Andres_Maser_and_others.JPG",
+    alt: "Биотехнологи за лабораторным столом", big: 1600 },
+  "sphere-d04-2": { by: "Aiseinau", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Saul%C4%97s_elektrin%C4%97.jpg",
+    alt: "Солнечная электростанция на закате", big: 1600 },
+  "sphere-d04-3": { by: "Unifadenfisch", lic: "CC BY-SA 4.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Bagnell_dam_spillways.jpg",
+    alt: "Плотина ГЭС и водохранилище", big: 1600 },
+  "sphere-d04-4": { by: "News Oresund", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:20201101_Vindkraftverk_E22_norr_om_Lund_2010_(50558777411).jpg",
+    alt: "Ветроустановка в вечернем свете", big: 1600 },
+  "sphere-d05-2": { by: "Photo: Andreas Praefcke", lic: "CC BY 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:BMF_Festsaal.jpg",
+    alt: "Зал заседаний: рабочие места депутатов", big: 1600 },
+  "sphere-d05-3": { by: "Sandstein", lic: "CC BY 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Bernerhof_Large_Salon.jpg",
+    alt: "Переговорная комната под куполом", big: 1600 },
+  "sphere-d05-4": { by: "Sandstein", lic: "Public domain", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Berne_Supreme_Court_courtroom.jpg",
+    alt: "Зал судебного заседания", big: 1600 },
+  "sphere-d06-2": { by: "Thomas Schmidt (NetAction)", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Axel_Springer_Haus_Newsroom.JPG",
+    alt: "Редакция новостей: рабочие места журналистов", big: 1600 },
+  "sphere-d06-3": { by: "Kowarisuki", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Bloomberg_in_London.jpg",
+    alt: "Телевизионная студия с камерами", big: 1600 },
+  "sphere-d06-4": { by: "C.andersson", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:2_Color_Pad_Printing_Machine_with_11_Station_Carousel.jpg",
+    alt: "Печатная машина в типографии", big: 1600 },
+  "life-campus": { by: "Rick Obst from Eugene, United States", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Student_Walking_on_the_University_of_Oregon_Campus_(26811370679).jpg",
+    alt: "Студент на аллее кампуса", big: 1200 },
+  "life-lab": { by: "Baitaal", lic: "CC BY-SA 3.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Biochemistry_Lab.jpg",
+    alt: "Реактивы в университетской лаборатории", big: 1200 },
+  "life-lawn": { by: "Nyttend", lic: "Public domain", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Alcoa_labs_in_New_Kensington.jpg",
+    alt: "Кампус университета: газон и корпуса", big: 1200 },
+  "life-walk": { by: "Tulane Public Relations", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Three_walking_students,_Tulane_University_New_Orleans,_March_2008.jpg",
+    alt: "Студенты на кампусе", big: 1200 },
 };
 var UNI_PHOTO = {
   'mgu-moskva': 'uni-mgu',
@@ -257,7 +301,8 @@ var DISTRICT_PHOTO = {
   'ЦФО': 'dist-cfo', 'СЗФО': 'dist-nw', 'ЮФО': 'dist-south', 'СКФО': 'dist-caucasus',
   'ПФО': 'dist-volga', 'УФО': 'dist-ural', 'СФО': 'dist-siberia', 'ДФО': 'dist-feast'
 };
-var LIFE_PHOTOS = ['life-library', 'life-reading', 'life-class', 'life-theatre'];
+var LIFE_PHOTOS = ['life-library', 'life-reading', 'life-class', 'life-theatre',
+  'life-campus', 'life-lab', 'life-lawn', 'life-walk'];
 /* Раздел → сцена: подобрано вручную, чтобы соседние страницы не повторялись. */
 var LIFE_FOR = {
   universities: 'life-library',
@@ -311,16 +356,18 @@ function photoPlate(key, alt, sizes) {
     '<div class="cover-ov"><span class="cover-name">' + h(alt || p.alt) + '</span></div></div>' +
     '<figcaption>' + photoCreditOf(key) + '</figcaption></figure>';
 }
-function uniPhotoKey(u) {
+function uniPhotoKey(u, i) {
   /* Свой корпус — если снимок есть; иначе нейтральная учебная сцена.
-     Панораму округа подставлять нельзя: город на кадре не город вуза. */
-  return UNI_PHOTO[u.slug] || photoPick(u.slug, LIFE_PHOTOS);
+     Панораму округа подставлять нельзя: город на кадре не город вуза.
+     Шаг 3 по кругу из 8 кадров: соседние карточки не совпадают никогда. */
+  if (UNI_PHOTO[u.slug]) return UNI_PHOTO[u.slug];
+  return LIFE_PHOTOS[((i || 0) * 3) % LIFE_PHOTOS.length];
 }
 function uniPhotoIsOwn(u) { return !!UNI_PHOTO[u.slug]; }
 /* Подпись на странице вуза честно различает свой корпус и иллюстрацию. */
 function uniPlate(u) {
-  var key = uniPhotoKey(u);
-  if (uniPhotoIsOwn(u)) return photoPlate(key);
+  if (uniPhotoIsOwn(u)) return photoPlate(uniPhotoKey(u));
+  var key = photoPick(u.slug, LIFE_PHOTOS);
   var p = PHOTO_LIB[key];
   return p ? photoPlate(key, 'Иллюстрация: ' + lower1(p.alt) + '. Это не здание данного вуза') : '';
 }
@@ -348,6 +395,21 @@ function sphereAltKey(code) {
 }
 function sphereMainKey(code) {
   return code ? 'sphere-' + sphereKey(code) : '';
+}
+/* Набор кадров сферы: основной, альтернативный и ещё три сцены. Карточки
+   в списке берут их по очереди, поэтому соседние не повторяются. */
+var SPHERE_PHOTOS = {
+  'D-01': ['sphere-d01', 'sphere-d01-alt', 'sphere-d01-2', 'sphere-d01-3', 'sphere-d01-4'],
+  'D-02': ['sphere-d02', 'sphere-d02-alt', 'sphere-d02-2', 'sphere-d02-3', 'sphere-d02-4'],
+  'D-03': ['sphere-d03', 'sphere-d03-alt', 'sphere-d03-2', 'sphere-d03-3', 'sphere-d03-4'],
+  'D-04': ['sphere-d04', 'sphere-d04-alt', 'sphere-d04-2', 'sphere-d04-3', 'sphere-d04-4'],
+  'D-05': ['sphere-d05', 'sphere-d05-alt', 'sphere-d05-2', 'sphere-d05-3', 'sphere-d05-4'],
+  'D-06': ['sphere-d06', 'sphere-d06-alt', 'sphere-d06-2', 'sphere-d06-3', 'sphere-d06-4']
+};
+function spherePhotoAt(code, i) {
+  var keys = SPHERE_PHOTOS[code];
+  if (!keys) return sphereMainKey(code);
+  return keys[Math.abs(i || 0) % keys.length];
 }
 /* Кадр «как выглядит работа»: подпись привязана к конкретной профессии. */
 function workPlate(code, subject) {
@@ -2767,14 +2829,14 @@ return '<tr><td data-label="Направление">' + h(pr.direction) + '<span
 '<td data-label="Бюджет" class="b">' + (pr.budget ? '≈' + h(pr.budget) : '—') + '</td>' +
 '<td data-label="Платно" class="p">' + (pr.paid ? '≈' + h(pr.paid) : '—') + '</td></tr>';
 }
-function uniCard(u) {
+function uniCard(u, i) {
 var more = u.programs.length > 4
 ? '<button class="more-btn" data-more data-label="Показать все ' + u.programs.length + ' ' +
 plural(u.programs.length, 'направление', 'направления', 'направлений') + '">Показать все ' +
 u.programs.length + ' ' + plural(u.programs.length, 'направление', 'направления', 'направлений') + ' ↓</button>'
 : '';
 return '<section class="panel uni reveal">' +
-photoStrip(uniPhotoKey(u), '', !UNI_PHOTO[u.slug]) +
+photoStrip(uniPhotoKey(u, i), '', !UNI_PHOTO[u.slug]) +
 '<div class="uni-top"><div><p class="uni-city">' + h(u.region) + ' · ' + h(u.city) + '</p><h3><a href="#/universities/' + h(u.slug) + '">' + h(u.short) + '</a></h3>' +
 '<p class="full">' + h(u.full) + '</p></div>' +
 '<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div></div>' +
@@ -2826,6 +2888,8 @@ return '<optgroup label="' + h(d.code + ' · ' + d.name) + '">' + list.map(optio
 }
 function groupedUnis(list, st) {
 var out = '';
+/* Сквозной номер карточки: соседние вузы получают разные учебные сцены. */
+var seen = 0;
 FEDERAL.forEach(function (d) {
 var inDistrict = list.filter(function (u) { return u.district === d.code; });
 if (!inDistrict.length) return;
@@ -2843,7 +2907,7 @@ return '<div class="region-block">' +
 '<div class="region-head"><h3>' + h(r.name) + '</h3>' +
 '<span class="mono tiny">' + regionUnis.length + ' ' + plural(regionUnis.length, 'вуз', 'вуза', 'вузов') +
 ' · ' + programs + ' ' + plural(programs, 'программа', 'программы', 'программ') + ' · средний балл ≈' + r.avg + '</span></div>' +
-'<div class="uni-grid">' + regionUnis.map(uniCard).join('') + '</div>' +
+'<div class="uni-grid">' + regionUnis.map(function (u) { return uniCard(u, seen++); }).join('') + '</div>' +
 '</div>';
 }).join('') +
 '</section>';
@@ -3276,9 +3340,9 @@ b.textContent = open ? 'Свернуть ↑' : (b.getAttribute('data-label') ||
 });
 repaint();
 }
-function collegeCard(c) {
+function collegeCard(c, i) {
 return '<a class="panel cc reveal" href="#/colleges/' + c.slug + '">' +
-photoStrip(sphereAltKey(c.sphereCode)) +
+photoStrip(spherePhotoAt(c.sphereCode, i)) +
 '<div class="cc-top"><span>' + h(c.code) + '</span><span>' + h(c.sphereCode) + '</span></div>' +
 '<h3>' + h(c.title) + '</h3>' +
 '<p>' + h(c.desc) + '</p>' +
@@ -3378,11 +3442,11 @@ repaint();
 });
 repaint();
 }
-function specCard(s) {
+function specCard(s, i) {
 var cities = s.cities.slice(0, 4).join(' · ');
 if (s.cities.length > 4) cities += ' +' + (s.cities.length - 4);
 return '<a class="panel spec-card reveal" href="#/specialties/' + h(s.slug) + '">' +
-photoStrip(sphereMainKey(s.sphereCode)) +
+photoStrip(spherePhotoAt(s.sphereCode, i)) +
 '<div class="spec-top"><span class="mono">' + h(s.code) + '</span><span class="tag">' + h(s.sphereCode) + '</span></div>' +
 '<h3>' + h(s.direction) + '</h3>' +
 '<p class="spec-prof">' + h(s.profession) + '</p>' +
@@ -3562,6 +3626,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">15 ноября 2026</span><div><b>Больше кадров, меньше повторов.</b> У каждой сферы теперь по пять снимков: производство, лаборатории, энергетика, залы заседаний, редакции и студии. Карточки специальностей, колледжей и вузов берут кадры по очереди — соседние больше не повторяются. Учебных сцен стало восемь: добавились кампус, аллея и биохимическая лаборатория.</div></li>' +
 '<li><span class="mono">14 ноября 2026</span><div><b>Фототека разделов.</b> У вузов, колледжей, специальностей и округов появились собственные снимки: корпуса конкретных университетов, панорамы городов и учебные сцены. На странице «О проекте» — полный список файлов с авторами и лицензиями Wikimedia Commons.</div></li>' +
 '<li><span class="mono">13 ноября 2026</span><div><b>Редакционный редизайн.</b> Тёплая бумажная база и один акцент — коралл. Плоские поверхности вместо градиентов, единый радиус, крупная типографика Onest без второго шрифта. Профиль профессии — горизонтальные полосы вместо радара, индекс спроса раскрашен по ступеням.</div></li>' +
 '<li><span class="mono">9 ноября 2026</span><div><b>Стиль и печать.</b> Единая палитра и токены, шрифтовая шкала, мера строки и редакционный ритм. Общая система наведения, линейные иконки сфер, компас в пустых состояниях. Режим чтения и печатный титул с колонтитулом на A4.</div></li>' +
@@ -4516,7 +4581,7 @@ plural(s.cities.length, 'городе', 'городах', 'городах') + '.
 '<a class="btn btn-sm" href="' + h(pageHref('/specialties', 'sphere=' + s.sphereCode)) + '">Специальности сферы</a>' +
 '</div>' +
 '</header>' +
-photoPlate(sphereMainKey(s.sphereCode)) +
+photoPlate(photoPick(s.slug, SPHERE_PHOTOS[s.sphereCode] || [sphereMainKey(s.sphereCode)])) +
 '<section class="sec-head reveal"><div><p class="eyebrow">Вузы</p><h2 class="sec">Где учиться</h2></div></section>' +
 '<div class="tbl-wrap"><table class="data"><thead><tr><th>Вуз</th><th>Город</th><th>Бюджет</th><th>Платно</th></tr></thead><tbody>' +
 rows + '</tbody></table></div>' +

@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v58';
+const VERSION = 'atlas-2030-v59';
 const SHELL = [
   './',
   './index.html',
@@ -45,10 +45,32 @@ const SHELL = [
   './photos/sphere-d04-alt-800.webp',
   './photos/sphere-d05-alt-800.webp',
   './photos/sphere-d06-alt-800.webp',
+  './photos/sphere-d01-2-800.webp',
+  './photos/sphere-d01-3-800.webp',
+  './photos/sphere-d01-4-800.webp',
+  './photos/sphere-d02-2-800.webp',
+  './photos/sphere-d02-3-800.webp',
+  './photos/sphere-d02-4-800.webp',
+  './photos/sphere-d03-2-800.webp',
+  './photos/sphere-d03-3-800.webp',
+  './photos/sphere-d03-4-800.webp',
+  './photos/sphere-d04-2-800.webp',
+  './photos/sphere-d04-3-800.webp',
+  './photos/sphere-d04-4-800.webp',
+  './photos/sphere-d05-2-800.webp',
+  './photos/sphere-d05-3-800.webp',
+  './photos/sphere-d05-4-800.webp',
+  './photos/sphere-d06-2-800.webp',
+  './photos/sphere-d06-3-800.webp',
+  './photos/sphere-d06-4-800.webp',
   './photos/life-library-800.webp',
   './photos/life-reading-800.webp',
   './photos/life-class-800.webp',
   './photos/life-theatre-800.webp',
+  './photos/life-campus-800.webp',
+  './photos/life-lab-800.webp',
+  './photos/life-lawn-800.webp',
+  './photos/life-walk-800.webp',
   './photos/uni-mgu-800.webp',
   './photos/uni-spbgu-800.webp',
   './photos/uni-itmo-800.webp',

@@ -15,7 +15,48 @@
    "license": "CC BY-SA 4.0",
    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "source": "https://commons.wikimedia.org/wiki/File:Racks_Amravati_Data_Center.jpg"
-  }
+  },
+  "extra": [
+   {
+    "file": "photos/sphere-d01-2-800.webp",
+    "files": [
+     "photos/sphere-d01-2-1600.webp",
+     "photos/sphere-d01-2-800.webp"
+    ],
+    "title": "File:BalticServers data center.jpg",
+    "caption": "Серверные стойки дата-центра",
+    "author": "BalticServers.com",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:BalticServers_data_center.jpg"
+   },
+   {
+    "file": "photos/sphere-d01-3-800.webp",
+    "files": [
+     "photos/sphere-d01-3-1600.webp",
+     "photos/sphere-d01-3-800.webp"
+    ],
+    "title": "File:Ashs-digital-technology-suite.jpg",
+    "caption": "Компьютерный класс с рабочими местами",
+    "author": "Mosborne01",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ashs-digital-technology-suite.jpg"
+   },
+   {
+    "file": "photos/sphere-d01-4-800.webp",
+    "files": [
+     "photos/sphere-d01-4-1600.webp",
+     "photos/sphere-d01-4-800.webp"
+    ],
+    "title": "File:Asperitas AIC24 Immersion system.jpg",
+    "caption": "Коммутация в системе иммерсионного охлаждения",
+    "author": "Rolf Brink",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Asperitas_AIC24_Immersion_system.jpg"
+   }
+  ]
  },
  "D-02": {
   "cover": {
@@ -33,7 +74,48 @@
    "license": "CC BY-SA 4.0",
    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "source": "https://commons.wikimedia.org/wiki/File:2018_Schwei%C3%9Fer_-_Fritzmeier_Group.jpg"
-  }
+  },
+  "extra": [
+   {
+    "file": "photos/sphere-d02-2-800.webp",
+    "files": [
+     "photos/sphere-d02-2-1600.webp",
+     "photos/sphere-d02-2-800.webp"
+    ],
+    "title": "File:Automatische Gepäckverladung.tif",
+    "caption": "Робот-сварщик на автоматической линии",
+    "author": "TheGrenzebachGroup",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Automatische_Gep%C3%A4ckverladung.tif"
+   },
+   {
+    "file": "photos/sphere-d02-3-800.webp",
+    "files": [
+     "photos/sphere-d02-3-1600.webp",
+     "photos/sphere-d02-3-800.webp"
+    ],
+    "title": "File:B1 machining.jpg",
+    "caption": "Оператор станка с ЧПУ за пультом",
+    "author": "U.S. Air Force photo/Margo Wright",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "source": "https://commons.wikimedia.org/wiki/File:B1_machining.jpg"
+   },
+   {
+    "file": "photos/sphere-d02-4-800.webp",
+    "files": [
+     "photos/sphere-d02-4-1600.webp",
+     "photos/sphere-d02-4-800.webp"
+    ],
+    "title": "File:3D Drucker – CeBIT 2016 03.jpg",
+    "caption": "3D-печать деталей на производстве",
+    "author": "Frank Schwichtenberg",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:3D_Drucker_%E2%80%93_CeBIT_2016_03.jpg"
+   }
+  ]
  },
  "D-03": {
   "cover": {
@@ -51,7 +133,48 @@
    "license": "Public domain",
    "licenseUrl": "",
    "source": "https://commons.wikimedia.org/wiki/File:Researchers_in_laboratory.jpg"
-  }
+  },
+  "extra": [
+   {
+    "file": "photos/sphere-d03-2-800.webp",
+    "files": [
+     "photos/sphere-d03-2-1600.webp",
+     "photos/sphere-d03-2-800.webp"
+    ],
+    "title": "File:CPMC Surgery (412142792).jpg",
+    "caption": "Хирург у монитора во время операции",
+    "author": "Artur Bergman",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:CPMC_Surgery_(412142792).jpg"
+   },
+   {
+    "file": "photos/sphere-d03-3-800.webp",
+    "files": [
+     "photos/sphere-d03-3-1600.webp",
+     "photos/sphere-d03-3-800.webp"
+    ],
+    "title": "File:Equipo Oncocir.jpg",
+    "caption": "Операционная бригада за работой",
+    "author": "Oncocir S.A.P.",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Equipo_Oncocir.jpg"
+   },
+   {
+    "file": "photos/sphere-d03-4-800.webp",
+    "files": [
+     "photos/sphere-d03-4-1600.webp",
+     "photos/sphere-d03-4-800.webp"
+    ],
+    "title": "File:Andres Maser and others.JPG",
+    "caption": "Биотехнологи за лабораторным столом",
+    "author": "Maxim Bilovitskiy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Andres_Maser_and_others.JPG"
+   }
+  ]
  },
  "D-04": {
   "cover": {
@@ -69,7 +192,48 @@
    "license": "CC BY-SA 4.0",
    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "source": "https://commons.wikimedia.org/wiki/File:Country%27s_largest_solar_power_plant_inaugurated.png"
-  }
+  },
+  "extra": [
+   {
+    "file": "photos/sphere-d04-2-800.webp",
+    "files": [
+     "photos/sphere-d04-2-1600.webp",
+     "photos/sphere-d04-2-800.webp"
+    ],
+    "title": "File:Saulės elektrinė.jpg",
+    "caption": "Солнечная электростанция на закате",
+    "author": "Aiseinau",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Saul%C4%97s_elektrin%C4%97.jpg"
+   },
+   {
+    "file": "photos/sphere-d04-3-800.webp",
+    "files": [
+     "photos/sphere-d04-3-1600.webp",
+     "photos/sphere-d04-3-800.webp"
+    ],
+    "title": "File:Bagnell dam spillways.jpg",
+    "caption": "Плотина ГЭС и водохранилище",
+    "author": "Unifadenfisch",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bagnell_dam_spillways.jpg"
+   },
+   {
+    "file": "photos/sphere-d04-4-800.webp",
+    "files": [
+     "photos/sphere-d04-4-1600.webp",
+     "photos/sphere-d04-4-800.webp"
+    ],
+    "title": "File:20201101 Vindkraftverk E22 norr om Lund 2010 (50558777411).jpg",
+    "caption": "Ветроустановка в вечернем свете",
+    "author": "News Oresund",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:20201101_Vindkraftverk_E22_norr_om_Lund_2010_(50558777411).jpg"
+   }
+  ]
  },
  "D-05": {
   "cover": {
@@ -87,7 +251,48 @@
    "license": "CC0",
    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
    "source": "https://commons.wikimedia.org/wiki/File:Desks_in_an_open_office_space_(Unsplash).jpg"
-  }
+  },
+  "extra": [
+   {
+    "file": "photos/sphere-d05-2-800.webp",
+    "files": [
+     "photos/sphere-d05-2-1600.webp",
+     "photos/sphere-d05-2-800.webp"
+    ],
+    "title": "File:BMF Festsaal.jpg",
+    "caption": "Зал заседаний: рабочие места депутатов",
+    "author": "Photo: Andreas Praefcke",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:BMF_Festsaal.jpg"
+   },
+   {
+    "file": "photos/sphere-d05-3-800.webp",
+    "files": [
+     "photos/sphere-d05-3-1600.webp",
+     "photos/sphere-d05-3-800.webp"
+    ],
+    "title": "File:Bernerhof Large Salon.jpg",
+    "caption": "Переговорная комната под куполом",
+    "author": "Sandstein",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bernerhof_Large_Salon.jpg"
+   },
+   {
+    "file": "photos/sphere-d05-4-800.webp",
+    "files": [
+     "photos/sphere-d05-4-1600.webp",
+     "photos/sphere-d05-4-800.webp"
+    ],
+    "title": "File:Berne Supreme Court courtroom.jpg",
+    "caption": "Зал судебного заседания",
+    "author": "Sandstein",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "source": "https://commons.wikimedia.org/wiki/File:Berne_Supreme_Court_courtroom.jpg"
+   }
+  ]
  },
  "D-06": {
   "cover": {
@@ -105,7 +310,48 @@
    "license": "CC BY 2.0",
    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
    "source": "https://commons.wikimedia.org/wiki/File:Tom-at-Desk.jpg"
-  }
+  },
+  "extra": [
+   {
+    "file": "photos/sphere-d06-2-800.webp",
+    "files": [
+     "photos/sphere-d06-2-1600.webp",
+     "photos/sphere-d06-2-800.webp"
+    ],
+    "title": "File:Axel Springer Haus Newsroom.JPG",
+    "caption": "Редакция новостей: рабочие места журналистов",
+    "author": "Thomas Schmidt (NetAction)",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Axel_Springer_Haus_Newsroom.JPG"
+   },
+   {
+    "file": "photos/sphere-d06-3-800.webp",
+    "files": [
+     "photos/sphere-d06-3-1600.webp",
+     "photos/sphere-d06-3-800.webp"
+    ],
+    "title": "File:Bloomberg in London.jpg",
+    "caption": "Телевизионная студия с камерами",
+    "author": "Kowarisuki",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bloomberg_in_London.jpg"
+   },
+   {
+    "file": "photos/sphere-d06-4-800.webp",
+    "files": [
+     "photos/sphere-d06-4-1600.webp",
+     "photos/sphere-d06-4-800.webp"
+    ],
+    "title": "File:2 Color Pad Printing Machine with 11 Station Carousel.jpg",
+    "caption": "Печатная машина в типографии",
+    "author": "C.andersson",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2_Color_Pad_Printing_Machine_with_11_Station_Carousel.jpg"
+   }
+  ]
  },
  "universities": {
   "uni-mgu": {
@@ -397,6 +643,58 @@
    "license": "CC BY-SA 4.0",
    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "source": "https://commons.wikimedia.org/wiki/File:Lecture_Theatre_of_the_Hive_Building.JPG"
+  },
+  "life-campus": {
+   "file": "photos/life-campus-800.webp",
+   "files": [
+    "photos/life-campus-1200.webp",
+    "photos/life-campus-800.webp"
+   ],
+   "title": "File:Student Walking on the University of Oregon Campus (26811370679).jpg",
+   "caption": "Студент на аллее кампуса",
+   "author": "Rick Obst from Eugene, United States",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Student_Walking_on_the_University_of_Oregon_Campus_(26811370679).jpg"
+  },
+  "life-lab": {
+   "file": "photos/life-lab-800.webp",
+   "files": [
+    "photos/life-lab-1200.webp",
+    "photos/life-lab-800.webp"
+   ],
+   "title": "File:Biochemistry Lab.jpg",
+   "caption": "Реактивы в университетской лаборатории",
+   "author": "Baitaal",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Biochemistry_Lab.jpg"
+  },
+  "life-lawn": {
+   "file": "photos/life-lawn-800.webp",
+   "files": [
+    "photos/life-lawn-1200.webp",
+    "photos/life-lawn-800.webp"
+   ],
+   "title": "File:Alcoa labs in New Kensington.jpg",
+   "caption": "Кампус университета: газон и корпуса",
+   "author": "Nyttend",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Alcoa_labs_in_New_Kensington.jpg"
+  },
+  "life-walk": {
+   "file": "photos/life-walk-800.webp",
+   "files": [
+    "photos/life-walk-1200.webp",
+    "photos/life-walk-800.webp"
+   ],
+   "title": "File:Three walking students, Tulane University New Orleans, March 2008.jpg",
+   "caption": "Студенты на кампусе",
+   "author": "Tulane Public Relations",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Three_walking_students,_Tulane_University_New_Orleans,_March_2008.jpg"
   }
  }
 }
