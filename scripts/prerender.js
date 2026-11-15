@@ -13,6 +13,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -144,8 +145,24 @@ function sitemap(routes, lastmod) {
   return out.join('\n');
 }
 
+function gitDate(args) {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%cs'].concat(args),
+      { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : null;
+  } catch (e) { return null; }
+}
+
 function dataLastmod() {
-  const stamps = DATA_FILES.concat(['app.js', 'index.html'])
+  const files = DATA_FILES.concat(['app.js', 'index.html']);
+  /* Дата коммита, а не mtime файлов: у свежего клона mtime — это время
+     checkout, и sitemap «устаревал» на каждом запуске CI. В мелком клоне
+     история обрезана, поэтому последний довод — дата HEAD. */
+  const byFiles = gitDate(['--'].concat(files));
+  if (byFiles) return byFiles;
+  const byHead = gitDate([]);
+  if (byHead) return byHead;
+  const stamps = files
     .map((f) => fs.statSync(path.join(ROOT, f)).mtime)
     .map((d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10));
   return stamps.sort().pop();
