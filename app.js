@@ -142,7 +142,11 @@ var SPHERE_DESC = {
 'D-03': 'Здоровье, биология, фарма',
 'D-04': 'Энергия, климат, ресурсы',
 'D-05': 'Люди, право, экономика',
-'D-06': 'Тексты, медиа, перевод'
+'D-06': 'Тексты, медиа, перевод',
+'D-07': 'Обучение, методика, наставничество',
+'D-08': 'Среда, интерфейсы, визуальная культура',
+'D-09': 'Перевозки, инфраструктура, цепи поставок',
+'D-10': 'Поля, фермы, переработка, качество'
 };
 /* ---------- фотобанк сфер ----------
    Фотографии лежат рядом с сайтом и подключаются только в полной версии:
@@ -404,7 +408,12 @@ var SPHERE_PHOTOS = {
   'D-03': ['sphere-d03', 'sphere-d03-alt', 'sphere-d03-2', 'sphere-d03-3', 'sphere-d03-4'],
   'D-04': ['sphere-d04', 'sphere-d04-alt', 'sphere-d04-2', 'sphere-d04-3', 'sphere-d04-4'],
   'D-05': ['sphere-d05', 'sphere-d05-alt', 'sphere-d05-2', 'sphere-d05-3', 'sphere-d05-4'],
-  'D-06': ['sphere-d06', 'sphere-d06-alt', 'sphere-d06-2', 'sphere-d06-3', 'sphere-d06-4']
+  'D-06': ['sphere-d06', 'sphere-d06-alt', 'sphere-d06-2', 'sphere-d06-3', 'sphere-d06-4'],
+  /* Новые сферы пока без отдельного фотобанка: нейтральные учебные сцены. */
+  'D-07': ['life-class', 'life-reading'],
+  'D-08': ['life-theatre', 'life-campus'],
+  'D-09': ['life-walk', 'life-campus'],
+  'D-10': ['life-lab', 'life-lawn']
 };
 function spherePhotoAt(code, i) {
   var keys = SPHERE_PHOTOS[code];
@@ -989,6 +998,7 @@ if (st.step > 1) p.set('step', st.step);
 p.set('e', st.exams.join(','));
 if (st.sphere) p.set('s', st.sphere);
 if (st.sum !== 240) p.set('b', st.sum);
+if (st.sumGuess) p.set('sg', '1');
 if (st.mathLevel && st.exams.indexOf('Мат') >= 0) p.set('mlevel', st.mathLevel);
 return p;
 }
@@ -1004,6 +1014,7 @@ var st = { step: 1, exams: exams, sphere: '', sum: 240, mathLevel: o.mlevel === 
 if (o.s && SPHERES.some(function (x) { return x.code === o.s; })) st.sphere = o.s;
 var b = parseInt(o.b, 10);
 if (b >= 120 && b <= 300) st.sum = b;
+if (o.sg) st.sumGuess = true;
 var step = parseInt(o.step, 10);
 if (step >= 1 && step <= 4) st.step = step;
 return st;
@@ -1014,7 +1025,7 @@ try {
 var isDefault = st.step === 1 && !st.sphere && st.sum === 240 &&
 st.exams.join(',') === 'Рус,Мат,Инф' && (st.mathLevel || 'profile') === 'profile';
 if (isDefault) localStorage.removeItem('atlas:quiz');
-else localStorage.setItem('atlas:quiz', JSON.stringify({ e: st.exams, s: st.sphere, b: st.sum, step: st.step, mlevel: st.mathLevel || 'profile' }));
+else localStorage.setItem('atlas:quiz', JSON.stringify({ e: st.exams, s: st.sphere, b: st.sum, step: st.step, mlevel: st.mathLevel || 'profile', sg: st.sumGuess ? 1 : 0 }));
 } catch (e) {}
 updateChoice();
 syncChoiceOpen();
@@ -2447,7 +2458,8 @@ return '<button class="fav-btn' + (cls ? ' ' + cls : '') + '" type="button" data
 /* Графическая метка профессии: сетка точек, узор которой выводится
    из slug. Одна и та же профессия всегда получает один и тот же знак. */
 var SPHERE_MARK_COLOR = {
-'D-01': '#e2492b', 'D-02': '#d98324', 'D-03': '#2f8f5b', 'D-04': '#2f6fdb', 'D-05': '#7b4bbd', 'D-06': '#c0397a', 'D-07': '#5f7d1f', 'D-08': '#a16207'
+'D-01': '#e2492b', 'D-02': '#d98324', 'D-03': '#2f8f5b', 'D-04': '#2f6fdb', 'D-05': '#7b4bbd', 'D-06': '#c0397a', 'D-07': '#5f7d1f', 'D-08': '#a16207',
+'D-09': '#1f7a7a', 'D-10': '#7a5c2e'
 };
 function profMark(slug, sphereCode) {
 var seed = 2166136261;
@@ -5238,6 +5250,7 @@ var s = q.get('s');
 if (s && SPHERES.some(function (x) { return x.code === s; })) st.sphere = s;
 var b = parseInt(q.get('b'), 10);
 if (b >= 120 && b <= 300) st.sum = b;
+if (q.get('sg') === '1') st.sumGuess = true;
 var ml = q.get('mlevel');
 if (ml === 'basic' || ml === 'profile') st.mathLevel = ml;
 var step = parseInt(q.get('step'), 10);
@@ -5287,7 +5300,7 @@ var sum = st.sum;
 return P.map(function (p) {
 var progs = PROG[p.slug] || [];
 var fit = progs.filter(function (pr) {
-var mathRestricted = st.mathLevel === 'basic' && exams.indexOf('Мат') >= 0 && /Мат/.test(pr.ege) && ['D-01', 'D-02', 'D-04', 'D-05'].indexOf(p.sphereCode) >= 0;
+var mathRestricted = st.mathLevel === 'basic' && exams.indexOf('Мат') >= 0 && /Мат/.test(pr.ege) && ['D-01', 'D-02', 'D-04', 'D-05', 'D-09'].indexOf(p.sphereCode) >= 0;
 return !mathRestricted && fitsEge(pr.ege, exams);
 });
 var affordable = fit.filter(function (pr) { return pr.budget && pr.budget <= sum + 10; });
@@ -5340,7 +5353,7 @@ plural(printed, 'лучшее совпадение', 'лучших совпад�
 answers: [
 ['Экзамены ЕГЭ', h(st.exams.map(function (s) { return SUBJ_FULL[s] || s; }).join(' · '))],
 ['Уровень математики', st.exams.indexOf('Мат') >= 0 ? (st.mathLevel === 'basic' ? 'базовый' : 'профильный') : 'математика не выбрана'],
-['Ожидаемая сумма', st.sum + ' из 300'],
+['Ожидаемая сумма', st.sumGuess ? 'оценка ' + st.sum + ' из 300 (точное значение не указано)' : st.sum + ' из 300'],
 ['Сфера интереса', h(sphereObj ? sphereObj.name : 'любая')],
 ['Вузов в списке', String(Object.keys(uniSeen).length)]
 ],
@@ -5368,7 +5381,7 @@ var head = '<div class="report-head"><div><p class="eyebrow">Результат 
 '<button class="btn btn-sm btn-ghost" id="restart">Заново</button></div></div>';
 var tags = '<div class="report-sum"><span class="tag">ЕГЭ: ' + h(st.exams.join(' · ')) + '</span>' +
 '<span class="tag">Математика: ' + (st.mathLevel === 'basic' ? 'базовый уровень' : 'профильный уровень') + '</span>' +
-'<span class="tag">Сумма: ' + st.sum + ' из 300</span>' +
+'<span class="tag">Сумма: ' + (st.sumGuess ? 'оценка ' : '') + st.sum + ' из 300</span>' +
 '<span class="tag">Сфера: ' + h(sphereObj ? sphereObj.name : 'любая') + '</span></div>';
 if (!top.length) {
 return head + tags + '<div class="report-empty">' + ES_COMPASS + '<b>Подходящих программ не нашлось</b>' +
@@ -5416,8 +5429,9 @@ return '<button class="sphere" data-sphere="' + s.code + '" aria-pressed="' + (s
 plural(s.count, 'профессия', 'профессии', 'профессий') + '</span></button>';
 }).join('') +
 '</div>' +
-'<div class="quiz-foot"><span class="quiz-count">Шаг 2 из 4</span>' +
+'<div class="quiz-foot"><span class="quiz-count">Шаг 2 из 4 · можно пропустить</span>' +
 '<div class="quiz-nav"><button class="btn" data-back>← Назад</button>' +
+'<button class="btn btn-ghost" data-skip>Пропустить</button>' +
 '<button class="btn btn-primary" data-next>Дальше →</button></div></div>';
 }
 if (st.step === 3) {
@@ -5431,7 +5445,8 @@ return '<h2>Ожидаемая сумма баллов</h2>' +
 '<div class="quick">' + [180, 210, 240, 270, 290].map(function (v) {
 return '<button data-quick="' + v + '">' + v + '</button>';
 }).join('') + '</div>' +
-'<div class="quiz-foot"><span class="quiz-count">Шаг 3 из 4</span>' +
+'<p class="quiz-note" style="margin-top:10px"><button class="btn btn-ghost btn-sm" data-unknown>Не знаю сумму — подобрать по предметам</button></p>' +
+'<div class="quiz-foot"><span class="quiz-count">Шаг 3 из 4 · можно пропустить</span>' +
 '<div class="quiz-nav"><button class="btn" data-back>← Назад</button>' +
 '<button class="btn btn-primary" data-next>Показать результат →</button></div></div>' +
 '<p class="quiz-note">Шкала ориентировочная: 120–160 — чаще платное обучение, 200–240 — бюджет в региональных вузах, 260+ — ведущие вузы.</p>';
@@ -5465,6 +5480,7 @@ st.step = 1;
 st.exams = ['Рус', 'Мат', 'Инф'];
 st.sphere = '';
 st.sum = 240;
+st.sumGuess = false;
 st.mathLevel = 'profile';
 paintQuiz(st);
 });
@@ -5539,6 +5555,20 @@ range.dispatchEvent(new Event('input'));
 root.onclick = function (e) {
 var next = e.target.closest('[data-next]');
 var back = e.target.closest('[data-back]');
+var skip = e.target.closest('[data-skip]');
+var unknown = e.target.closest('[data-unknown]');
+if (skip) {
+st.step = Math.min(4, st.step + 1);
+paintQuiz(st);
+return;
+}
+if (unknown) {
+st.sumGuess = true;
+st.sum = 200;
+st.step = 4;
+paintQuiz(st);
+return;
+}
 if (next) {
 if (st.step === 1 && !st.exams.length) { toast('Необходимо выбрать хотя бы один предмет'); return; }
 st.step = Math.min(4, st.step + 1);
@@ -5800,8 +5830,9 @@ return '<button class="sphere" data-sphere="' + s.code + '" aria-pressed="' + (s
 plural(n, 'специальность', 'специальности', 'специальностей') + '</span></button>';
 }).join('') +
 '</div>' +
-'<div class="quiz-foot"><span class="quiz-count">Шаг 2 из 4</span>' +
+'<div class="quiz-foot"><span class="quiz-count">Шаг 2 из 4 · можно пропустить</span>' +
 '<div class="quiz-nav"><button class="btn" data-back>← Назад</button>' +
+'<button class="btn btn-ghost" data-skip>Пропустить</button>' +
 '<button class="btn btn-primary" data-next>Дальше →</button></div></div>';
 }
 if (st.step === 3) {
@@ -5891,6 +5922,20 @@ range.dispatchEvent(new Event('input'));
 root.onclick = function (e) {
 var next = e.target.closest('[data-next]');
 var back = e.target.closest('[data-back]');
+var skip = e.target.closest('[data-skip]');
+var unknown = e.target.closest('[data-unknown]');
+if (skip) {
+st.step = Math.min(4, st.step + 1);
+paintQuiz(st);
+return;
+}
+if (unknown) {
+st.sumGuess = true;
+st.sum = 200;
+st.step = 4;
+paintQuiz(st);
+return;
+}
 if (next) {
 if (st.step === 1 && !st.exams.length) { toast('Необходимо выбрать хотя бы один предмет'); return; }
 st.step = Math.min(4, st.step + 1);
@@ -7089,6 +7134,8 @@ var SPHERE_ICONS = {
 'D-06': '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 15l4.2-4 3.4 3.2L15 11l5 4.5"/><circle cx="9.5" cy="9" r="1.1"/>',
 'D-07': '<path d="M12 21V9"/><path d="M12 9c0-3 2-5 5.5-5C17.5 7 15.5 9 12 9z"/><path d="M12 13c0-2.6-1.8-4.4-5-4.4C7 11.5 8.8 13 12 13z"/>',
 'D-08': '<circle cx="6" cy="16.5" r="2.5"/><circle cx="18" cy="16.5" r="2.5"/><path d="M3.5 10h13.2l3.8 4M8 10V6h6"/>',
+'D-09': '<path d="M3 7h10v9H3zM13 11h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
+'D-10': '<path d="M12 21V8"/><path d="M12 12c-3 0-4-2-4-4 3 0 4 2 4 4zM12 12c3 0 4-2 4-4-3 0-4 2-4 4zM12 16c-3 0-4-2-4-4 3 0 4 2 4 4zM12 16c3 0 4-2 4-4-3 0-4 2-4 4z"/>',
 };
 function sphereIcon(code) {
 var d = SPHERE_ICONS[code] || SPHERE_ICONS['D-01'];

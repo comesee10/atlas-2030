@@ -37,7 +37,7 @@ for (const f of FILES) {
 const A = win.ATLAS;
 if (!A) { report(); process.exit(1); }
 
-const SPHERE_CODES = ['D-01', 'D-02', 'D-03', 'D-04', 'D-05', 'D-06'];
+const SPHERE_CODES = ['D-01', 'D-02', 'D-03', 'D-04', 'D-05', 'D-06', 'D-07', 'D-08', 'D-09', 'D-10'];
 const DISTRICT_CODES = ['ЦФО', 'СЗФО', 'ЮФО', 'СКФО', 'ПФО', 'УФО', 'СФО', 'ДФО'];
 
 /* карта городов из app.js — исторический источник region/district */
@@ -229,7 +229,9 @@ for (const f of FILES) {
 
 /* ---- фото-банки сфер: файлы должны быть в репозитории ---- */
 if (fs.existsSync(path.join(ROOT, 'photos'))) {
-  for (const code of SPHERE_CODES) {
+/* Отдельный фотобанк есть только у первых шести сфер; новые используют
+   нейтральные учебные сцены, их наличие проверяет smoke-links. */
+  for (const code of SPHERE_CODES.slice(0, 6)) {
     const key = code.toLowerCase().replace(/-/g, '');
     for (const size of ['800', '1600']) {
       for (const base of ['sphere-' + key + '-' + size, 'sphere-' + key + '-alt-' + size]) {

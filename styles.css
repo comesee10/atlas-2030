@@ -2476,6 +2476,7 @@ background:var(--bg-2);background-image:none;border-color:var(--rule);box-shadow
 :root{
 --sph-D01:#ff8a6e;--sph-D02:#e8a94f;--sph-D03:#5cbf8a;--sph-D04:#6d9ef2;
 --sph-D05:#a985e0;--sph-D06:#e07aa8;--sph-D07:#a8c95a;--sph-D08:#d99bd0;
+--sph-D09:#6fbaba;--sph-D10:#c9a06a;
 --up:#5cbf8a;--down:#f87171;
 --sph-h-D01:repeating-linear-gradient(45deg,var(--sph-D01) 0 2px,transparent 2px 6px);
 --sph-h-D02:repeating-linear-gradient(0deg,var(--sph-D02) 0 2px,transparent 2px 6px);
@@ -2485,10 +2486,13 @@ background:var(--bg-2);background-image:none;border-color:var(--rule);box-shadow
 --sph-h-D06:radial-gradient(var(--sph-D06) 1px,transparent 1.2px) 0 0/6px 6px;
 --sph-h-D07:repeating-linear-gradient(45deg,var(--sph-D07) 0 1px,transparent 1px 8px);
 --sph-h-D08:repeating-linear-gradient(90deg,var(--sph-D08) 0 1px,transparent 1px 5px);
+--sph-h-D09:radial-gradient(var(--sph-D09) 1px,transparent 1.2px) 2px 2px/7px 7px;
+--sph-h-D10:repeating-linear-gradient(-45deg,var(--sph-D10) 0 2px,transparent 2px 7px);
 }
 .theme-light{
 --sph-D01:#e2492b;--sph-D02:#d98324;--sph-D03:#2f8f5b;--sph-D04:#2f6fdb;
 --sph-D05:#7b4bbd;--sph-D06:#c0397a;--sph-D07:#5f7d1f;--sph-D08:#a16207;
+--sph-D09:#1f7a7a;--sph-D10:#7a5c2e;
 --up:#2f8f5b;--down:#c0392b;
 }
 .rail-sticky{box-shadow:none}
