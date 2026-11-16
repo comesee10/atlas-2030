@@ -2938,12 +2938,23 @@ regions.length + ' ' + plural(regions.length, 'регион', 'региона', 
 regions.map(function (r) {
 var regionUnis = inDistrict.filter(function (u) { return u.region === r.name; });
 var programs = regionUnis.reduce(function (n, u) { return n + u.programs.length; }, 0);
+/* Сводный список показывает по 4 карточки на регион: полный каталог
+   из 1200 организаций одним полотном нечитаем и тяжёл. */
+var cap = (st && (st.q || st.region || st.city)) ? 0 : 4;
+var shown = cap ? regionUnis.slice(0, cap) : regionUnis;
+var more = cap && regionUnis.length > cap
+? '<p class="mono tiny" style="margin:12px 0 0"><a href="' +
+h(pageHref('/universities', 'region=' + encodeURIComponent(r.name))) + '">Ещё ' +
+(regionUnis.length - cap) + ' ' + plural(regionUnis.length - cap, 'вуз', 'вуза', 'вузов') +
+' региона →</a></p>'
+: '';
 return '<div class="region-block">' +
 '<div class="region-head"><h3>' + h(r.name) + '</h3>' +
 '<span class="mono tiny">' + regionUnis.length + ' ' + plural(regionUnis.length, 'вуз', 'вуза', 'вузов') +
 ' · ' + programs + ' ' + plural(programs, 'программа', 'программы', 'программ') +
 (programs ? ' · средний балл ≈' + r.avg : ' · показатели без программ') + '</span></div>' +
-'<div class="uni-grid">' + regionUnis.map(function (u) { return uniCard(u, seen++); }).join('') + '</div>' +
+'<div class="uni-grid">' + shown.map(function (u) { return uniCard(u, seen++); }).join('') + '</div>' +
+more +
 '</div>';
 }).join('') +
 '</section>';
@@ -3251,7 +3262,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="eyebrow">Раздел IV · После 11 класса</p>' +
 '<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Вузы <em>по регионам</em></h1>' +
 '<p class="lead">' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' в ' + REGIONS.length + ' ' + plural(REGIONS.length, 'регионе', 'регионах', 'регионах') + ' и ' + DISTRICTS.length + ' федеральных округах. Направления, наборы ЕГЭ и ориентировочные баллы на бюджет и платное обучение. Сумма трёх экзаменов, максимум 300.</p>' +
-'<p class="source-note">Каталог — выборка вузов с открытыми данными о программах и баллах, а не полный список вузов страны. ' +
+'<p class="source-note">Каталог — головные вузы и филиалы из мониторинга высшего образования. У части организаций разобраны направления, наборы ЕГЭ и баллы, у остальных — только официальные показатели. ' +
 'Условия, льготы и даты приёма всегда уточняйте на сайте вуза.</p>' +
 '</section>' +
 photoHero('universities') +
@@ -7600,4 +7611,7 @@ history.replaceState(null, '', '#/');
 updateChoice();
 updateFavoritesUI();
 route();
+/* Сборщик статических страниц переиспользует один DOM и вызывает route()
+   для каждого адреса: создавать 1500 jsdom-окон подряд дорого. */
+if (window.__ATLAS_PRERENDER__) window.__atlasRoute = route;
 })();

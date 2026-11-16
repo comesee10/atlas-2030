@@ -22,7 +22,8 @@ const BASE = '/atlas-2030';
 const CHECK = process.argv.includes('--check');
 
 const DATA_FILES = ['data-core.js', 'data-universities-1.js', 'data-universities-2.js',
-  'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js', 'data-monitoring.js'];
+  'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js', 'data-monitoring.js',
+  'data-organizations-1.js', 'data-organizations-2.js'];
 
 /* Разделы с собственной статической копией. Должно совпадать с STATIC_ROUTE
    в app.js; совпадение проверяет scripts/smoke-links.js. */
@@ -85,14 +86,26 @@ function prepare(win, atlas) {
   win.scrollTo = () => {};
 }
 
-function renderPage(route, atlas) {
-  const url = SITE + BASE + (route === '/' ? '/' : route.replace(/\/+$/, '') + '/');
+function urlFor(route) {
+  return SITE + BASE + (route === '/' ? '/' : route.replace(/\/+$/, '') + '/');
+}
+
+/* Один DOM на пачку страниц: 1500 отдельных jsdom-окон переполняют память. */
+function createSession(atlas) {
   const dom = new JSDOM(read('index.html'), {
-    url, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: quiet
+    url: urlFor('/'), runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: quiet
   });
   const win = dom.window;
   prepare(win, structuredClone(atlas));
   win.eval(read('app.js'));
+  if (typeof win.__atlasRoute !== 'function') throw new Error('app.js не отдал route для сборщика');
+  return dom;
+}
+
+function renderPage(dom, route) {
+  const win = dom.window;
+  win.history.replaceState({}, '', urlFor(route));
+  win.__atlasRoute();
   const doc = win.document;
   const view = doc.querySelector('#app .view');
   if (!view) throw new Error(route + ': app.js не отрисовал страницу');
@@ -107,9 +120,7 @@ function renderPage(route, atlas) {
   doc.querySelectorAll('#app .boot-skel').forEach((el) => el.remove());
   /* Статическая копия уже содержит разметку: подсказка «нужен JavaScript» лишняя. */
   doc.querySelectorAll('noscript').forEach((el) => el.remove());
-  const html = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML + '\n';
-  win.close();
-  return html;
+  return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML + '\n';
 }
 
 function pageFile(route) {
@@ -175,8 +186,17 @@ function main() {
   const stale = [];
   const missing = [];
 
+  let session = null;
+  let sessionPages = 0;
   for (const page of pages) {
-    const html = renderPage(page.route, atlas);
+    /* Пачка ограничивает память: один DOM на 200 страниц вместо одного на страницу. */
+    if (!session || sessionPages >= 200) {
+      if (session) session.window.close();
+      session = createSession(atlas);
+      sessionPages = 0;
+    }
+    const html = renderPage(session, page.route);
+    sessionPages++;
     const file = pageFile(page.route);
     if (CHECK) {
       if (!fs.existsSync(file)) missing.push(page.route);
@@ -186,6 +206,7 @@ function main() {
       fs.writeFileSync(file, html);
     }
   }
+  if (session) session.window.close();
 
   const map = sitemap(routes, dataLastmod());
   const mapFile = path.join(ROOT, 'sitemap.xml');

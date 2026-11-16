@@ -11,7 +11,7 @@ const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..');
 const FILES = ['data-core.js', 'data-universities-1.js',
   'data-universities-2.js', 'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js',
-  'data-monitoring.js'];
+  'data-monitoring.js', 'data-organizations-1.js', 'data-organizations-2.js'];
 
 /* Источники, которыми можно подписывать числа. estimate — всегда «оценка атласа». */
 const SOURCES = ['monitoring-2025', 'monitoring-spo-2025', 'vuz-site', 'kcp-2025', 'min-edu-min-2025', 'ege-list-2025', 'estimate'];
@@ -127,7 +127,7 @@ unis.forEach((u, i) => {
   if (uniShorts.has(u.short)) err(t + ': дубликат short');
   uniShorts.add(u.short);
   if (u.avg === undefined) {
-    if (!(orgCard && u.avgEge)) err(t + ': поле avg пусто');
+    if (!(orgCard && (u.avgEge || u.students))) err(t + ': поле avg пусто');
   } else if (!(Number(u.avg) >= 100 && Number(u.avg) <= 300)) {
     err(t + ': avg вне 100..300: ' + u.avg);
   }
