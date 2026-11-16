@@ -1645,6 +1645,13 @@ history.replaceState(null, '', pageHref(legacyPath, legacyQi < 0 ? '' : legacyRo
 }
 var r = parseHash();
 if (r.path.indexOf('/professions') !== 0) clearCatalogState();
+/* Переименованный вуз: старый адрес ведёт на карточку преемника. */
+var REDIRECTS = (window.ATLAS && window.ATLAS.redirects) || {};
+var um = r.path.match(/^\/universities\/([^/]+)$/);
+if (um && REDIRECTS[um[1]]) {
+history.replaceState(null, '', pageHref('/universities/' + REDIRECTS[um[1]]));
+r = parseHash();
+}
 if (r.path === '/siberia') {
 history.replaceState(null, '', pageHref('/universities', 'district=' + encodeURIComponent('СФО')));
 r = parseHash();
@@ -4620,7 +4627,8 @@ app.innerHTML = '<div class="view">' +
 : '<div><span class="k">Средний балл</span><span class="v">≈' + u.avg + '</span></div>' +
 '<div><span class="k">Направлений</span><span class="v">' + u.programs.length + '</span></div>' +
 '<div><span class="k">Специальностей</span><span class="v">' + specs.length + '</span></div>' +
-'<div><span class="k">Бюджетных мест</span><span class="v">≈' + places + '</span></div>') +
+'<div><span class="k">Бюджетных мест</span><span class="v">≈' + places + '</span></div>' +
+(u.avgEge ? '<div><span class="k">ЕГЭ на предмет</span><span class="v">' + score1(u.avgEge) + '</span></div>' : '')) +
 '</div>' +
 '<div class="hero-cta">' +
 (org ? '' : '<a class="btn btn-primary btn-sm" href="' + h(pageHref('/quiz')) + '">Проверить шансы</a>') +
@@ -4631,6 +4639,8 @@ app.innerHTML = '<div class="view">' +
 '</div>' +
 '</header>' +
 uniPlate(u) +
+(u.mergedFrom ? '<p class="source-note">Вуз образован объединением: ' +
+u.mergedFrom.map(function (n) { return h(n); }).join('; ') + '.</p>' : '') +
 (org
 ? '<section class="sec-head reveal"><div><p class="eyebrow">Показатели</p><h2 class="sec">Официальные данные</h2></div></section>' +
 '<div class="panel reveal" style="padding:22px">' +

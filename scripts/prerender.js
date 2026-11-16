@@ -23,7 +23,7 @@ const CHECK = process.argv.includes('--check');
 
 const DATA_FILES = ['data-core.js', 'data-universities-1.js', 'data-universities-2.js',
   'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js', 'data-monitoring.js',
-  'data-organizations-1.js', 'data-organizations-2.js'];
+  'data-organizations-1.js', 'data-organizations-2.js', 'data-merges.js'];
 
 /* Разделы с собственной статической копией. Должно совпадать с STATIC_ROUTE
    в app.js; совпадение проверяет scripts/smoke-links.js. */
@@ -128,6 +128,19 @@ function pageFile(route) {
   return path.join(ROOT, rel, 'index.html');
 }
 
+/* Старый адрес переименованного вуза: мгновенный редирект на новую карточку.
+   Страницу не кладём в sitemap, но файл оставляем, чтобы ссылки не вели в 404. */
+function redirectPage(to) {
+  const url = SITE + BASE + '/universities/' + to + '/';
+  return '<!DOCTYPE html>\n<html lang="ru"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Вуз переименован — Профессии·2030</title>' +
+    '<link rel="canonical" href="' + url + '">' +
+    '<meta http-equiv="refresh" content="0; url=' + url + '">' +
+    '<script>location.replace(' + JSON.stringify(url) + ');</script>' +
+    '</head><body><p>Вуз переименован. <a href="' + url + '">Открыть карточку</a>.</p></body></html>\n';
+}
+
 function eachRoute(routes) {
   const list = [];
   for (const s of SECTIONS) list.push({ route: s.route, priority: s.priority, changefreq: s.changefreq });
@@ -208,13 +221,31 @@ function main() {
   }
   if (session) session.window.close();
 
+  if (session) session.window.close();
+
+  /* Редиректы старых адресов переименованных вузов. */
+  const redirects = atlas.redirects || {};
+  const redirectFiles = [];
+  for (const from of Object.keys(redirects)) {
+    const file = pageFile('/universities/' + from);
+    const html = redirectPage(redirects[from]);
+    redirectFiles.push(file);
+    if (CHECK) {
+      if (!fs.existsSync(file)) missing.push('/universities/' + from);
+      else if (fs.readFileSync(file, 'utf8') !== html) stale.push('/universities/' + from + ' (редирект)');
+    } else {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, html);
+    }
+  }
+
   const map = sitemap(routes, dataLastmod());
   const mapFile = path.join(ROOT, 'sitemap.xml');
   const mapDiff = !fs.existsSync(mapFile) || fs.readFileSync(mapFile, 'utf8') !== map;
   if (!CHECK && mapDiff) fs.writeFileSync(mapFile, map);
 
   /* Убираем страницы, которых больше нет (удалили профессию или вуз). */
-  const known = new Set(pages.map((p) => pageFile(p.route)));
+  const known = new Set(pages.map((p) => pageFile(p.route)).concat(redirectFiles));
   const orphans = [];
   for (const prefix of ['professions', 'universities', 'specialties', 'colleges']) {
     const dir = path.join(ROOT, prefix);
@@ -228,7 +259,7 @@ function main() {
     }
   }
 
-  const total = pages.length + 1;
+  const total = pages.length + redirectFiles.length + 1;
   if (CHECK) {
     const problems = stale.length + missing.length + (mapDiff ? 1 : 0) + orphans.length;
     for (const r of missing) console.error('MISSING ' + r + '/');

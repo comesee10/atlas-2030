@@ -11,7 +11,7 @@ const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..');
 const FILES = ['data-core.js', 'data-universities-1.js',
   'data-universities-2.js', 'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js',
-  'data-monitoring.js', 'data-organizations-1.js', 'data-organizations-2.js'];
+  'data-monitoring.js', 'data-organizations-1.js', 'data-organizations-2.js', 'data-merges.js'];
 
 /* Источники, которыми можно подписывать числа. estimate — всегда «оценка атласа». */
 const SOURCES = ['monitoring-2025', 'monitoring-spo-2025', 'vuz-site', 'kcp-2025', 'min-edu-min-2025', 'ege-list-2025', 'estimate'];

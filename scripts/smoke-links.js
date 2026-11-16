@@ -139,11 +139,20 @@ if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xm
   const existsRoute = (route) => fs.existsSync(path.join(ROOT, route.replace(/^\/|\/$/g, ''), 'index.html'))
     || (route === '/' && fs.existsSync(path.join(ROOT, 'index.html')));
 
+  let redirects = 0;
   for (const page of pages) {
     const html = fs.readFileSync(page.file, 'utf8');
     if (html.indexOf('<title>') < 0) err(page.route + '/: нет <title>');
     if (html.indexOf('<title>') > html.indexOf('<body')) err(page.route + '/: <title> оказался вне <head>');
     const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
+    /* Старый адрес переименованного вуза — мета-редирект на новую карточку. */
+    if (/http-equiv="refresh"/.test(html) && !/<main id="app"/.test(html)) {
+      redirects++;
+      if (!canonical) { err(page.route + '/: редирект без canonical'); continue; }
+      const target = canonical.replace(SITE + BASE, '').replace(/\/+$/, '');
+      if (!existsRoute(target)) err(page.route + '/: редирект на несуществующую страницу ' + canonical);
+      continue;
+    }
     if (canonical !== SITE + BASE + page.route + '/') err(page.route + '/: canonical ' + canonical);
     const blocks = html.match(/<main id="app"[\s\S]*?<\/main>/) || [''];
     const body = blocks[0];
@@ -161,7 +170,7 @@ if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xm
     }
   }
   if (!pages.length) err('prerender: не найдено ни одной статической карточки');
-  console.log('prerender: проверено ' + pages.length + ' статических карточек');
+  console.log('prerender: проверено ' + (pages.length - redirects) + ' статических карточек, редиректов: ' + redirects);
 }
 
 console.log('---');
