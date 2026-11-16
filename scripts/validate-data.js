@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-/* A4: валидация данных атласа. Парсит data-core.js и чанки вузов так же,
-   как браузер (window.ATLAS), и проверяет структуру и согласованность.
+/* A4: валидация данных атласа. Парсит data-core.js, каркас data-framework.js
+   и чанки вузов так же, как браузер (window.ATLAS), и проверяет структуру,
+   согласованность и провенанс.
    Запуск: node scripts/validate-data.js — nonzero exit при любой ошибке. */
 'use strict';
 const fs = require('fs');
@@ -8,8 +9,14 @@ const path = require('path');
 const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
-const FILES = ['data-core.js', 'data-universities-1.js', 'data-universities-2.js',
-  'data-universities-3.js', 'catalog-expansion.js'];
+const FILES = ['data-core.js', 'data-universities-1.js',
+  'data-universities-2.js', 'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js'];
+
+/* Источники, которыми можно подписывать числа. estimate — всегда «оценка атласа». */
+const SOURCES = ['monitoring-2025', 'monitoring-spo-2025', 'vuz-site', 'kcp-2025', 'min-edu-min-2025', 'ege-list-2025', 'estimate'];
+/* Ни один чанк не должен расти бесконтрольно: иначе первая страница раздела
+   будет грузить сотни килобайт ради одного фильтра. */
+const MAX_CHUNK_KB = 400;
 
 const errors = [];
 const warns = [];
@@ -30,13 +37,54 @@ const A = win.ATLAS;
 if (!A) { report(); process.exit(1); }
 
 const SPHERE_CODES = ['D-01', 'D-02', 'D-03', 'D-04', 'D-05', 'D-06'];
+const DISTRICT_CODES = ['ЦФО', 'СЗФО', 'ЮФО', 'СКФО', 'ПФО', 'УФО', 'СФО', 'ДФО'];
 
-/* карта городов из app.js — источник region/district (в данных их нет) */
+/* карта городов из app.js — исторический источник region/district */
 const appSrc = fs.existsSync(path.join(ROOT, 'app.js')) ? fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8') : '';
 const cityBlock = appSrc.match(/var CITY_GEO = \{([\s\S]*?)\n\};/);
 const CITY_GEO = new Set();
 if (!cityBlock) err('app.js: не найден CITY_GEO');
 else for (const m of cityBlock[1].matchAll(/'([^']+)':/g)) CITY_GEO.add(m[1]);
+
+/* ---- каркас: география и источники ---- */
+const geo = A.geo;
+if (!geo) {
+  err('geo: нет ATLAS.geo (data-framework.js)');
+} else {
+  if (!geo.updated) warn('geo.updated отсутствует');
+  const regions = geo.regions || {};
+  const cities = geo.cities || {};
+  const regionNames = Object.keys(regions);
+  if (regionNames.length < 80) warn('geo.regions: подозрительно мало регионов — ' + regionNames.length);
+  for (const [name, district] of Object.entries(regions)) {
+    if (DISTRICT_CODES.indexOf(district) < 0) err('geo.regions[' + name + ']: неизвестный округ ' + district);
+  }
+  for (const [city, pair] of Object.entries(cities)) {
+    if (!Array.isArray(pair) || pair.length !== 2) { err('geo.cities[' + city + ']: ожидается [регион, округ]'); continue; }
+    if (!regions[pair[0]]) err('geo.cities[' + city + ']: регион «' + pair[0] + '» отсутствует в geo.regions');
+    if (DISTRICT_CODES.indexOf(pair[1]) < 0) err('geo.cities[' + city + ']: неизвестный округ ' + pair[1]);
+  }
+  if (Object.keys(cities).length < 80) warn('geo.cities: подозрительно мало городов — ' + Object.keys(cities).length);
+}
+
+if (!Array.isArray(A.sources) || !A.sources.length) {
+  warn('sources: реестр источников пуст');
+} else {
+  A.sources.forEach((s, i) => {
+    const t = 'sources[' + i + ']';
+    for (const k of ['id', 'name', 'url', 'asOf']) if (!s[k]) err(t + ': поле ' + k + ' пусто');
+    if (s.id && SOURCES.indexOf(s.id) < 0) warn(t + ': неизвестный id ' + s.id);
+    if (s.url && !/^https?:\/\//.test(s.url)) err(t + ': url не абсолютный — ' + s.url);
+    if (s.asOf && !/^\d{4}(-\d{2}(-\d{2})?)?$/.test(s.asOf)) err(t + ': asOf не дата — ' + s.asOf);
+  });
+}
+
+/* провенанс записи: либо src+asOf есть, либо запись явно помечена как оценка */
+function provenance(t, rec) {
+  if (!rec.src) { warn(t + ': нет src — запись без источника'); return; }
+  if (SOURCES.indexOf(rec.src) < 0) err(t + ': неизвестный src ' + rec.src);
+  if (!rec.asOf) err(t + ': src есть, asOf нет');
+}
 
 /* ---- meta ---- */
 if (!A.meta || !A.meta.updated) warn('meta.updated отсутствует');
@@ -45,6 +93,7 @@ if (!A.meta || !A.meta.updated) warn('meta.updated отсутствует');
 const profs = A.professions || [];
 if (!profs.length) err('professions пустой');
 const slugs = new Set();
+const allSlugs = new Set();
 const ranks = new Set();
 profs.forEach((p, i) => {
   const t = 'profession[' + i + '] ' + (p.slug || '?');
@@ -53,6 +102,8 @@ profs.forEach((p, i) => {
   if (!/^[a-z0-9-]+$/.test(p.slug || '')) err(t + ': slug не snake-case: ' + p.slug);
   if (slugs.has(p.slug)) err(t + ': дубликат slug');
   slugs.add(p.slug);
+  if (allSlugs.has(p.slug)) err(t + ': slug пересекается с другой сущностью: ' + p.slug);
+  allSlugs.add(p.slug);
   if (ranks.has(p.rank)) warn(t + ': дубликат rank ' + p.rank);
   ranks.add(p.rank);
   if (!(Number(p.index) >= 0 && Number(p.index) <= 100)) err(t + ': index вне 0..100: ' + p.index);
@@ -71,17 +122,28 @@ unis.forEach((u, i) => {
   if (uniShorts.has(u.short)) err(t + ': дубликат short');
   uniShorts.add(u.short);
   if (!(Number(u.avg) >= 100 && Number(u.avg) <= 300)) err(t + ': avg вне 100..300: ' + u.avg);
-  if (CITY_GEO.size && !CITY_GEO.has(u.city)) err(t + ': город «' + u.city + '» отсутствует в CITY_GEO (география сломается)');
+  const known = (geo && geo.cities && geo.cities[u.city]) || CITY_GEO.has(u.city);
+  if (!known) err(t + ': город «' + u.city + '» отсутствует в geo.cities и CITY_GEO (география сломается)');
+  /* новый официальный показатель: средний балл в расчёте на один предмет */
+  if (u.avgEge !== undefined) {
+    if (!(Number(u.avgEge) >= 40 && Number(u.avgEge) <= 100)) err(t + ': avgEge вне 40..100: ' + u.avgEge);
+    if (u.avgEge && u.src !== 'monitoring-2025') warn(t + ': avgEge без src monitoring-2025');
+  }
+  if (u.passEstimate !== undefined && !(Number(u.passEstimate) >= 100 && Number(u.passEstimate) <= 400))
+    err(t + ': passEstimate вне 100..400: ' + u.passEstimate);
+  provenance(t, u);
   if (!Array.isArray(u.programs) || !u.programs.length) { err(t + ': нет программ'); return; }
   u.programs.forEach((pr, j) => {
     const pt = t + '.program[' + j + ']';
     for (const k of ['direction', 'code', 'ege']) if (!pr[k]) err(pt + ': поле ' + k + ' пусто');
+    if (!/^\d{2}\.\d{2}\.\d{2}$/.test(pr.code || '')) err(pt + ': код не в формате 00.00.00 — ' + pr.code);
     if (pr.professionSlug && !slugs.has(pr.professionSlug)) err(pt + ': битая ссылка на профессию ' + pr.professionSlug);
     if (pr.budget && isNaN(Number(String(pr.budget).replace(/[^\d.]/g, '')))) warn(pt + ': budget не число: ' + pr.budget);
+    if ((pr.budget || pr.paid) && pr.src && SOURCES.indexOf(pr.src) < 0) err(pt + ': неизвестный src ' + pr.src);
   });
 });
 
-/* ---- colleges ---- */
+/* ---- СПО-специальности (историческое имя colleges) ---- */
 const cols = A.colleges || [];
 const colDetails = A.collegeDetails || {};
 const colSlugs = new Set();
@@ -91,10 +153,35 @@ cols.forEach((c) => {
     if (!c[k]) err(t + ': поле ' + k + ' пусто');
   if (colSlugs.has(c.slug)) err(t + ': дубликат slug');
   colSlugs.add(c.slug);
+  if (allSlugs.has(c.slug)) err(t + ': slug пересекается с другой сущностью: ' + c.slug);
+  allSlugs.add(c.slug);
   if (SPHERE_CODES.indexOf(c.sphereCode) < 0) err(t + ': неизвестная sphereCode ' + c.sphereCode);
+  if (!/^\d{2}\.\d{2}\.\d{2}$/.test(c.code || '')) err(t + ': код не в формате 00.00.00 — ' + c.code);
   if (!colDetails[c.slug]) warn(t + ': нет collegeDetails');
 });
 for (const k of Object.keys(colDetails)) if (!colSlugs.has(k)) err('collegeDetails: лишний ключ ' + k);
+
+/* ---- организации СПО (новый слой, заполняется батчем 3) ---- */
+const orgs = A.collegeOrgs || [];
+if (!Array.isArray(orgs)) err('collegeOrgs: ожидается массив');
+const orgSlugs = new Set();
+orgs.forEach((o, i) => {
+  const t = 'collegeOrg[' + i + '] ' + (o.slug || '?');
+  for (const k of ['slug', 'name', 'city']) if (!o[k]) err(t + ': поле ' + k + ' пусто');
+  if (!/^[a-z0-9-]+$/.test(o.slug || '')) err(t + ': slug не snake-case');
+  if (orgSlugs.has(o.slug)) err(t + ': дубликат slug');
+  orgSlugs.add(o.slug);
+  if (allSlugs.has(o.slug)) err(t + ': slug пересекается с другой сущностью: ' + o.slug);
+  allSlugs.add(o.slug);
+  const known = (geo && geo.cities && geo.cities[o.city]) || CITY_GEO.has(o.city);
+  if (!known) err(t + ': город «' + o.city + '» отсутствует в geo.cities');
+  if (o.ugs && !Array.isArray(o.ugs)) err(t + ': ugs должен быть массивом');
+  (o.ugs || []).forEach((g, j) => {
+    if (!/^\d{2}\.\d{2}\.\d{2}$/.test(g.code || '')) err(t + '.ugs[' + j + ']: код не в формате 00.00.00 — ' + g.code);
+    if (!g.title) err(t + '.ugs[' + j + ']: пустое название');
+  });
+  provenance(t, o);
+});
 
 /* ---- details ---- */
 const details = A.details || {};
@@ -110,6 +197,14 @@ for (const k of Object.keys(details)) {
 
 /* ---- methodology ---- */
 if (!A.methodology) warn('methodology отсутствует');
+
+/* ---- размеры чанков ---- */
+for (const f of FILES) {
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) continue;
+  const kb = Math.round(fs.statSync(p).size / 1024);
+  if (kb > MAX_CHUNK_KB) err(f + ': ' + kb + ' КБ, лимит ' + MAX_CHUNK_KB + ' КБ — делить по округам');
+}
 
 /* ---- фото-банки сфер: файлы должны быть в репозитории ---- */
 if (fs.existsSync(path.join(ROOT, 'photos'))) {
@@ -130,6 +225,8 @@ function report() {
   warns.forEach((w) => console.log('WARN  ' + w));
   errors.forEach((e) => console.error('ERROR ' + e));
   console.log('validate-data: ' + (errors.length ? 'FAIL (' + errors.length + ' ошибок)' : 'OK') +
-    ' | ' + (A ? profs.length + ' профессий, ' + unis.length + ' вузов, ' + cols.length + ' специальностей' : 'данные не загрузились'));
+    ' | ' + (A ? profs.length + ' профессий, ' + unis.length + ' вузов, ' + cols.length + ' специальностей, ' +
+      (A.collegeOrgs || []).length + ' организаций СПО' : 'данные не загрузились') +
+    (A && A.geo ? ', ' + Object.keys(A.geo.cities || {}).length + ' городов' : ''));
   process.exit(errors.length ? 1 : 0);
 }

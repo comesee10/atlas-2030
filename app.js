@@ -559,8 +559,8 @@ var CITY_GEO = {
 'Бийск': ['Алтайский край', 'СФО'],
 'Кемерово': ['Кемеровская область — Кузбасс', 'СФО'],
 'Новокузнецк': ['Кемеровская область — Кузбасс', 'СФО'],
-'Улан-Удэ': ['Республика Бурятия', 'СФО'],
-'Чита': ['Забайкальский край', 'СФО'],
+'Улан-Удэ': ['Республика Бурятия', 'ДФО'],
+'Чита': ['Забайкальский край', 'ДФО'],
 'Абакан': ['Республика Хакасия', 'СФО'],
 'Кызыл': ['Республика Тыва', 'СФО'],
 'Владивосток': ['Приморский край', 'ДФО'],
@@ -572,6 +572,9 @@ var CITY_GEO = {
 'Петропавловск-Камчатский': ['Камчатский край', 'ДФО'],
 'Магадан': ['Магаданская область', 'ДФО']
 };
+/* Полная карта городов из официального мониторинга (data-framework.js).
+   CITY_GEO остаётся запасной: в нём только города из старых записей. */
+var GEO_CITIES = (window.ATLAS && window.ATLAS.geo && window.ATLAS.geo.cities) || {};
 function districtIndex(code) {
 for (var i = 0; i < FEDERAL.length; i++) if (FEDERAL[i].code === code) return i;
 return 99;
@@ -583,7 +586,8 @@ return null;
 var REGIONS = [];
 var REGION_BY_NAME = {};
 U.forEach(function (u) {
-var geo = CITY_GEO[u.city] || ['Другие регионы', 'ЦФО'];
+var geo = (u.region && u.district) ? [u.region, u.district] :
+  (GEO_CITIES[u.city] || CITY_GEO[u.city] || ['Другие регионы', 'ЦФО']);
 u.region = geo[0];
 u.district = geo[1];
 var r = REGION_BY_NAME[u.region];
