@@ -2934,6 +2934,30 @@ return '<optgroup label="' + h(d.code + ' · ' + d.name) + '">' + list.map(optio
 }).join('');
 }
 function groupedUnis(list, st) {
+/* Сводка без фильтров: регионы и число вузов, без 300 карточек.
+   Полный список открывается по региону или поиску. */
+var summary = st && !st.q && !st.region && !st.city && !st.exam && !st.mode &&
+!st.dorm && !st.format && !st.minAvg;
+if (summary) {
+var out = '';
+FEDERAL.forEach(function (d) {
+var inDistrict = list.filter(function (u) { return u.district === d.code; });
+if (!inDistrict.length) return;
+var regions = REGIONS.filter(function (r) {
+return r.district === d.code && inDistrict.some(function (u) { return u.region === r.name; });
+});
+out += '<section class="district-block">' +
+'<div class="district-head"><div><p class="eyebrow">' + h(d.code) + '</p><h2 class="sec">' + h(d.name) + '</h2></div>' +
+'<p class="mono tiny">' + inDistrict.length + ' ' + plural(inDistrict.length, 'вуз', 'вуза', 'вузов') + ' · ' +
+regions.length + ' ' + plural(regions.length, 'регион', 'региона', 'регионов') + '</p></div>' +
+'<div class="region-links">' + regions.map(function (r) {
+var n = inDistrict.filter(function (u) { return u.region === r.name; }).length;
+return '<a href="#/universities?region=' + encodeURIComponent(r.name) + '">' +
+'<span>' + h(r.name) + '</span><b>' + n + '</b></a>';
+}).join('') + '</div></section>';
+});
+return out;
+}
 var out = '';
 /* Сквозной номер карточки: соседние вузы получают разные учебные сцены. */
 var seen = 0;
@@ -3320,7 +3344,16 @@ var dormEl = document.getElementById('dormSelect');
 var minAvgEl = document.getElementById('minAvgSelect');
 function repaint() {
 var list = filteredUnis(st);
-grid.innerHTML = list.length ? groupedUnis(list, st) :
+/* Длинную выдачу не рендерим целиком: 80 карточек достаточно, чтобы
+   выбрать, а остальное уточняется фильтрами. */
+var shownList = list;
+var hidden = 0;
+var summaryMode = !st.q && !st.region && !st.city && !st.exam && !st.mode &&
+!st.dorm && !st.format && !st.minAvg;
+if (!summaryMode && list.length > 80) { shownList = list.slice(0, 80); hidden = list.length - 80; }
+grid.innerHTML = shownList.length ? groupedUnis(shownList, st) +
+(hidden ? '<p class="mono tiny" style="margin-top:16px">Показаны первые 80 из ' + list.length +
+'. Уточните ' + (st.region ? 'город или запрос' : 'округ, регион или запрос') + ', чтобы увидеть остальные.</p>' : '') :
 '<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Измените запрос или выберите другой федеральный округ.</div>';
 var regionCount = [];
 var districtCount = [];
