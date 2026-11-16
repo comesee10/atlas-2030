@@ -147,7 +147,7 @@ function eachRoute(routes) {
   const detail = [
     ['/professions/', routes.professions, '0.7'],
     ['/universities/', routes.universities, '0.6'],
-    ['/specialties/', routes.specialties, '0.6'],
+    ['/specialties/', routes.directions, '0.6'],
     ['/colleges/', routes.colleges, '0.6']
   ];
   for (const [prefix, items, priority] of detail) {

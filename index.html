@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Профессии·2030 — атлас востребованных профессий</title>
-<meta name="description" content="Атлас профессий 2027–2030: 47 профессий, 181 вуз, 1558 программ и 174 специальности в 70 регионах России. Симулятор баллов ЕГЭ, опросник по ЕГЭ и ОГЭ, подбор вузов и колледжей, проходные баллы, объёмная 3D-карта России с вузами и прозрачная методология.">
+<meta name="description" content="Атлас профессий 2027–2030: 47 профессий, 1223 вуза, 1555 программ и 172 направления в 84 регионах России. Симулятор баллов ЕГЭ, опросник по ЕГЭ и ОГЭ, подбор вузов и колледжей, проходные баллы, объёмная 3D-карта России с вузами и прозрачная методология.">
 <meta name="theme-color" content="#fbfaf7">
 <meta name="color-scheme" content="light dark">
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -45,7 +45,7 @@
 <link rel="preload" href="/atlas-2030/data-organizations-1.js?v=20261116-1" as="script">
 <link rel="preload" href="/atlas-2030/data-organizations-2.js?v=20261116-1" as="script">
 <link rel="preload" href="/atlas-2030/data-merges.js?v=20261116-1" as="script">
-<link rel="preload" href="/atlas-2030/app.js?v=20261116-6" as="script" fetchpriority="high">
+<link rel="preload" href="/atlas-2030/app.js?v=20261116-7" as="script" fetchpriority="high">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none';">
 <!-- Тема ставится до первой отрисовки: иначе первый кадр тёмный, когда выбрана светлая. -->
 <script src="/atlas-2030/theme-boot.js?v=20261115-2"></script>
@@ -65,7 +65,7 @@
       "@type": "Dataset",
       "@id": "https://comesee10.github.io/atlas-2030/#dataset",
       "name": "Профессии·2030: востребованные профессии, вузы и проходные баллы",
-      "description": "47 профессий, 181 вуз, 1558 программ и 174 специальности в 70 регионах России: индекс спроса, рост вакансий, зарплаты, наборы ЕГЭ и ориентировочные проходные баллы на бюджет.",
+      "description": "47 профессий, 1223 вуза, 1555 программ и 172 направления в 84 регионах России: индекс спроса, рост вакансий, зарплаты, наборы ЕГЭ и ориентировочные проходные баллы на бюджет.",
       "url": "https://comesee10.github.io/atlas-2030/",
       "keywords": "профессии 2030, вузы России, проходные баллы, ЕГЭ, ОГЭ, специальности, колледжи, поступление",
       "inLanguage": "ru",
@@ -109,7 +109,7 @@
         <summary>Ещё<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
         <div class="nav-more-list">
           <a href="#/colleges" data-route="/colleges">Колледжи после 9 класса</a>
-          <a href="#/specialties" data-route="/specialties">Специальности и коды</a>
+          <a href="#/specialties" data-route="/specialties">Направления и коды</a>
           <a href="#/admission" data-route="/admission">Бюджетные места</a>
           <a href="#/regions" data-route="/regions">Регионы и округа</a>
           <a href="#/map" data-route="/map">Карта России</a>
@@ -165,7 +165,7 @@
     <nav aria-label="Разделы сайта">
       <a href="/atlas-2030/quiz">Опросник</a> · <a href="/atlas-2030/simulator">Симулятор баллов</a> ·
       <a href="/atlas-2030/professions">Профессии</a> ·
-      <a href="/atlas-2030/specialties">Специальности</a> · <a href="/atlas-2030/universities">Вузы</a> ·
+      <a href="/atlas-2030/specialties">Направления</a> · <a href="/atlas-2030/universities">Вузы</a> ·
       <a href="/atlas-2030/colleges">Колледжи</a> · <a href="/atlas-2030/regions">Регионы</a> ·
       <a href="/atlas-2030/about">О проекте</a>
     </nav>
@@ -176,7 +176,7 @@
   <div class="wrap ftr-in">
     <div class="ftr-col ftr-brand">
       <p class="brand-name">Профессии·2030</p>
-      <p class="muted">Исследовательский атлас профессий, востребованных в 2027–2030 годах: 47 профессий, 181 вуз, 1558 программ и 174 специальности в 70 регионах России. Подбор вузов после 11 класса, колледжей после 9 класса и единая география федеральных округов.</p>
+      <p class="muted">Исследовательский атлас профессий, востребованных в 2027–2030 годах: 47 профессий, 1223 вуза, 1555 программ и 172 направления в 84 регионах России. Подбор вузов после 11 класса, колледжей после 9 класса и единая география федеральных округов.</p>
       <p class="mono tiny">Обновлено: октябрь 2026</p>
     </div>
     <div class="ftr-col">
@@ -184,7 +184,7 @@
       <a href="#/quiz">Опросник</a>
       <a href="#/simulator">Симулятор баллов</a>
       <a href="#/professions">Профессии</a>
-      <a href="#/specialties">Специальности</a>
+      <a href="#/specialties">Направления</a>
       <a href="#/universities">Вузы</a>
       <a href="#/admission">Бюджетные места</a>
       <a href="#/calendar">Календарь приёма</a>
@@ -210,7 +210,7 @@
   <div class="palette-box" role="dialog" aria-modal="true" aria-label="Поиск по атласу">
     <div class="palette-head">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="paletteInput" type="text" placeholder="Профессия, вуз, город, специальность…" autocomplete="off" spellcheck="false" aria-label="Поиск">
+      <input id="paletteInput" type="text" placeholder="Профессия, вуз, город, направление…" autocomplete="off" spellcheck="false" aria-label="Поиск">
       <button class="palette-esc" type="button" data-close aria-label="Закрыть поиск">esc</button>
     </div>
     <div class="palette-list" id="paletteList" role="listbox" aria-label="Результаты поиска"></div>
@@ -253,6 +253,6 @@
 <script defer src="/atlas-2030/data-organizations-1.js?v=20261116-1"></script>
 <script defer src="/atlas-2030/data-organizations-2.js?v=20261116-1"></script>
 <script defer src="/atlas-2030/data-merges.js?v=20261116-1"></script>
-<script defer src="/atlas-2030/app.js?v=20261116-6"></script>
+<script defer src="/atlas-2030/app.js?v=20261116-7"></script>
 </body>
 </html>
