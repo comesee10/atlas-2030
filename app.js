@@ -1702,10 +1702,18 @@ var io = null;
 function initReveal(root) {
 var els = (root || app).querySelectorAll('.reveal');
 if (!els.length) return;
+if (noMotion) {
+els.forEach(function (e) { e.classList.add('in'); });
+return;
+}
 if (!('IntersectionObserver' in window)) {
 els.forEach(function (e) { e.classList.add('in'); });
 return;
 }
+/* Каскад только для первого экрана: восемь карточек по 40 мс. */
+els.forEach(function (e, i) {
+if (i < 8) e.style.setProperty('--rd', (i * 0.04).toFixed(2) + 's');
+});
 if (!io) {
 io = new IntersectionObserver(function (entries) {
 entries.forEach(function (en) {
@@ -1714,6 +1722,28 @@ if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target);
 }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
 }
 els.forEach(function (e) { io.observe(e); });
+}
+/* FLIP для списков: запоминаем позиции карточек до перерисовки и
+   возвращаем их на место анимацией. Только transform, 220 мс. */
+function flipRender(container, paint) {
+if (!container || noMotion || !container.animate) { paint(); return; }
+var prev = {};
+Array.prototype.forEach.call(container.querySelectorAll('[data-flip]'), function (el) {
+prev[el.getAttribute('data-flip')] = el.getBoundingClientRect();
+});
+paint();
+Array.prototype.forEach.call(container.querySelectorAll('[data-flip]'), function (el) {
+var before = prev[el.getAttribute('data-flip')];
+if (!before) return;
+var now = el.getBoundingClientRect();
+var dx = before.left - now.left;
+var dy = before.top - now.top;
+if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+el.animate(
+[{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+{ duration: 220, easing: 'cubic-bezier(.22,1,.36,1)' }
+);
+});
 }
 var TILT_SEL = '.fcard,.spec-card,.city-card,.geo-card,.adv-card,.ind-card,.cc';
 var canTilt = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
@@ -2514,7 +2544,7 @@ uniPlaces(u) + ' ' + plural(uniPlaces(u), 'место', 'места', 'мест'
 '</a>';
 }
 function specMini(s) {
-return '<a class="panel spec-card reveal" href="#/specialties/' + h(s.slug) + '">' +
+return '<a class="panel spec-card reveal" data-flip="' + h(s.slug) + '" href="#/specialties/' + h(s.slug) + '">' +
 '<div class="spec-top"><span class="mono">' + h(s.code) + '</span><span class="tag">' + h(s.sphereCode) + '</span></div>' +
 '<h3>' + h(s.direction) + '</h3>' +
 '<p class="spec-prof">' + h(s.profession) + '</p>' +
@@ -2894,7 +2924,7 @@ var body = org
 'Средний балл ЕГЭ — по очной форме, в расчёте на один предмет.</p>'
 : '<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Профессия</th><th>ЕГЭ</th>' +
 '<th>Бюджет</th><th>Платно</th></tr></thead><tbody>' + u.programs.map(uniRow).join('') + '</tbody></table></div>';
-return '<section class="panel uni reveal">' +
+return '<section class="panel uni reveal" data-flip="' + h(u.slug) + '">' +
 photoStrip(uniPhotoKey(u, i), '', !UNI_PHOTO[u.slug]) +
 '<div class="uni-top"><div><p class="uni-city">' + h(u.region) + ' · ' + h(u.city) + '</p><h3><a href="#/universities/' + h(u.slug) + '">' + h(u.short) + '</a></h3>' +
 '<p class="full">' + h(u.full) + '</p></div>' +
@@ -3358,10 +3388,12 @@ var hidden = 0;
 var summaryMode = !st.q && !st.region && !st.city && !st.exam && !st.mode &&
 !st.dorm && !st.format && !st.minAvg;
 if (!summaryMode && list.length > 80) { shownList = list.slice(0, 80); hidden = list.length - 80; }
+flipRender(grid, function () {
 grid.innerHTML = shownList.length ? groupedUnis(shownList, st) +
 (hidden ? '<p class="mono tiny" style="margin-top:16px">Показаны первые 80 из ' + list.length +
 '. Уточните ' + (st.region ? 'город или запрос' : 'округ, регион или запрос') + ', чтобы увидеть остальные.</p>' : '') :
 '<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Измените запрос или выберите другой федеральный округ.</div>';
+});
 var regionCount = [];
 var districtCount = [];
 list.forEach(function (u) {
@@ -3436,6 +3468,15 @@ if (!b) return;
 var card = b.closest('.uni');
 var open = card.classList.toggle('expanded');
 b.textContent = open ? 'Свернуть ↑' : (b.getAttribute('data-label') || 'Показать все') + ' ↓';
+if (open && !noMotion) {
+Array.prototype.forEach.call(card.querySelectorAll('tbody tr'), function (tr, i) {
+if (i < 4 || !tr.animate) return;
+tr.animate(
+[{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }],
+{ duration: 180, delay: Math.min(i - 4, 5) * 24, easing: 'cubic-bezier(.22,1,.36,1)' }
+);
+});
+}
 });
 repaint();
 }
@@ -3544,7 +3585,7 @@ repaint();
 function specCard(s, i) {
 var cities = s.cities.slice(0, 4).join(' · ');
 if (s.cities.length > 4) cities += ' +' + (s.cities.length - 4);
-return '<a class="panel spec-card reveal" href="#/specialties/' + h(s.slug) + '">' +
+return '<a class="panel spec-card reveal" data-flip="' + h(s.slug) + '" href="#/specialties/' + h(s.slug) + '">' +
 photoStrip(spherePhotoAt(s.sphereCode, i)) +
 '<div class="spec-top"><span class="mono">' + h(s.code) + '</span><span class="tag">' + h(s.sphereCode) + '</span></div>' +
 '<h3>' + h(s.direction) + '</h3>' +
@@ -3600,8 +3641,10 @@ var countEl = document.getElementById('specCount');
 var searchEl = document.getElementById('specSearch');
 function repaint() {
 var list = filteredDirections(st);
+flipRender(grid, function () {
 grid.innerHTML = list.length ? list.map(specCard).join('') :
 '<div class="empty">' + ES_SEARCH + '<b>Ничего не найдено</b>Попробуйте другой запрос или сбросьте фильтр сферы.</div>';
+});
 countEl.textContent = 'Найдено ' + list.length + ' ' + plural(list.length, 'направление', 'направления', 'направлений');
 var params = new URLSearchParams();
 if (st.q) params.set('q', st.q);
@@ -5616,10 +5659,23 @@ window.scrollTo({ top: Math.max(0, root.getBoundingClientRect().top + window.scr
 };
 if (st.step === 4) bindReport(st);
 }
+function quizStepMotion(root, st) {
+var prev = st._motionStep;
+st._motionStep = st.step;
+if (noMotion || !prev || prev === st.step) return;
+var panel = root.querySelector('.quiz');
+if (!panel || !panel.animate) return;
+var dir = st.step > prev ? 1 : -1;
+panel.animate(
+[{ opacity: 0, transform: 'translateX(' + (18 * dir) + 'px)' }, { opacity: 1, transform: 'none' }],
+{ duration: 200, easing: 'cubic-bezier(.22,1,.36,1)' }
+);
+}
 function paintQuiz(st) {
 var root = document.getElementById('quizRoot');
 if (!root) return;
 root.innerHTML = '<div class="quiz panel quiz-report-ege' + (st.step === 4 ? ' quiz-report' : '') + '">' + quizSteps(st.step) + quizStepBody(st) + '</div>';
+quizStepMotion(root, st);
 bindQuiz(st);
 quizSync(st);
 initReveal(root);
@@ -6002,6 +6058,7 @@ function paintQuizOge(st) {
 var root = document.getElementById('quizRoot');
 if (!root) return;
 root.innerHTML = '<div class="quiz panel quiz-report-oge' + (st.step === 4 ? ' quiz-report' : '') + '">' + quizSteps(st.step) + ogeStepBody(st) + '</div>';
+quizStepMotion(root, st);
 bindOgeQuiz(st);
 ogeSync(st);
 initReveal(root);
