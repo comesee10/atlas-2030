@@ -22,7 +22,7 @@ const BASE = '/atlas-2030';
 const CHECK = process.argv.includes('--check');
 
 const DATA_FILES = ['data-core.js', 'data-universities-1.js', 'data-universities-2.js',
-  'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js'];
+  'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js', 'data-monitoring.js'];
 
 /* Разделы с собственной статической копией. Должно совпадать с STATIC_ROUTE
    в app.js; совпадение проверяет scripts/smoke-links.js. */

@@ -10,7 +10,8 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const FILES = ['data-core.js', 'data-universities-1.js',
-  'data-universities-2.js', 'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js'];
+  'data-universities-2.js', 'data-universities-3.js', 'catalog-expansion.js', 'data-framework.js',
+  'data-monitoring.js'];
 
 /* Источники, которыми можно подписывать числа. estimate — всегда «оценка атласа». */
 const SOURCES = ['monitoring-2025', 'monitoring-spo-2025', 'vuz-site', 'kcp-2025', 'min-edu-min-2025', 'ege-list-2025', 'estimate'];
@@ -117,22 +118,42 @@ if (!unis.length) err('universities пустой');
 const uniShorts = new Set();
 unis.forEach((u, i) => {
   const t = 'university[' + i + '] ' + (u.short || '?');
-  for (const k of ['short', 'full', 'city', 'avg'])
+  /* card:'org' — карточка организации с официальными показателями, но без
+     разобранных программ: такие записи добавляет data-monitoring.js. */
+  const orgCard = u.card === 'org';
+  if (u.card !== undefined && !orgCard) err(t + ': неизвестный card ' + u.card);
+  for (const k of ['short', 'full', 'city'])
     if (u[k] === undefined || u[k] === '') err(t + ': поле ' + k + ' пусто');
   if (uniShorts.has(u.short)) err(t + ': дубликат short');
   uniShorts.add(u.short);
-  if (!(Number(u.avg) >= 100 && Number(u.avg) <= 300)) err(t + ': avg вне 100..300: ' + u.avg);
+  if (u.avg === undefined) {
+    if (!(orgCard && u.avgEge)) err(t + ': поле avg пусто');
+  } else if (!(Number(u.avg) >= 100 && Number(u.avg) <= 300)) {
+    err(t + ': avg вне 100..300: ' + u.avg);
+  }
   const known = (geo && geo.cities && geo.cities[u.city]) || CITY_GEO.has(u.city);
   if (!known) err(t + ': город «' + u.city + '» отсутствует в geo.cities и CITY_GEO (география сломается)');
   /* новый официальный показатель: средний балл в расчёте на один предмет */
   if (u.avgEge !== undefined) {
     if (!(Number(u.avgEge) >= 40 && Number(u.avgEge) <= 100)) err(t + ': avgEge вне 40..100: ' + u.avgEge);
-    if (u.avgEge && u.src !== 'monitoring-2025') warn(t + ': avgEge без src monitoring-2025');
+    if (u.avgEge && u.avgEgeSrc !== 'monitoring-2025' && u.src !== 'monitoring-2025')
+      warn(t + ': avgEge без src monitoring-2025');
   }
+  if (u.avgEgeSrc !== undefined && u.avgEgeSrc !== 'monitoring-2025')
+    err(t + ': avgEgeSrc ожидается monitoring-2025 — ' + u.avgEgeSrc);
+  if (u.students !== undefined && !(Number(u.students) > 0)) err(t + ': students вне >0: ' + u.students);
+  if (u.monitoringId !== undefined && !/^\d+$/.test(String(u.monitoringId)))
+    err(t + ': monitoringId не число — ' + u.monitoringId);
+  if (orgCard && !u.monitoringId) err(t + ': card org без monitoringId');
   if (u.passEstimate !== undefined && !(Number(u.passEstimate) >= 100 && Number(u.passEstimate) <= 400))
     err(t + ': passEstimate вне 100..400: ' + u.passEstimate);
   provenance(t, u);
-  if (!Array.isArray(u.programs) || !u.programs.length) { err(t + ': нет программ'); return; }
+  if (!Array.isArray(u.programs)) { err(t + ': programs не массив'); return; }
+  if (!u.programs.length) {
+    if (!orgCard) err(t + ': нет программ');
+    else if (!u.avgEge && !u.students) err(t + ': карточка организации без показателей');
+    return;
+  }
   u.programs.forEach((pr, j) => {
     const pt = t + '.program[' + j + ']';
     for (const k of ['direction', 'code', 'ege']) if (!pr[k]) err(pt + ': поле ' + k + ' пусто');

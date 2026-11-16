@@ -592,18 +592,20 @@ u.region = geo[0];
 u.district = geo[1];
 var r = REGION_BY_NAME[u.region];
 if (!r) {
-r = { name: u.region, district: u.district, unis: [], cities: [], programs: 0, avgSum: 0, count: 0, avg: 0 };
+r = { name: u.region, district: u.district, unis: [], cities: [], programs: 0, avgSum: 0, avgCount: 0, count: 0, avg: 0 };
 REGION_BY_NAME[u.region] = r;
 REGIONS.push(r);
 }
 r.unis.push(u);
 if (r.cities.indexOf(u.city) < 0) r.cities.push(u.city);
 r.programs += (u.programs || []).length;
-r.avgSum += u.avg;
+/* Карточки организаций без программ не участвуют в среднем балле:
+   у них avg — производное от балла ЕГЭ, а не проходной балл. */
+if ((u.programs || []).length && u.avg !== undefined) { r.avgSum += u.avg; r.avgCount++; }
 });
 REGIONS.forEach(function (r) {
 r.count = r.unis.length;
-r.avg = r.count ? Math.round(r.avgSum / r.count) : 0;
+r.avg = r.avgCount ? Math.round(r.avgSum / r.avgCount) : 0;
 r.cities.sort(function (a, b) { return a.localeCompare(b, 'ru'); });
 r.unis.sort(function (a, b) { return b.avg - a.avg || a.short.localeCompare(b.short, 'ru'); });
 });
@@ -619,7 +621,10 @@ unis.forEach(function (u) { if (cities.indexOf(u.city) < 0) cities.push(u.city);
 return {
 code: d.code, name: d.name, short: d.short, regions: regions, unis: unis,
 count: unis.length, programs: programs, cities: cities.length,
-avg: unis.length ? Math.round(unis.reduce(function (n, u) { return n + u.avg; }, 0) / unis.length) : 0
+avg: (function () {
+var withPrograms = unis.filter(function (u) { return (u.programs || []).length && u.avg !== undefined; });
+return withPrograms.length ? Math.round(withPrograms.reduce(function (n, u) { return n + u.avg; }, 0) / withPrograms.length) : 0;
+})()
 };
 }).filter(function (d) { return d.count > 0; });
 var TOTAL_PROGRAMS = U.reduce(function (n, u) { return n + (u.programs || []).length; }, 0);
@@ -633,7 +638,9 @@ var pp = PROF_BY_SLUG[pr.professionSlug];
 pr.profession = pp ? pp.title : pr.direction;
 }
 });
-if (!u.format) {
+/* У карточек организаций нет разобранных программ, поэтому форма обучения
+   и общежитие не синтезируются: в интерфейсе они не показываются. */
+if (!u.format && u.card !== 'org') {
 var fk = hash32(u.short);
 u.format = fk % 7 === 0 ? 'очно-заочная' : 'очная';
 u.dorm = fk % 5 !== 0;
@@ -772,6 +779,18 @@ return '<svg class="spark ' + (hist[hist.length - 1] >= hist[0] ? 'up' : 'down')
 }
 function uniPlaces(u) {
 return u.programs.reduce(function (n, pr) { return n + progStats(pr, u).places; }, 0);
+}
+/* Официальные показатели мониторинга ВО: балл в расчёте на один предмет
+   (две цифры после запятой, как в отчёте) и численность студентов. */
+function score1(v) { return Number(v).toFixed(2).replace('.', ','); }
+function thousands(v) { return Number(v).toLocaleString('ru-RU'); }
+
+function isOrgCard(u) { return u.card === 'org'; }
+/* Строка официальных показателей для карточки и шапки страницы:
+   балл ЕГЭ показывает крупная плашка, здесь — только численность и год. */
+function orgMetaLine(u) {
+return (u.students ? thousands(u.students) + ' ' + plural(u.students, 'студент', 'студента', 'студентов') + ' · ' : '') +
+'официальные показатели 2025 года';
 }
 var ADM = (function () {
 var places = 0, grow = 0, up = 0, n = 0;
@@ -2462,13 +2481,17 @@ return '<div class="fcard-wrap reveal">' +
 '</a>' + favButton(p) + '</div>';
 }
 function uniMini(u) {
+var org = isOrgCard(u);
 return '<a class="panel uni reveal" href="#/universities/' + h(u.slug) + '">' +
 '<div class="uni-top"><div><p class="uni-city">' + h(u.region) + ' · ' + h(u.city) + '</p><h3>' + h(u.short) + '</h3>' +
 '<p class="full">' + h(u.full) + '</p></div>' +
-'<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div></div>' +
-'<p class="mono tiny" style="margin-top:14px;color:var(--ink-3)">' + u.programs.length + ' ' +
-plural(u.programs.length, 'направление', 'направления', 'направлений') + ' в атласе · ≈' +
-uniPlaces(u) + ' ' + plural(uniPlaces(u), 'место', 'места', 'мест') + ' на бюджете</p>' +
+(org
+? (u.avgEge ? '<div class="uni-score"><span class="v">' + score1(u.avgEge) + '</span><span class="k">средний балл ЕГЭ на предмет</span></div>' : '')
+: '<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div>') + '</div>' +
+'<p class="mono tiny" style="margin-top:14px;color:var(--ink-3)">' + (org
+? (u.students ? thousands(u.students) + ' ' + plural(u.students, 'студент', 'студента', 'студентов') + ' · официальные показатели 2025 года' : 'официальные показатели 2025 года')
+: u.programs.length + ' ' + plural(u.programs.length, 'направление', 'направления', 'направлений') + ' в атласе · ≈' +
+uniPlaces(u) + ' ' + plural(uniPlaces(u), 'место', 'места', 'мест') + ' на бюджете') + '</p>' +
 '</a>';
 }
 function specMini(s) {
@@ -2489,7 +2512,7 @@ return '<a class="panel city-card reveal" href="#/universities?district=' + enco
 '<p class="city-note">' + h(cities) + '</p>' +
 '<div class="city-meta"><span>' + r.count + ' ' + plural(r.count, 'вуз', 'вуза', 'вузов') + '</span>' +
 '<span>' + r.programs + ' ' + plural(r.programs, 'программа', 'программы', 'программ') + '</span>' +
-'<span>≈' + r.avg + '</span></div>' +
+(r.programs ? '<span>≈' + r.avg + '</span>' : '') + '</div>' +
 '<span class="spec-arrow">Вузы региона →</span></a>';
 }
 function districtCard(d) {
@@ -2503,7 +2526,7 @@ plural(d.regions.length, 'регион', 'региона', 'регионов') +
 '<p class="city-note">' + h(top) + '</p>' +
 '<div class="geo-meta"><span>' + d.count + ' ' + plural(d.count, 'вуз', 'вуза', 'вузов') + '</span>' +
 '<span>' + d.programs + ' ' + plural(d.programs, 'программа', 'программы', 'программ') + '</span>' +
-'<span>≈' + d.avg + '</span></div>' +
+(d.programs ? '<span>≈' + d.avg + '</span>' : '') + '</div>' +
 '<span class="spec-arrow">Открыть округ →</span></a>';
 }
 function advCard(n, title, text) {
@@ -2515,7 +2538,7 @@ setTitle('Профессии·2030 — атлас востребованных �
 var byIndex = P.slice().sort(function (a, b) { return b.index - a.index; });
 var top = byIndex.slice(0, 8);
 var featured = P.slice().sort(function (a, b) { return b.growth - a.growth; }).slice(0, 6);
-var uniTop = U.slice().sort(function (a, b) { return b.avg - a.avg; }).slice(0, 3);
+var uniTop = U.filter(function (u) { return u.programs.length; }).sort(function (a, b) { return b.avg - a.avg; }).slice(0, 3);
 var colTop = C.slice().sort(function (a, b) { return b.count - a.count; }).slice(0, 4);
 var specTop = SPECIALTIES.slice(0, 6);
 var geoTop = DISTRICTS.slice();
@@ -2831,22 +2854,33 @@ return '<tr><td data-label="Направление">' + h(pr.direction) + '<span
 '<td data-label="Платно" class="p">' + (pr.paid ? '≈' + h(pr.paid) : '—') + '</td></tr>';
 }
 function uniCard(u, i) {
-var more = u.programs.length > 4
+var org = isOrgCard(u);
+var more = !org && u.programs.length > 4
 ? '<button class="more-btn" data-more data-label="Показать все ' + u.programs.length + ' ' +
 plural(u.programs.length, 'направление', 'направления', 'направлений') + '">Показать все ' +
 u.programs.length + ' ' + plural(u.programs.length, 'направление', 'направления', 'направлений') + ' ↓</button>'
 : '';
+var score = org
+? (u.avgEge ? '<div class="uni-score"><span class="v">' + score1(u.avgEge) + '</span><span class="k">средний балл ЕГЭ на предмет</span></div>' : '')
+: '<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div>';
+var meta = org
+? '<p class="uni-places mono tiny">' + orgMetaLine(u) +
+' · <a href="#/compare?unis=' +
+encodeURIComponent(u.short) + '">сравнить вуз</a></p>'
+: '<p class="uni-places mono tiny">≈' + uniPlaces(u) + ' ' + plural(uniPlaces(u), 'бюджетное место', 'бюджетных места', 'бюджетных мест') +
+' · ' + h(u.format) + (u.dorm ? ' · общежитие' : '') +
+' · <a href="#/admission">история баллов →</a> · <a href="#/compare?unis=' + encodeURIComponent(u.short) + '">сравнить вуз</a></p>';
+var body = org
+? '<p class="source-note">Программы этого вуза в атласе пока не разобраны: в карточке только официальные показатели 2025 года. ' +
+'Средний балл ЕГЭ — по очной форме, в расчёте на один предмет.</p>'
+: '<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Профессия</th><th>ЕГЭ</th>' +
+'<th>Бюджет</th><th>Платно</th></tr></thead><tbody>' + u.programs.map(uniRow).join('') + '</tbody></table></div>';
 return '<section class="panel uni reveal">' +
 photoStrip(uniPhotoKey(u, i), '', !UNI_PHOTO[u.slug]) +
 '<div class="uni-top"><div><p class="uni-city">' + h(u.region) + ' · ' + h(u.city) + '</p><h3><a href="#/universities/' + h(u.slug) + '">' + h(u.short) + '</a></h3>' +
 '<p class="full">' + h(u.full) + '</p></div>' +
-'<div class="uni-score"><span class="v">≈' + u.avg + '</span><span class="k">средний балл на бюджет</span></div></div>' +
-'<p class="uni-places mono tiny">≈' + uniPlaces(u) + ' ' + plural(uniPlaces(u), 'бюджетное место', 'бюджетных места', 'бюджетных мест') +
-' · ' + h(u.format) + (u.dorm ? ' · общежитие' : '') +
-' · <a href="#/admission">история баллов →</a> · <a href="#/compare?unis=' + encodeURIComponent(u.short) + '">сравнить вуз</a></p>' +
-'<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Профессия</th><th>ЕГЭ</th>' +
-'<th>Бюджет</th><th>Платно</th></tr></thead><tbody>' + u.programs.map(uniRow).join('') + '</tbody></table></div>' +
-more + '</section>';
+score + '</div>' +
+meta + body + more + '</section>';
 }
 function filteredUnis(st) {
 var q = norm(st.q);
@@ -2855,9 +2889,9 @@ if (st.district && u.district !== st.district) return false;
 if (st.region && u.region !== st.region) return false;
 if (st.city && u.city !== st.city) return false;
 if (st.minAvg && Number(u.avg || 0) < st.minAvg) return false;
-if (st.format && u.format && u.format !== st.format) return false;
-if (st.dorm === 'yes' && u.dorm === false) return false;
-if (st.dorm === 'no' && u.dorm === true) return false;
+if (st.format && u.format !== st.format) return false;
+if (st.dorm === 'yes' && u.dorm !== true) return false;
+if (st.dorm === 'no' && u.dorm !== false) return false;
 if (st.mode === 'budget' && !u.programs.some(function (p) { return !!p.budget; })) return false;
 if (st.mode === 'paid' && !u.programs.some(function (p) { return !!p.paid; })) return false;
 if (st.exam && !u.programs.some(function (p) { return String(p.ege || '').indexOf(st.exam) >= 0; })) return false;
@@ -2907,7 +2941,8 @@ var programs = regionUnis.reduce(function (n, u) { return n + u.programs.length;
 return '<div class="region-block">' +
 '<div class="region-head"><h3>' + h(r.name) + '</h3>' +
 '<span class="mono tiny">' + regionUnis.length + ' ' + plural(regionUnis.length, 'вуз', 'вуза', 'вузов') +
-' · ' + programs + ' ' + plural(programs, 'программа', 'программы', 'программ') + ' · средний балл ≈' + r.avg + '</span></div>' +
+' · ' + programs + ' ' + plural(programs, 'программа', 'программы', 'программ') +
+(programs ? ' · средний балл ≈' + r.avg : ' · показатели без программ') + '</span></div>' +
 '<div class="uni-grid">' + regionUnis.map(function (u) { return uniCard(u, seen++); }).join('') + '</div>' +
 '</div>';
 }).join('') +
@@ -3535,7 +3570,8 @@ repaint();
 }
 function renderRegions() {
 setTitle('Регионы и вузы — Профессии·2030');
-var avg = U.length ? Math.round(U.reduce(function (n, u) { return n + u.avg; }, 0) / U.length) : 0;
+var avgBase = U.filter(function (u) { return u.programs.length && u.avg !== undefined; });
+var avg = avgBase.length ? Math.round(avgBase.reduce(function (n, u) { return n + u.avg; }, 0) / avgBase.length) : 0;
 var largest = DISTRICTS.slice().sort(function (a, b) { return b.count - a.count; });
 app.innerHTML = '<div class="view">' +
 '<section class="hero">' +
@@ -3563,7 +3599,8 @@ DISTRICTS.map(function (d) {
 return '<div class="region-list-block reveal">' +
 '<div class="region-list-head"><div><p class="eyebrow">' + h(d.code) + '</p><h3>' + h(d.name) + '</h3></div>' +
 '<span class="mono tiny">' + d.count + ' ' + plural(d.count, 'вуз', 'вуза', 'вузов') + ' · ' + d.programs + ' ' +
-plural(d.programs, 'программа', 'программы', 'программ') + ' · средний балл ≈' + d.avg + '</span></div>' +
+plural(d.programs, 'программа', 'программы', 'программ') +
+(d.programs ? ' · средний балл ≈' + d.avg : ' · показатели без программ') + '</span></div>' +
 '<div class="region-links">' + d.regions.map(function (r) {
 return '<a href="#/universities?district=' + encodeURIComponent(d.code) + '&region=' + encodeURIComponent(r.name) + '">' +
 '<span>' + h(r.name) + '</span><b>' + r.count + '</b></a>';
@@ -4488,14 +4525,19 @@ return SPEC_BY_KEY[pr.code + '|' + norm(pr.direction)] || null;
 function renderUniversity(slug) {
 var u = UNI_BY_SLUG[slug];
 if (!u) { render404('/universities/' + slug); return; }
-setTitle(u.full + ' — ' + u.city + ': баллы и программы — Профессии·2030');
-setDescription(u.full + ' (' + u.short + ', ' + u.city + '): ' + u.programs.length + ' направлений подготовки, наборы ЕГЭ и ориентировочные проходные баллы на бюджет и платное отделение.');
+var org = isOrgCard(u);
+setTitle(org
+? u.full + ' — ' + u.city + ': официальные показатели — Профессии·2030'
+: u.full + ' — ' + u.city + ': баллы и программы — Профессии·2030');
+setDescription(org
+? u.full + ' (' + u.short + ', ' + u.city + '): средний балл ЕГЭ в расчёте на один предмет и численность студентов — официальные показатели мониторинга 2025 года.'
+: u.full + ' (' + u.short + ', ' + u.city + '): ' + u.programs.length + ' направлений подготовки, наборы ЕГЭ и ориентировочные проходные баллы на бюджет и платное отделение.');
 var specs = SPECIALTIES.filter(function (s) {
 return s.unis.some(function (x) { return x.uni === u; });
 });
 var places = uniPlaces(u);
 var sameCity = U.filter(function (x) { return x !== u && x.city === u.city; })
-.sort(function (a, b) { return b.avg - a.avg; }).slice(0, 6);
+.sort(function (a, b) { return (b.avg || 0) - (a.avg || 0); }).slice(0, 6);
 var rows = u.programs.map(function (pr) {
 var sp = specKeyFor(pr);
 return '<tr><td data-label="Направление">' +
@@ -4510,24 +4552,40 @@ app.innerHTML = '<div class="view">' +
 '<header class="detail-head">' +
 '<p class="eyebrow" style="margin-top:18px">' + h(u.district) + ' · ' + h(u.region) + (u.region !== u.city ? ' · ' + h(u.city) : '') + '</p>' +
 '<h1>' + h(u.full) + '</h1>' +
-'<p class="lead">' + h(u.short) + ': ' + u.programs.length + ' ' + plural(u.programs.length, 'направление', 'направления', 'направлений') +
-' подготовки, средний балл на бюджет ≈' + u.avg + ' из 300. ' + h(u.format) + (u.dorm ? ', общежитие есть.' : ', общежития нет.') + '</p>' +
+'<p class="lead">' + (org
+? h(u.short) + ': ' + orgMetaLine(u) + '.'
+: h(u.short) + ': ' + u.programs.length + ' ' + plural(u.programs.length, 'направление', 'направления', 'направлений') +
+' подготовки, средний балл на бюджет ≈' + u.avg + ' из 300. ' + h(u.format) + (u.dorm ? ', общежитие есть.' : ', общежития нет.')) + '</p>' +
 '<div class="fact-strip">' +
-'<div><span class="k">Средний балл</span><span class="v">≈' + u.avg + '</span></div>' +
+(org
+? (u.avgEge ? '<div><span class="k">Средний балл ЕГЭ</span><span class="v">' + score1(u.avgEge) + '</span></div>' : '') +
+(u.students ? '<div><span class="k">Студентов</span><span class="v">' + thousands(u.students) + '</span></div>' : '') +
+'<div><span class="k">Направлений</span><span class="v">—</span></div>'
+: '<div><span class="k">Средний балл</span><span class="v">≈' + u.avg + '</span></div>' +
 '<div><span class="k">Направлений</span><span class="v">' + u.programs.length + '</span></div>' +
 '<div><span class="k">Специальностей</span><span class="v">' + specs.length + '</span></div>' +
-'<div><span class="k">Бюджетных мест</span><span class="v">≈' + places + '</span></div>' +
+'<div><span class="k">Бюджетных мест</span><span class="v">≈' + places + '</span></div>') +
 '</div>' +
 '<div class="hero-cta">' +
-'<a class="btn btn-primary btn-sm" href="' + h(pageHref('/quiz')) + '">Проверить шансы</a>' +
+(org ? '' : '<a class="btn btn-primary btn-sm" href="' + h(pageHref('/quiz')) + '">Проверить шансы</a>') +
 '<a class="btn btn-sm" href="' + h(pageHref('/universities', 'city=' + encodeURIComponent(u.city))) + '">Все вузы ' + h(u.city) + '</a>' +
-'<a class="btn btn-sm" href="' + h(pageHref('/admission')) + '">Бюджетные места</a>' +
+(org
+? '<a class="btn btn-sm" href="' + h(pageHref('/compare', 'unis=' + encodeURIComponent(u.short))) + '">Сравнить вуз</a>'
+: '<a class="btn btn-sm" href="' + h(pageHref('/admission')) + '">Бюджетные места</a>') +
 '</div>' +
 '</header>' +
 uniPlate(u) +
-'<section class="sec-head reveal"><div><p class="eyebrow">Программы</p><h2 class="sec">Направления, ЕГЭ и баллы</h2></div></section>' +
+(org
+? '<section class="sec-head reveal"><div><p class="eyebrow">Показатели</p><h2 class="sec">Официальные данные</h2></div></section>' +
+'<div class="panel reveal" style="padding:22px">' +
+'<p class="muted" style="margin:0">В атласе у этого вуза пока нет разобранных направлений и проходных баллов. ' +
+'Ниже — официальные показатели мониторинга деятельности организаций высшего образования за 2025 год.</p>' +
+'<p class="mono tiny" style="margin:12px 0 0;color:var(--ink-3)">Средний балл ЕГЭ — по очной форме обучения, в расчёте на один предмет. ' +
+'Численность — студенты бакалавриата, специалитета и магистратуры всех форм обучения.</p>' +
+'<p style="margin:14px 0 0"><a class="btn btn-sm" href="' + h(pageHref('/methodology')) + '">Методика и источники →</a></p></div>'
+: '<section class="sec-head reveal"><div><p class="eyebrow">Программы</p><h2 class="sec">Направления, ЕГЭ и баллы</h2></div></section>' +
 '<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Профессия</th><th>ЕГЭ</th><th>Бюджет</th><th>Платно</th></tr></thead><tbody>' +
-rows + '</tbody></table></div>' +
+rows + '</tbody></table></div>') +
 (specs.length ? '<section class="sec-head reveal"><div><p class="eyebrow">Специальности</p><h2 class="sec">Коды и направления</h2></div>' +
 '<a class="sec-link" href="' + h(pageHref('/specialties')) + '">Все специальности →</a></section>' +
 '<div class="chips">' + specs.slice(0, 40).map(function (s) {
@@ -4536,7 +4594,9 @@ return '<a class="chip" href="' + h(pageHref('/specialties/' + s.slug)) + '">' +
 (sameCity.length ? '<section class="sec-head reveal"><div><p class="eyebrow">Рядом</p><h2 class="sec">Ещё вузы ' + h(u.city) + '</h2></div></section>' +
 '<div class="spec-grid">' + sameCity.map(function (x) {
 return '<a class="panel reveal" href="' + h(pageHref('/universities/' + x.slug)) + '" style="padding:18px;display:block">' +
-'<p class="eyebrow" style="margin:0">≈' + x.avg + ' балл</p><h3 style="margin:6px 0 0">' + h(x.short) + '</h3>' +
+'<p class="eyebrow" style="margin:0">' + (isOrgCard(x)
+? (x.avgEge ? score1(x.avgEge) + ' балла ЕГЭ' : 'показатели 2025')
+: '≈' + x.avg + ' балл') + '</p><h3 style="margin:6px 0 0">' + h(x.short) + '</h3>' +
 '<p class="muted tiny" style="margin:4px 0 0">' + h(x.full) + '</p></a>';
 }).join('') + '</div>' : '') +
 '</div>';
@@ -6063,10 +6123,10 @@ function mapCities() {
   U.forEach(function (u) {
     var c = byCity[u.city];
     if (!c) {
-      c = byCity[u.city] = { city: u.city, count: 0, avgSum: 0, unis: [], district: u.district, region: u.region };
+      c = byCity[u.city] = { city: u.city, count: 0, avgSum: 0, avgCount: 0, unis: [], district: u.district, region: u.region };
     }
     c.count++;
-    c.avgSum += u.avg;
+    if (u.programs.length && u.avg !== undefined) { c.avgSum += u.avg; c.avgCount++; }
     c.unis.push(u);
   });
   var out = [];
@@ -6079,7 +6139,7 @@ function mapCities() {
     var p = RUS_GEO.project(ll[1], ll[0]);
     c.x = p[0];
     c.y = p[1];
-    c.avg = Math.round(c.avgSum / c.count);
+    c.avg = c.avgCount ? Math.round(c.avgSum / c.avgCount) : 0;
     c.pin = 16 + Math.min(c.count, 12) * 3.4;
     out.push(c);
   }
@@ -6417,7 +6477,8 @@ function mapShowTip(c, x, y) {
   var name = document.createElement('b');
   name.textContent = c.city;
   var meta = document.createElement('span');
-  meta.textContent = c.count + ' ' + plural(c.count, 'вуз', 'вуза', 'вузов') + ' · ≈' + c.avg + ' балла · ' + c.district;
+  meta.textContent = c.count + ' ' + plural(c.count, 'вуз', 'вуза', 'вузов') +
+    (c.avgCount ? ' · ≈' + c.avg + ' балла' : ' · показатели без программ') + ' · ' + c.district;
   var reg = document.createElement('em');
   reg.textContent = c.region;
   st.tip.appendChild(name);
@@ -6705,7 +6766,7 @@ return '≈' + Math.min.apply(null, vals) + '–' + Math.max.apply(null, vals);
 }
 function uniCompareTable(list) {
 var best = {
-avg: Math.max.apply(null, list.map(function (u) { return u.avg; })),
+avg: Math.max.apply(null, list.map(function (u) { return u.programs.length ? u.avg : 0; })),
 places: Math.max.apply(null, list.map(uniPlaces)),
 minBudget: Math.min.apply(null, list.map(function (u) {
 var v = u.programs.map(function (p) { return num(p.budget); }).filter(Boolean);
@@ -6714,12 +6775,17 @@ return v.length ? Math.min.apply(null, v) : 999;
 };
 var rows = [
 ['Город и округ', function (u) { return h(u.city) + '<span class="sm">' + h(u.region) + ' · ' + h(u.district) + '</span>'; }],
-['Средний балл на бюджет', function (u) { return '<span class="hi' + (u.avg === best.avg ? ' best' : '') + '">≈' + u.avg + '</span>'; }],
+['Средний балл на бюджет', function (u) {
+if (isOrgCard(u)) return u.avgEge ? score1(u.avgEge) + '<span class="sm">ЕГЭ на предмет</span>' : '—';
+return '<span class="hi' + (u.avg === best.avg ? ' best' : '') + '">≈' + u.avg + '</span>';
+}],
 ['Бюджетных мест, оценка', function (u) {
+if (isOrgCard(u)) return '—';
 var n = uniPlaces(u);
 return '<span class="hi' + (n === best.places ? ' best' : '') + '">≈' + n + '</span>';
 }],
 ['Программ в атласе', function (u) { return u.programs.length; }],
+['Студентов', function (u) { return u.students ? thousands(u.students) : '—'; }],
 ['Минимальный балл', function (u) {
 var v = u.programs.map(function (p) { return num(p.budget); }).filter(Boolean);
 var m = v.length ? Math.min.apply(null, v) : 0;
@@ -6727,9 +6793,10 @@ return m ? '<span class="hi' + (m === best.minBudget ? ' best' : '') + '">≈' +
 }],
 ['Бюджет: диапазон', function (u) { return uniRange(u, 'budget'); }],
 ['Платно: диапазон', function (u) { return uniRange(u, 'paid'); }],
-['Форма обучения', function (u) { return h(u.format); }],
-['Общежитие', function (u) { return u.dorm ? 'Есть' : 'Нет'; }],
+['Форма обучения', function (u) { return u.format ? h(u.format) : '—'; }],
+['Общежитие', function (u) { return u.dorm === undefined ? '—' : (u.dorm ? 'Есть' : 'Нет'); }],
 ['Ведущие направления', function (u) {
+if (!u.programs.length) return '—';
 return u.programs.slice().sort(function (a, b) { return num(b.budget) - num(a.budget); }).slice(0, 3).map(function (p) {
 return h(p.direction);
 }).join('<span class="sm">' + h(u.programs[0] ? '' : '') + '</span><br>');
@@ -6763,7 +6830,7 @@ var tabs = '<div class="seg-tabs" role="tablist">' +
 var body;
 if (mode === 'uni') {
 if (picked.length < 2) {
-var byAvg = U.slice().sort(function (a, b) { return b.avg - a.avg; });
+var byAvg = U.filter(function (u) { return u.programs.length; }).sort(function (a, b) { return b.avg - a.avg; });
 picked = [byAvg[0], byAvg[1]];
 }
 var a = picked[0], b = picked[1];
