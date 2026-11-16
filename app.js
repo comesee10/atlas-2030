@@ -162,12 +162,25 @@ var PHOTO_CREDITS = {
   'D-06': { by: 'The Smiler (band)', lic: 'CC BY 2.0', src: 'https://commons.wikimedia.org/wiki/File:TheSmiler2014-158--Fri-Bruk--Foto_Michaela_Klouda_(Urban_Sound_Studios,_taken_on_2014-02-16_13.46.48._uploaded_by_The_Smiler_(band)_@_Flickr_12741125195).jpg' }
 };
 function sphereKey(code) { return String(code || '').toLowerCase().replace(/-/g, ''); }
+/* У новых сфер пока нет собственного фотобанка: берём близкую сцену,
+   чтобы карточки не оставались пустыми. */
+var SPHERE_ASSET = {
+'D-07': 'life-class',
+'D-08': 'life-theatre',
+'D-09': 'sphere-d02',
+'D-10': 'life-lawn'
+};
 function spherePhoto(code, size) {
   if (!PHOTOS_ON) return '';
-  return ASSET_BASE + 'photos/sphere-' + sphereKey(code) + (size ? '-' + size : '') + '.webp';
+  var key = SPHERE_ASSET[code] || ('sphere-' + sphereKey(code));
+  return ASSET_BASE + 'photos/' + key + (size ? '-' + size : '') + '.webp';
 }
 function photoCredit(code) {
   var c = PHOTO_CREDITS[code];
+  if (!c && SPHERE_ASSET[code] && typeof PHOTO_LIB !== 'undefined') {
+    var p = PHOTO_LIB[SPHERE_ASSET[code]];
+    if (p) c = { by: p.by, lic: p.lic, src: p.src };
+  }
   if (!c) return '';
   return '<a class="photo-credit" href="' + h(c.src) + '" target="_blank" rel="noopener noreferrer">Фото: ' + h(c.by) + ' · ' + h(c.lic) + ' · Wikimedia Commons</a>';
 }
