@@ -2971,7 +2971,7 @@ app.innerHTML = '<div class="view">' +
 '<div class="hero-copy">' +
 roleSwitchHtml() +
 '<p class="eyebrow">Раздел I · Навигатор</p>' +
-'<div class="hero-num-row"><b class="hero-num">' + P.length + '</b><span>' + plural(P.length, 'профессия', 'профессии', 'профессий') + ' в атласе · шесть сфер · 2027–2030</span></div>' +
+'<div class="hero-num-row"><b class="hero-num">' + SPHERES.length + '</b><span>' + plural(SPHERES.length, 'сфера', 'сферы', 'сфер') + ' атласа · 2027–2030</span></div>' +
 (teacher
 ? '<h1 class="display">Профессии будущего — <em>на уроке</em> и дома</h1>' +
 '<p class="lead">Материал для классного часа и семейного разговора: ' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', ' +
@@ -3019,12 +3019,17 @@ return '<div class="mini-row"><a href="#/professions/' + p.slug + '">' + h(p.tit
 '</aside>' +
 '</div>' +
 '</section>' +
-'<div class="fact-strip reveal">' +
-'<div><span class="k">Профессии</span><span class="v">' + P.length + '</span></div>' +
-'<div><span class="k">Направления</span><span class="v">' + DIRECTIONS.length + '</span></div>' +
-'<div><span class="k">Вузы</span><span class="v">' + U.length + '</span></div>' +
-'<div><span class="k">Города</span><span class="v">' + CITIES.length + '</span></div>' +
-'<div><span class="k">Регионы</span><span class="v">' + REGIONS.length + '</span></div>' +
+'<div class="hero-facts reveal">' +
+'<p class="hf-line">' +
+factItem(P.length, 'профессия', 'профессии', 'профессий', '#/professions', 'профессии', true) +
+'<span class="hf-dot" aria-hidden="true">·</span>' +
+factItem(DIRECTIONS.length, 'направление', 'направления', 'направлений', '#/specialties', 'направления', false) +
+'<span class="hf-dot" aria-hidden="true">·</span>' +
+factItem(U.length, 'вуз', 'вуза', 'вузов', '#/universities', 'вузы', false) +
+'<span class="hf-dot" aria-hidden="true">·</span>' +
+factItem(CITIES.length, 'город', 'города', 'городов', '#/regions', 'города', false) +
+'</p>' +
+'<p class="hf-src">официальный мониторинг · октябрь 2026</p>' +
 '</div>' +
 teacherPanel +
 // Дата — вне .hero-home: у секции overflow:hidden, и transform reveal
@@ -3089,6 +3094,7 @@ advCard('06', 'Сравнение и печатный отчёт', 'До трё�
 '</div>';
 renderPlot();
 bindQuickEge();
+animateFacts();
 }
 function bindQuickEge() {
 var form = document.getElementById('quickEge');
@@ -3104,6 +3110,52 @@ if (!ex.length) ex = ['Рус', 'Мат', 'Инф'];
 if (!(b >= 120 && b <= 300)) b = 220;
 location.hash = '#/quiz?step=4&e=' + encodeURIComponent(ex.join(',')) + '&b=' + b;
 });
+}
+/* Показатель атласа: цифра-ссылка, слово и скрытая подпись для чтения с экрана. */
+function factItem(n, one, few, many, href, label, lead) {
+var word = plural(n, one, few, many);
+return '<a class="hf' + (lead ? ' hf-lead' : '') + '" href="' + href + '" aria-label="' + n + ' ' + word + ' — ' + label + '">' +
+'<b class="hf-n" data-count="' + n + '" aria-hidden="true">' + groupNum(n) + '</b>' +
+'<span aria-hidden="true">' + word + '</span></a>';
+}
+function groupNum(n) {
+return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
+}
+/* Цифры «набегают» при открытии главной; reduced motion — сразу значение. */
+function animateFacts() {
+var nums = Array.prototype.slice.call(document.querySelectorAll('.hf-n[data-count]'));
+if (!nums.length) return;
+var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var fin = function (el) { el.textContent = groupNum(el.getAttribute('data-count')); };
+if (reduce || !window.requestAnimationFrame || document.hidden) { nums.forEach(fin); return; }
+var widths = nums.map(function (el) {
+el.textContent = groupNum(el.getAttribute('data-count'));
+var w = el.getBoundingClientRect().width;
+el.style.width = w + 'px';
+el.style.textAlign = 'center';
+el.textContent = '0';
+return w;
+});
+/* Страховка: если вкладка ушла в фон и кадры не идут, цифры всё равно встанут. */
+var safety = setTimeout(function () {
+nums.forEach(function (el) { fin(el); el.style.width = ''; el.style.textAlign = ''; });
+}, 1200);
+var t0 = null, DUR = 450;
+function step(ts) {
+if (!t0) t0 = ts;
+var p = Math.min(1, (ts - t0) / DUR);
+var e = 1 - Math.pow(1 - p, 3);
+nums.forEach(function (el) {
+var to = parseInt(el.getAttribute('data-count'), 10) || 0;
+el.textContent = groupNum(Math.round(to * e));
+});
+if (p < 1) requestAnimationFrame(step);
+else {
+clearTimeout(safety);
+nums.forEach(function (el) { fin(el); el.style.width = ''; el.style.textAlign = ''; });
+}
+}
+requestAnimationFrame(step);
 }
 function subjectOptions(active) {
 return SUBJECTS.map(function (s) {
@@ -4170,6 +4222,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Показатели одной строкой.</b> Цифры атласа на главной стали крупнее и кликабельными: 47 профессий выделены акцентом, рядом — направления, вузы и города. При открытии числа набегают, при наведении подчёркиваются, а источник и дата подписаны под строкой.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Быстрый подбор и баллы.</b> На главной появилась форма: три предмета ЕГЭ и сумма — сразу к результатам, без прохождения шагов. Добавлены раздел «Баллы и шансы» с порогами по направлениям, подборки «Профессии по предметам ЕГЭ» и общий список программ с фильтрами по предмету, баллу и городу.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры без повторов.</b> Карточки направлений берут кадры по кругу из своей группы, сфер и учебных сцен — на странице направлений соседи больше не дублируются. У крупных групп свои вторые и третьи сцены, у двадцати двух вузов — подтверждённые снимки корпусов.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры направлений.</b> Карточки направлений больше не берут общий снимок сферы: у физики — лазерная лаборатория, у химии — работа с колбами, у строительства — площадка, у информатики — серверный зал, у архитектуры — современный фасад. Кадры сгруппированы по укрупнённым кодам, автор и лицензия — в списке фотографий.</div></li>' +

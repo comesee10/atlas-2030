@@ -218,7 +218,24 @@ transition:border-color .15s,color .15s,background .15s;
 .qe-field select:focus-visible,.qe-field input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.15)}
 .qe-sum{max-width:96px}
 .qe-go{height:36px;white-space:nowrap}
-/* Карточки предметов ЕГЭ и фильтр программ. */
+/* Показатели атласа: одна строка крупной типографики, первая цифра — акцент. */
+.hero-facts{margin-top:28px;padding-top:18px;border-top:1px solid var(--rule)}
+.hf-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin:0}
+.hf{display:inline-flex;align-items:baseline;gap:8px;position:relative;padding-bottom:3px;color:var(--ink);text-decoration:none}
+.hf-n{font-family:var(--serif);font-size:clamp(26px,3.2vw,36px);font-weight:700;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.hf-lead .hf-n{color:var(--accent);font-size:clamp(32px,4.2vw,44px)}
+.hf span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
+.hf::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform var(--dur-2) var(--ease-out)}
+.hf:hover::after,.hf:focus-visible::after{transform:scaleX(1)}
+.hf:focus-visible{outline:none}
+.hf-dot{color:var(--ink-4);font-size:20px;line-height:1}
+.hf-src{margin:10px 0 0;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4)}
+@media (max-width:760px){
+.hf-line{gap:6px 10px}
+.hf span{font-size:9px}
+.hf-dot{display:none}
+.hf{flex:0 0 calc(50% - 6px)}
+}
 .subj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
 .subj-card{display:block;padding:16px 18px}
 .subj-card b{display:block;font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink)}
