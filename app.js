@@ -339,8 +339,52 @@ var PHOTO_LIB = {
     alt: "Гид с группой туристов", big: 800 },
   "prof-digital-marketer": { by: "Virginia State Parks staff", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Marketing_Team_Meeting_First_Landing_2012_(9316218233).jpg",
     alt: "Команда маркетинга на встрече", big: 800 },
-  "prof-mechanical-engineer": { by: "USDAgov", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:APHIS-Aircraft_and_Equipment_Operations_(AEO),_Aircraft_Operations_and_Warehouse_(20230622-CDP-APHIS-0829).jpg",
-    alt: "Механик за шлифовальным станком", big: 800 },
+  "prof-mechanical-engineer": { by: "Shixart1985", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Worker_adjusts_a_metal_lathe_in_a_machine_workshop.jpg",
+    alt: "Наладка металлорежущего станка", big: 800 },
+  "prof-ml-engineer": { by: "Caiguanhao", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:Computer_Room_403_in_Lab_Bldg_of_Foshan_University_(Beiyuan).jpg",
+    alt: "Компьютерный класс с рабочими местами", big: 800 },
+  "prof-uav-engineer": { by: "Samworthington", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:%22Wing_GCS%22_Portable_Ground_Control_Station_for_UAVs_(drones)_from_Worthington_Sharpe.jpg",
+    alt: "Оператор беспилотника за наземной станцией управления", big: 800 },
+  "prof-personalized-medicine": { by: "National Institute of Standards and Technology", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Laboratory_Technician_Pipettes_Dirt_(10714910404).jpg",
+    alt: "Лаборант с дозатором в медицинской лаборатории", big: 800 },
+  "prof-robotics": { by: "Matti Blume", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Paris_Motor_Show_2018,_Paris_(1Y7A1752).jpg",
+    alt: "Промышленный манипулятор в лаборатории", big: 800 },
+  "prof-bioinformatics": { by: "NASA", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:First-ever_sequencing_of_DNA_in_space,_performed_by_Kate_Rubins_on_the_ISS._128f0462_sequencer_1.jpg",
+    alt: "Секвенатор ДНК и рабочий ноутбук в лаборатории", big: 800 },
+  "prof-oil-gas-engineer": { by: "Michael Elleray from England, United Kingdom", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:The_UK%27s_2015_Oil_Reality_(17918967973).jpg",
+    alt: "Морская нефтегазовая платформа", big: 800 },
+  "prof-product-manager": { by: "See-N-e-v-e-r-M-i-n-d", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Kiat_Lim_2024.jpg",
+    alt: "Продуктовый менеджер у экрана с метриками", big: 800 },
+  "prof-teacher": { by: "Kambai Akau", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:A_classroom_with_students_at_the_College_of_Medicine,_FUASK.jpg",
+    alt: "Учитель ведёт урок в классе", big: 800 },
+  "prof-renewable-energy": { by: "CoCreatr from Yokohama, Japan", lic: "CC BY-SA 2.0", src: "https://commons.wikimedia.org/wiki/File:Solar_installation_technician_on_rooftop_(5392894792).jpg",
+    alt: "Монтажник солнечных панелей на крыше", big: 800 },
+  "prof-gene-engineer": { by: "Rhoda Baer (Photographer)", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Researcher_looks_through_microscope_(1).jpg",
+    alt: "Исследователи за микроскопом в лаборатории", big: 800 },
+  "prof-railway-engineer": { by: "Harveyqs", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:WORKERS.jpg",
+    alt: "Путейцы осматривают железнодорожный путь", big: 800 },
+  "prof-ux-researcher": { by: "Samuel Mann from Dunedin, New Zealand", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Project_User_Experience_Testing_(9719939867).jpg",
+    alt: "Дизайнер на сессии юзабилити-тестирования", big: 800 },
+  "prof-pharmacist": { by: "Akeeb Feroz", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Working_at_pharmacy.jpg",
+    alt: "Аптека: фармацевт и покупатели у витрин", big: 800 },
+  "prof-fintech-analyst": { by: "Ank Kumar", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Frankfurt_Stock_Exchange_(Ank_Kumar)_01.jpg",
+    alt: "Трейдинговый зал биржи", big: 800 },
+  "prof-neuropsychologist": { by: "Walej", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:FNIRS_head_Hitachi_ETG4000_2.jpg",
+    alt: "Испытуемый с ЭЭГ-шапочкой в лаборатории", big: 800 },
+  "prof-translator": { by: "FrDr", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:EU_interpretation_(DG_SCIC)_02.jpg",
+    alt: "Синхронный переводчик в кабине", big: 800 },
+  "prof-edtech-methodologist": { by: "Phil Roeder from Des Moines, IA, USA", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Onlineteacher.jpg",
+    alt: "Педагог ведёт онлайн-занятие", big: 800 },
+  "prof-transport-engineer": { by: "European Space Agency", lic: "CC BY-SA 3.0 IGO", src: "https://commons.wikimedia.org/wiki/File:Main_Control_Room_pano_ESA382553.jpg",
+    alt: "Операторы в диспетчерском зале", big: 800 },
+  "prof-supply-chain": { by: "Andrzej Otrębski", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Trieste_APL_New_Jersey_3.jpg",
+    alt: "Контейнерный терминал в порту", big: 800 },
+  "prof-metallurgist": { by: "Bruno Barbaresi", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:La_Providence_R%C3%A9hon_-_steel_workers.jpg",
+    alt: "Сталевар у плавильной печи", big: 800 },
+  "prof-land-surveyor": { by: "CEphoto, Uwe Aranas", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:District-Nabawan_Sabah_Land-Surveyors-01.jpg",
+    alt: "Геодезисты в поле с прибором", big: 800 },
+  "prof-bim-engineer": { by: "Zynell02", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Calumpang_NHS_ICT_AutoCAD_Activity.jpg",
+    alt: "Инженер за работой в САПР", big: 800 },
 };
 var UNI_PHOTO = {
   'mgu-moskva': 'uni-mgu',
@@ -3831,7 +3875,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
-'<li><span class="mono">17 ноября 2026</span><div><b>Кадры профессий.</b> У двадцати профессий вместо общей сцены сферы — собственный снимок: центр кибербезопасности, приём у врача, чистый зал микроэлектроники, пульт энергосистемы, стройплощадка, лаборатория материалов, сборка космического аппарата. Автор и лицензия указаны под каждым кадром, полный список — выше, в разделе фотографий.</div></li>' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Кадры профессий.</b> У сорока двух профессий вместо общей сцены сферы — собственный снимок: центр кибербезопасности, приём у врача, чистый зал микроэлектроники, пульт энергосистемы, стройплощадка, лаборатория материалов, сборка космического аппарата, класс, аптека, кабина синхронного перевода, сталеплавильный цех. Автор и лицензия указаны под каждым кадром, полный список — выше.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Короткая шапка.</b> Вход в подбор стал кнопкой «Подобрать профессию», а второстепенные разделы собраны в «Ещё» тремя группами: каталог, инструменты, о проекте. Симулятор убран из меню, но остался в результатах подбора и на странице бюджетных мест.</div></li>' +
 '<li><span class="mono">15 ноября 2026</span><div><b>Живая шкала спроса.</b> График на главной перестроен: строка — сфера, точка — профессия, число справа — средний индекс. Ползунок задаёт порог: точки ниже гаснут, а сверху в реальном времени пересчитывается, сколько профессий остаётся и кто лидер. Больше никаких мелких пузырьков разного размера и горизонтальной прокрутки.</div></li>' +
 '<li><span class="mono">15 ноября 2026</span><div><b>Больше кадров, меньше повторов.</b> У каждой сферы теперь по пять снимков: производство, лаборатории, энергетика, залы заседаний, редакции и студии. Карточки специальностей, колледжей и вузов берут кадры по очереди — соседние больше не повторяются. Учебных сцен стало восемь: добавились кампус, аллея и биохимическая лаборатория.</div></li>' +

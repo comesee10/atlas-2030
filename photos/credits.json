@@ -871,12 +871,210 @@
   },
   "prof-mechanical-engineer": {
    "file": "photos/prof-mechanical-engineer-800.webp",
-   "title": "APHIS-Aircraft and Equipment Operations (AEO), Aircraft Operations and Warehouse (20230622-CDP-APHIS-0829).jpg",
-   "caption": "Механик за шлифовальным станком",
-   "author": "USDAgov",
+   "title": "Worker adjusts a metal lathe in a machine workshop.jpg",
+   "caption": "Наладка металлорежущего станка",
+   "author": "Shixart1985",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Worker_adjusts_a_metal_lathe_in_a_machine_workshop.jpg"
+  },
+  "prof-ml-engineer": {
+   "file": "photos/prof-ml-engineer-800.webp",
+   "title": "Computer Room 403 in Lab Bldg of Foshan University (Beiyuan).jpg",
+   "caption": "Компьютерный класс с рабочими местами",
+   "author": "Caiguanhao",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Computer_Room_403_in_Lab_Bldg_of_Foshan_University_(Beiyuan).jpg"
+  },
+  "prof-uav-engineer": {
+   "file": "photos/prof-uav-engineer-800.webp",
+   "title": "\"Wing GCS\" Portable Ground Control Station for UAVs (drones) from Worthington Sharpe.jpg",
+   "caption": "Оператор беспилотника за наземной станцией управления",
+   "author": "Samworthington",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%22Wing_GCS%22_Portable_Ground_Control_Station_for_UAVs_(drones)_from_Worthington_Sharpe.jpg"
+  },
+  "prof-personalized-medicine": {
+   "file": "photos/prof-personalized-medicine-800.webp",
+   "title": "Laboratory Technician Pipettes Dirt (10714910404).jpg",
+   "caption": "Лаборант с дозатором в медицинской лаборатории",
+   "author": "National Institute of Standards and Technology",
    "license": "Public domain",
    "licenseUrl": "",
-   "source": "https://commons.wikimedia.org/wiki/File:APHIS-Aircraft_and_Equipment_Operations_(AEO),_Aircraft_Operations_and_Warehouse_(20230622-CDP-APHIS-0829).jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Laboratory_Technician_Pipettes_Dirt_(10714910404).jpg"
+  },
+  "prof-robotics": {
+   "file": "photos/prof-robotics-800.webp",
+   "title": "Paris Motor Show 2018, Paris (1Y7A1752).jpg",
+   "caption": "Промышленный манипулятор в лаборатории",
+   "author": "Matti Blume",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Paris_Motor_Show_2018,_Paris_(1Y7A1752).jpg"
+  },
+  "prof-bioinformatics": {
+   "file": "photos/prof-bioinformatics-800.webp",
+   "title": "First-ever sequencing of DNA in space, performed by Kate Rubins on the ISS. 128f0462 sequencer 1.jpg",
+   "caption": "Секвенатор ДНК и рабочий ноутбук в лаборатории",
+   "author": "NASA",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:First-ever_sequencing_of_DNA_in_space,_performed_by_Kate_Rubins_on_the_ISS._128f0462_sequencer_1.jpg"
+  },
+  "prof-oil-gas-engineer": {
+   "file": "photos/prof-oil-gas-engineer-800.webp",
+   "title": "The UK's 2015 Oil Reality (17918967973).jpg",
+   "caption": "Морская нефтегазовая платформа",
+   "author": "Michael Elleray from England, United Kingdom",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_UK%27s_2015_Oil_Reality_(17918967973).jpg"
+  },
+  "prof-product-manager": {
+   "file": "photos/prof-product-manager-800.webp",
+   "title": "Kiat Lim 2024.jpg",
+   "caption": "Продуктовый менеджер у экрана с метриками",
+   "author": "See-N-e-v-e-r-M-i-n-d",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Kiat_Lim_2024.jpg"
+  },
+  "prof-teacher": {
+   "file": "photos/prof-teacher-800.webp",
+   "title": "A classroom with students at the College of Medicine, FUASK.jpg",
+   "caption": "Учитель ведёт урок в классе",
+   "author": "Kambai Akau",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:A_classroom_with_students_at_the_College_of_Medicine,_FUASK.jpg"
+  },
+  "prof-renewable-energy": {
+   "file": "photos/prof-renewable-energy-800.webp",
+   "title": "Solar installation technician on rooftop (5392894792).jpg",
+   "caption": "Монтажник солнечных панелей на крыше",
+   "author": "CoCreatr from Yokohama, Japan",
+   "license": "CC BY-SA 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Solar_installation_technician_on_rooftop_(5392894792).jpg"
+  },
+  "prof-gene-engineer": {
+   "file": "photos/prof-gene-engineer-800.webp",
+   "title": "Researcher looks through microscope (1).jpg",
+   "caption": "Исследователи за микроскопом в лаборатории",
+   "author": "Rhoda Baer (Photographer)",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Researcher_looks_through_microscope_(1).jpg"
+  },
+  "prof-railway-engineer": {
+   "file": "photos/prof-railway-engineer-800.webp",
+   "title": "WORKERS.jpg",
+   "caption": "Путейцы осматривают железнодорожный путь",
+   "author": "Harveyqs",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:WORKERS.jpg"
+  },
+  "prof-ux-researcher": {
+   "file": "photos/prof-ux-researcher-800.webp",
+   "title": "Project User Experience Testing (9719939867).jpg",
+   "caption": "Дизайнер на сессии юзабилити-тестирования",
+   "author": "Samuel Mann from Dunedin, New Zealand",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Project_User_Experience_Testing_(9719939867).jpg"
+  },
+  "prof-pharmacist": {
+   "file": "photos/prof-pharmacist-800.webp",
+   "title": "Working at pharmacy.jpg",
+   "caption": "Аптека: фармацевт и покупатели у витрин",
+   "author": "Akeeb Feroz",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Working_at_pharmacy.jpg"
+  },
+  "prof-fintech-analyst": {
+   "file": "photos/prof-fintech-analyst-800.webp",
+   "title": "Frankfurt Stock Exchange (Ank Kumar) 01.jpg",
+   "caption": "Трейдинговый зал биржи",
+   "author": "Ank Kumar",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Frankfurt_Stock_Exchange_(Ank_Kumar)_01.jpg"
+  },
+  "prof-neuropsychologist": {
+   "file": "photos/prof-neuropsychologist-800.webp",
+   "title": "FNIRS head Hitachi ETG4000 2.jpg",
+   "caption": "Испытуемый с ЭЭГ-шапочкой в лаборатории",
+   "author": "Walej",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:FNIRS_head_Hitachi_ETG4000_2.jpg"
+  },
+  "prof-translator": {
+   "file": "photos/prof-translator-800.webp",
+   "title": "EU interpretation (DG SCIC) 02.jpg",
+   "caption": "Синхронный переводчик в кабине",
+   "author": "FrDr",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:EU_interpretation_(DG_SCIC)_02.jpg"
+  },
+  "prof-edtech-methodologist": {
+   "file": "photos/prof-edtech-methodologist-800.webp",
+   "title": "Onlineteacher.jpg",
+   "caption": "Педагог ведёт онлайн-занятие",
+   "author": "Phil Roeder from Des Moines, IA, USA",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Onlineteacher.jpg"
+  },
+  "prof-transport-engineer": {
+   "file": "photos/prof-transport-engineer-800.webp",
+   "title": "Main Control Room pano ESA382553.jpg",
+   "caption": "Операторы в диспетчерском зале",
+   "author": "European Space Agency",
+   "license": "CC BY-SA 3.0 IGO",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/igo/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Main_Control_Room_pano_ESA382553.jpg"
+  },
+  "prof-supply-chain": {
+   "file": "photos/prof-supply-chain-800.webp",
+   "title": "Trieste APL New Jersey 3.jpg",
+   "caption": "Контейнерный терминал в порту",
+   "author": "Andrzej Otrębski",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Trieste_APL_New_Jersey_3.jpg"
+  },
+  "prof-metallurgist": {
+   "file": "photos/prof-metallurgist-800.webp",
+   "title": "La Providence Réhon - steel workers.jpg",
+   "caption": "Сталевар у плавильной печи",
+   "author": "Bruno Barbaresi",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:La_Providence_R%C3%A9hon_-_steel_workers.jpg"
+  },
+  "prof-land-surveyor": {
+   "file": "photos/prof-land-surveyor-800.webp",
+   "title": "District-Nabawan Sabah Land-Surveyors-01.jpg",
+   "caption": "Геодезисты в поле с прибором",
+   "author": "CEphoto, Uwe Aranas",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:District-Nabawan_Sabah_Land-Surveyors-01.jpg"
+  },
+  "prof-bim-engineer": {
+   "file": "photos/prof-bim-engineer-800.webp",
+   "title": "Calumpang NHS ICT AutoCAD Activity.jpg",
+   "caption": "Инженер за работой в САПР",
+   "author": "Zynell02",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Calumpang_NHS_ICT_AutoCAD_Activity.jpg"
   }
  }
 }

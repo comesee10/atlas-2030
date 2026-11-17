@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v72';
+const VERSION = 'atlas-2030-v73';
 const SHELL = [
   './',
   './index.html',
@@ -70,6 +70,28 @@ const SHELL = [
   './photos/prof-tourism-manager-800.webp',
   './photos/prof-digital-marketer-800.webp',
   './photos/prof-mechanical-engineer-800.webp',
+  './photos/prof-bim-engineer-800.webp',
+  './photos/prof-land-surveyor-800.webp',
+  './photos/prof-metallurgist-800.webp',
+  './photos/prof-supply-chain-800.webp',
+  './photos/prof-transport-engineer-800.webp',
+  './photos/prof-edtech-methodologist-800.webp',
+  './photos/prof-translator-800.webp',
+  './photos/prof-neuropsychologist-800.webp',
+  './photos/prof-fintech-analyst-800.webp',
+  './photos/prof-pharmacist-800.webp',
+  './photos/prof-ux-researcher-800.webp',
+  './photos/prof-railway-engineer-800.webp',
+  './photos/prof-gene-engineer-800.webp',
+  './photos/prof-renewable-energy-800.webp',
+  './photos/prof-teacher-800.webp',
+  './photos/prof-product-manager-800.webp',
+  './photos/prof-oil-gas-engineer-800.webp',
+  './photos/prof-bioinformatics-800.webp',
+  './photos/prof-robotics-800.webp',
+  './photos/prof-personalized-medicine-800.webp',
+  './photos/prof-uav-engineer-800.webp',
+  './photos/prof-ml-engineer-800.webp',
   './photos/sphere-d01-2-800.webp',
   './photos/sphere-d01-3-800.webp',
   './photos/sphere-d01-4-800.webp',
