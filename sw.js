@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v74';
+const VERSION = 'atlas-2030-v75';
 const SHELL = [
   './',
   './index.html',
@@ -71,6 +71,20 @@ const SHELL = [
   './photos/prof-digital-marketer-800.webp',
   './photos/prof-mechanical-engineer-800.webp',
   './photos/prof-bim-engineer-800.webp',
+  './photos/spec-27-1-800.webp',
+  './photos/spec-26-1-800.webp',
+  './photos/spec-25-1-800.webp',
+  './photos/spec-24-2-800.webp',
+  './photos/spec-24-1-800.webp',
+  './photos/spec-23-1-800.webp',
+  './photos/spec-22-1-800.webp',
+  './photos/spec-21-2-800.webp',
+  './photos/spec-21-1-800.webp',
+  './photos/spec-20-1-800.webp',
+  './photos/spec-19-1-800.webp',
+  './photos/spec-15-1-800.webp',
+  './photos/spec-14-1-800.webp',
+  './photos/spec-13-1-800.webp',
   './photos/spec-12-1-800.webp',
   './photos/spec-11-1-800.webp',
   './photos/spec-10-2-800.webp',
