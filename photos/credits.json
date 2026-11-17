@@ -483,6 +483,123 @@
    "license": "CC BY-SA 4.0",
    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "source": "https://commons.wikimedia.org/wiki/File:%D0%9A%D0%A4%D0%A3._%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5.jpg"
+  },
+  "uni-spbpu": {
+   "file": "photos/uni-spbpu-800.webp",
+   "title": "5935. Saint Petersburg Polytechnical University.jpg",
+   "caption": "Корпус Политехнического университета в Санкт-Петербурге",
+   "author": "GAlexandrova",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:5935._Saint_Petersburg_Polytechnical_University.jpg"
+  },
+  "uni-mephi": {
+   "file": "photos/uni-mephi-800.webp",
+   "title": "Moscow Engineering Physics Institute building K.jpg",
+   "caption": "Учебный корпус МИФИ в Москве",
+   "author": "Юрий Д.К.",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Moscow_Engineering_Physics_Institute_building_K.jpg"
+  },
+  "uni-rudn": {
+   "file": "photos/uni-rudn-800.webp",
+   "title": "РУДН 2016.jpg",
+   "caption": "Вход в учебный корпус РУДН",
+   "author": "DmitryVilunos",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D0%A0%D0%A3%D0%94%D0%9D_2016.jpg"
+  },
+  "uni-yufu": {
+   "file": "photos/uni-yufu-800.webp",
+   "title": "Rostov State University.jpg",
+   "caption": "Главный корпус Южного федерального университета",
+   "author": "Vlad2000Plus",
+   "license": "CC BY-SA 2.5",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+   "source": "https://commons.wikimedia.org/wiki/File:Rostov_State_University.jpg"
+  },
+  "uni-tsu": {
+   "file": "photos/uni-tsu-800.webp",
+   "title": "2016-08-07 0037 - Главный корпус ТГУ.jpg",
+   "caption": "Главный корпус Томского государственного университета",
+   "author": "Александр Рауш (Rausch)",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:2016-08-07_0037_-_%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D1%8B%D0%B9_%D0%BA%D0%BE%D1%80%D0%BF%D1%83%D1%81_%D0%A2%D0%93%D0%A3.jpg"
+  },
+  "uni-tpu": {
+   "file": "photos/uni-tpu-800.webp",
+   "title": "Главный корпус Технологического института (Томский политехнический университет), проспект Ленина, 30, Томск.jpg",
+   "caption": "Главный корпус Томского политехнического университета",
+   "author": "SAKRI",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D1%8B%D0%B9_%D0%BA%D0%BE%D1%80%D0%BF%D1%83%D1%81_%D0%A2%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B8%D0%BD%D1%81%D1%82%D0%B8%D1%82%D1%83%D1%82%D0%B0_(%D0%A2%D0%BE%D0%BC%D1%81%D0%BA%D0%B8%D0%B9_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%82%D0%B5%D1%82),_%D0%BF%D1%80%D0%BE%D1%81%D0%BF%D0%B5%D0%BA%D1%82_%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%D0%B0,_30,_%D0%A2%D0%BE%D0%BC%D1%81%D0%BA.jpg"
+  },
+  "uni-tusur": {
+   "file": "photos/uni-tusur-800.webp",
+   "title": "Tomsk State University of Control Systems and Radioelectronics-2.jpg",
+   "caption": "Корпус ТУСУР в Томске",
+   "author": "Alexany2012",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Tomsk_State_University_of_Control_Systems_and_Radioelectronics-2.jpg"
+  },
+  "uni-sfu": {
+   "file": "photos/uni-sfu-800.webp",
+   "title": "Сибирский федеральный университет. - panoramio (2).jpg",
+   "caption": "Корпуса Сибирского федерального университета",
+   "author": "Станислав Соломахин",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%B8%D0%B1%D0%B8%D1%80%D1%81%D0%BA%D0%B8%D0%B9_%D1%84%D0%B5%D0%B4%D0%B5%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%82%D0%B5%D1%82._-_panoramio_(2).jpg"
+  },
+  "uni-unngu": {
+   "file": "photos/uni-unngu-800.webp",
+   "title": "Nizhny Novgorod. First Block of National University named Lobachevsky.jpg",
+   "caption": "Первый корпус Нижегородского университета",
+   "author": "Алексей Белобородов",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Nizhny_Novgorod._First_Block_of_National_University_named_Lobachevsky.jpg"
+  },
+  "uni-leti": {
+   "file": "photos/uni-leti-800.webp",
+   "title": "North facade of Building 5 of the Saint Petersburg Electrotechnical University LETI.jpg",
+   "caption": "Корпус ЛЭТИ в Санкт-Петербурге",
+   "author": "Vityavo",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:North_facade_of_Building_5_of_the_Saint_Petersburg_Electrotechnical_University_LETI.jpg"
+  },
+  "uni-mgsu": {
+   "file": "photos/uni-mgsu-800.webp",
+   "title": "Moscow State University of Civil Engineering - 2025-09 - p02.jpg",
+   "caption": "Учебный корпус МГСУ",
+   "author": "Александр Сигачёв",
+   "license": "CC0",
+   "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Moscow_State_University_of_Civil_Engineering_-_2025-09_-_p02.jpg"
+  },
+  "uni-plekhanov": {
+   "file": "photos/uni-plekhanov-800.webp",
+   "title": "Moscow Plekhanov Russian Economic University 1 2011.JPG",
+   "caption": "Корпус РЭУ имени Плеханова",
+   "author": "Alexey Vikhrov",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Moscow_Plekhanov_Russian_Economic_University_1_2011.JPG"
+  },
+  "uni-pnipu": {
+   "file": "photos/uni-pnipu-800.webp",
+   "title": "Пермский национальный исследовательский политехнический университет.jpg",
+   "caption": "Корпус Пермского политехнического университета",
+   "author": "NoGo",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B5%D1%80%D0%BC%D1%81%D0%BA%D0%B8%D0%B9_%D0%BD%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D0%B8%D1%81%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%82%D0%B5%D1%82.jpg"
   }
  },
  "districts": {

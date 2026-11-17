@@ -246,7 +246,7 @@ if (fs.existsSync(path.join(ROOT, 'photos'))) {
     let credits = {};
     try { credits = JSON.parse(fs.readFileSync(creditsFile, 'utf8')); } catch (e) { err('photos/credits.json: ' + e.message); }
     const ALLOWED = /^(CC BY(?!-NC|-ND)|CC0|Public domain)/i;
-    for (const section of ['professions', 'directions']) {
+    for (const section of ['professions', 'directions', 'universities']) {
       const bank = credits[section] || {};
       const keys = Object.keys(bank);
       if (!keys.length) warn('photos/credits.json: нет раздела ' + section);
