@@ -130,7 +130,7 @@ if (rob && !/Sitemap:\s*https:\/\/comesee10\.github\.io\/atlas-2030\/sitemap\.xm
     }
   }
   for (const s of ['professions', 'simulator', 'universities', 'specialties', 'colleges', 'regions', 'admission',
-    'calendar', 'teacher', 'about', 'methodology']) {
+    'calendar', 'teacher', 'about', 'methodology', 'scores', 'ege', 'programs']) {
     const file = path.join(ROOT, s, 'index.html');
     if (!fs.existsSync(file)) err('нет статической копии раздела /' + s + '/');
   }

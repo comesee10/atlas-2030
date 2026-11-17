@@ -10,6 +10,9 @@
   <url><loc>https://comesee10.github.io/atlas-2030/admission/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/calendar/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/regions/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/scores/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/programs/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/teacher/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/methodology/</loc><lastmod>2026-11-17</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/about/</loc><lastmod>2026-11-17</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
@@ -1482,4 +1485,15 @@
   <url><loc>https://comesee10.github.io/atlas-2030/colleges/design-spo/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/colleges/marketing-spo/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://comesee10.github.io/atlas-2030/colleges/teacher-spo/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/russkiy/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/matematika/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/informatika/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/fizika/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/himiya/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/biologiya/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/obshchestvoznanie/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/istoriya/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/literatura/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/inostrannyy/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://comesee10.github.io/atlas-2030/ege/geografiya/</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

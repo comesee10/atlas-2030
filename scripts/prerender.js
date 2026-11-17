@@ -36,6 +36,9 @@ const SECTIONS = [
   { route: '/admission', priority: '0.8', changefreq: 'monthly' },
   { route: '/calendar', priority: '0.8', changefreq: 'monthly' },
   { route: '/regions', priority: '0.7', changefreq: 'monthly' },
+  { route: '/scores', priority: '0.7', changefreq: 'monthly' },
+  { route: '/ege', priority: '0.7', changefreq: 'monthly' },
+  { route: '/programs', priority: '0.7', changefreq: 'monthly' },
   { route: '/teacher', priority: '0.7', changefreq: 'monthly' },
   { route: '/methodology', priority: '0.5', changefreq: 'yearly' },
   { route: '/about', priority: '0.4', changefreq: 'yearly' }
@@ -148,7 +151,8 @@ function eachRoute(routes) {
     ['/professions/', routes.professions, '0.7'],
     ['/universities/', routes.universities, '0.6'],
     ['/specialties/', routes.directions, '0.6'],
-    ['/colleges/', routes.colleges, '0.6']
+    ['/colleges/', routes.colleges, '0.6'],
+    ['/ege/', routes.subjects, '0.5']
   ];
   for (const [prefix, items, priority] of detail) {
     for (const slug of items) list.push({ route: prefix + slug, priority, changefreq: 'monthly' });

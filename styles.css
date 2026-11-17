@@ -207,6 +207,29 @@ transition:border-color .15s,color .15s,background .15s;
 .hero-meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
 .hero-meta span{display:flex;align-items:center;gap:8px}
 .hero-meta span::before{content:"";width:4px;height:4px;background:var(--ink-4);border-radius:50%}
+/* Быстрый подбор по ЕГЭ на главной: компактная форма, а не второй опросник. */
+.qe-form{margin-top:24px;padding:16px 18px;background:var(--bg-2);border:1px solid var(--rule);border-radius:12px;max-width:680px}
+.qe-label{margin:0 0 10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4)}
+.qe-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px;align-items:end}
+.qe-field{display:grid;gap:5px;min-width:0}
+.qe-field>span{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
+.qe-field select,.qe-field input{height:36px;width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--rule-2);border-radius:7px;padding:0 8px;font-family:var(--sans);font-size:13px}
+.qe-field select{appearance:none;-webkit-appearance:none;padding-right:26px;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);background-position:calc(100% - 15px) 15px,calc(100% - 10px) 15px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.qe-field select:focus-visible,.qe-field input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.15)}
+.qe-sum{max-width:96px}
+.qe-go{height:36px;white-space:nowrap}
+/* Карточки предметов ЕГЭ и фильтр программ. */
+.subj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.subj-card{display:block;padding:16px 18px}
+.subj-card b{display:block;font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink)}
+.subj-card span{display:block;margin-top:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4)}
+.subj-card:hover{border-color:var(--accent)}
+.prog-filter{gap:12px;flex-wrap:wrap}
+@media (max-width:760px){
+.qe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.qe-sum{max-width:none}
+.qe-go{grid-column:1/-1}
+}
 .start-card{padding:22px;position:relative;overflow:hidden}
 .start-card::after{content:"";position:absolute;inset:auto -40% -60% auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(226,73,43,.35),transparent 70%);pointer-events:none}
 .start-card h2{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:14px}

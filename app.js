@@ -1086,7 +1086,10 @@ window.ATLAS_ROUTES = {
 professions: P.map(function (p) { return p.slug; }),
 universities: U.map(function (u) { return u.slug; }),
 directions: DIRECTIONS.map(function (s) { return s.slug; }),
-colleges: C.map(function (c) { return c.slug; }).filter(Boolean)
+colleges: C.map(function (c) { return c.slug; }).filter(Boolean),
+subjects: ['Рус', 'Мат', 'Инф', 'Физ', 'Хим', 'Био', 'Общ', 'Ист', 'Лит', 'Ин.яз', 'Гео'].map(function (s) {
+return { 'Рус': 'russkiy', 'Мат': 'matematika', 'Инф': 'informatika', 'Физ': 'fizika', 'Хим': 'himiya', 'Био': 'biologiya', 'Общ': 'obshchestvoznanie', 'Ист': 'istoriya', 'Лит': 'literatura', 'Ин.яз': 'inostrannyy', 'Гео': 'geografiya' }[s];
+})
 };
 var SUBJECTS = ['Рус', 'Мат', 'Инф', 'Физ', 'Хим', 'Био', 'Общ', 'Ист', 'Лит', 'Ин.яз', 'Гео'];
 var SUBJ_FULL = {
@@ -1613,8 +1616,8 @@ return SITE_URL + String(u).replace(/^#?\//, '').replace(/^/, '');
    настоящие URL, а не на hash. Интерактивные разделы (опросник, карта, избранное,
    сравнение) остаются на hash: у них нет смысла в отдельной статической копии. */
 var BASE = '/atlas-2030';
-var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar|simulator)(?:\/[-a-z0-9-]+)?$/;
-var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|simulator|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
+var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar|simulator|scores|programs|ege)(?:\/[-a-z0-9-]+)?$/;
+var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|simulator|scores|programs|ege(?:\/[-a-z0-9-]+)?|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
 function cleanPath(path) {
 var p = String(path == null ? '/' : path).split('?')[0];
 if (!p) p = '/';
@@ -1982,6 +1985,10 @@ var ROUTES = [
 [/^\/specialties$/, renderDirections],
 [/^\/specialties\/([^/]+)$/, function (m) { renderDirection(safeDecode(m[1])); }],
 [/^\/regions$/, renderRegions],
+[/^\/scores$/, renderScores],
+[/^\/ege$/, renderEge],
+[/^\/ege\/([^/]+)$/, function (m) { renderEgeSubject(safeDecode(m[1])); }],
+[/^\/programs$/, renderPrograms],
 [/^\/about$/, renderAbout],
 [/^\/methodology$/, renderMethodology],
 [/^\/teacher$/, renderTeacher]
@@ -2977,6 +2984,15 @@ U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ', ' +
 TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + ' и ' +
 C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'колледжей') + '. Ответьте на три вопроса — и увидите, какие профессии и программы подходят именно вам.</p>' +
 '<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Подобрать профессию за 3 шага →</a><a class="btn" href="#/professions">Открыть каталог</a></div>') +
+'<form class="qe-form" id="quickEge" novalidate>' +
+'<p class="qe-label">Быстрый подбор: предметы ЕГЭ и сумма баллов</p>' +
+'<div class="qe-grid">' +
+'<label class="qe-field"><span>Предмет 1</span><select name="e1">' + subjectOptions('Рус') + '</select></label>' +
+'<label class="qe-field"><span>Предмет 2</span><select name="e2">' + subjectOptions('Мат') + '</select></label>' +
+'<label class="qe-field"><span>Предмет 3</span><select name="e3">' + subjectOptions('Инф') + '</select></label>' +
+'<label class="qe-field qe-sum"><span>Сумма</span><input name="b" type="number" inputmode="numeric" min="120" max="300" step="1" value="220" aria-label="Сумма баллов за три экзамена"></label>' +
+'<button class="btn btn-primary btn-sm qe-go" type="submit">Показать программы →</button>' +
+'</div></form>' +
 '<div class="hero-meta">' +
 '<span>' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + '</span>' +
 '<span>' + TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + '</span>' +
@@ -3003,6 +3019,13 @@ return '<div class="mini-row"><a href="#/professions/' + p.slug + '">' + h(p.tit
 '</aside>' +
 '</div>' +
 '</section>' +
+'<div class="fact-strip reveal">' +
+'<div><span class="k">Профессии</span><span class="v">' + P.length + '</span></div>' +
+'<div><span class="k">Направления</span><span class="v">' + DIRECTIONS.length + '</span></div>' +
+'<div><span class="k">Вузы</span><span class="v">' + U.length + '</span></div>' +
+'<div><span class="k">Города</span><span class="v">' + CITIES.length + '</span></div>' +
+'<div><span class="k">Регионы</span><span class="v">' + REGIONS.length + '</span></div>' +
+'</div>' +
 teacherPanel +
 // Дата — вне .hero-home: у секции overflow:hidden, и transform reveal
 // уводил текст за границу обрезки (IntersectionObserver не срабатывал).
@@ -3065,6 +3088,27 @@ advCard('06', 'Сравнение и печатный отчёт', 'До трё�
 '</div>' +
 '</div>';
 renderPlot();
+bindQuickEge();
+}
+function bindQuickEge() {
+var form = document.getElementById('quickEge');
+if (!form) return;
+form.addEventListener('submit', function (e) {
+e.preventDefault();
+var ex = ['e1', 'e2', 'e3'].map(function (n) {
+var el = form.elements[n];
+return el ? el.value : '';
+}).filter(function (s, i, arr) { return s && arr.indexOf(s) === i; }).slice(0, 3);
+var b = parseInt(form.elements.b.value, 10);
+if (!ex.length) ex = ['Рус', 'Мат', 'Инф'];
+if (!(b >= 120 && b <= 300)) b = 220;
+location.hash = '#/quiz?step=4&e=' + encodeURIComponent(ex.join(',')) + '&b=' + b;
+});
+}
+function subjectOptions(active) {
+return SUBJECTS.map(function (s) {
+return '<option value="' + h(s) + '"' + (s === active ? ' selected' : '') + '>' + h(SUBJ_FULL[s]) + '</option>';
+}).join('');
 }
 function sortBtn(key, label, active) {
 return '<button data-sort="' + key + '" aria-pressed="' + (active === key ? 'true' : 'false') + '">' + label + '</button>';
@@ -4126,6 +4170,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Быстрый подбор и баллы.</b> На главной появилась форма: три предмета ЕГЭ и сумма — сразу к результатам, без прохождения шагов. Добавлены раздел «Баллы и шансы» с порогами по направлениям, подборки «Профессии по предметам ЕГЭ» и общий список программ с фильтрами по предмету, баллу и городу.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры без повторов.</b> Карточки направлений берут кадры по кругу из своей группы, сфер и учебных сцен — на странице направлений соседи больше не дублируются. У крупных групп свои вторые и третьи сцены, у двадцати двух вузов — подтверждённые снимки корпусов.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры направлений.</b> Карточки направлений больше не берут общий снимок сферы: у физики — лазерная лаборатория, у химии — работа с колбами, у строительства — площадка, у информатики — серверный зал, у архитектуры — современный фасад. Кадры сгруппированы по укрупнённым кодам, автор и лицензия — в списке фотографий.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры профессий.</b> У сорока двух профессий вместо общей сцены сферы — собственный снимок: центр кибербезопасности, приём у врача, чистый зал микроэлектроники, пульт энергосистемы, стройплощадка, лаборатория материалов, сборка космического аппарата, класс, аптека, кабина синхронного перевода, сталеплавильный цех. Автор и лицензия указаны под каждым кадром, полный список — выше.</div></li>' +
@@ -5108,6 +5153,163 @@ return '<a class="panel reveal" href="' + h(pageHref('/specialties/' + x.slug)) 
 '<p class="muted tiny" style="margin:6px 0 0">' + x.count + ' ' + plural(x.count, 'вуз', 'вуза', 'вузов') + ' · от ≈' + x.minBudget + '</p></a>';
 }).join('') + '</div>' : '') +
 '</div>';
+}
+/* ---------- справочник баллов и подборки по ЕГЭ ---------- */
+/* Адреса предметов для статических страниц: короткий латинский слаг. */
+var SUBJ_SLUG = {
+'Рус': 'russkiy', 'Мат': 'matematika', 'Инф': 'informatika', 'Физ': 'fizika',
+'Хим': 'himiya', 'Био': 'biologiya', 'Общ': 'obshchestvoznanie', 'Ист': 'istoriya',
+'Лит': 'literatura', 'Ин.яз': 'inostrannyy', 'Гео': 'geografiya'
+};
+var SUBJ_BY_SLUG = {};
+SUBJECTS.forEach(function (s) { SUBJ_BY_SLUG[SUBJ_SLUG[s]] = s; });
+/* Предмет входит в набор, если он есть хотя бы в одном допустимом варианте ЕГЭ. */
+function directionHasSubject(s, subj) {
+return parseEge(s.ege).some(function (c) { return c.indexOf(subj) >= 0; });
+}
+function professionsForSubject(subj) {
+return P.filter(function (p) {
+return (PROG[p.slug] || []).some(function (pr) { return parseEge(pr.ege).some(function (c) { return c.indexOf(subj) >= 0; }); });
+});
+}
+function directionsForSubject(subj) {
+return DIRECTIONS.filter(function (s) { return directionHasSubject(s, subj); });
+}
+function renderScores() {
+setTitle('Баллы ЕГЭ и шансы на бюджет — Профессии·2030');
+var minSort = DIRECTIONS.slice().sort(function (a, b) { return a.minBudget - b.minBudget; });
+var maxSort = DIRECTIONS.slice().sort(function (a, b) { return b.avgBudget - a.avgBudget; });
+function scoreTable(list, caption) {
+return '<div class="tbl-wrap"><table class="data"><caption class="sr-only">' + h(caption) + '</caption>' +
+'<thead><tr><th>Направление</th><th>Код</th><th>Мин. балл</th><th>Средний</th><th>Вузов</th></tr></thead><tbody>' +
+list.map(function (s) {
+return '<tr><td><a href="' + h(pageHref('/specialties/' + s.slug)) + '">' + h(s.direction) + '</a></td>' +
+'<td class="mono">' + h(s.code) + '</td>' +
+'<td class="b">≈' + s.minBudget + '</td><td class="p">≈' + s.avgBudget + '</td><td>' + s.count + '</td></tr>';
+}).join('') + '</tbody></table></div>';
+}
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел IV · Баллы</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Баллы ЕГЭ и <em>шансы</em> на бюджет</h1>' +
+'<p class="lead">Сумма трёх экзаменов — до 300. В атласе баллы ориентировочные: это итоги приёмных кампаний 2024–2025 годов, а не гарантия. Пограничная зона — 10 баллов: разница между «прохожу» и «не прохожу» часто именно в ней.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Проверить свои шансы →</a><a class="btn" href="#/simulator">Симулятор +5 баллов</a></div>' +
+'</section>' +
+'<div class="fact-strip reveal">' +
+'<div><span class="k">Направлений</span><span class="v">' + DIRECTIONS.length + '</span></div>' +
+'<div><span class="k">Мин. балл</span><span class="v">≈' + minSort[0].minBudget + '</span></div>' +
+'<div><span class="k">Самый высокий средний</span><span class="v">≈' + maxSort[0].avgBudget + '</span></div>' +
+'<div><span class="k">Допуск</span><span class="v">±10</span></div>' +
+'</div>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Доступнее всего</p><h2 class="sec">Направления с низким минимальным баллом</h2></div>' +
+'<a class="sec-link" href="' + h(pageHref('/specialties')) + '">Все направления →</a></section>' +
+scoreTable(minSort.slice(0, 10), 'Направления с низким минимальным баллом') +
+'<section class="sec-head reveal"><div><p class="eyebrow">Высокий порог</p><h2 class="sec">Направления с высоким средним баллом</h2></div></section>' +
+scoreTable(maxSort.slice(0, 10), 'Направления с высоким средним баллом') +
+'<p class="source-note">Баллы — сумма трёх экзаменов ЕГЭ по данным приёмных кампаний 2024–2025 годов. ' +
+'Актуальные значения публикует приёмная комиссия вуза; сравнивайте с запасом.</p>' +
+'</div>';
+}
+function renderEge() {
+setTitle('Профессии и направления по предметам ЕГЭ — Профессии·2030');
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел V · Предметы</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Профессии по <em>предметам</em> ЕГЭ</h1>' +
+'<p class="lead">Выберите предмет — увидите профессии и направления, где он входит в набор вступительных испытаний. Наборы различаются по вузам, поэтому всегда сверяйтесь с перечнем на сайте приёмной комиссии.</p>' +
+'</section>' +
+'<div class="subj-grid reveal">' +
+SUBJECTS.map(function (s) {
+var profs = professionsForSubject(s).length;
+var dirs = directionsForSubject(s).length;
+return '<a class="panel subj-card" href="#/ege/' + h(SUBJ_SLUG[s]) + '"><b>' + h(SUBJ_FULL[s]) + '</b>' +
+'<span>' + profs + ' ' + plural(profs, 'профессия', 'профессии', 'профессий') + ' · ' + dirs + ' ' + plural(dirs, 'направление', 'направления', 'направлений') + '</span></a>';
+}).join('') +
+'</div>' +
+'<div class="cta-block reveal"><a class="btn btn-primary" href="#/quiz">Подобрать по трём предметам →</a></div>' +
+'</div>';
+}
+function renderEgeSubject(slug) {
+var subj = SUBJ_BY_SLUG[slug];
+if (!subj) { render404('/ege/' + slug); return; }
+var profs = professionsForSubject(subj).sort(function (a, b) { return b.index - a.index; });
+var dirs = directionsForSubject(subj).sort(function (a, b) { return b.count - a.count; });
+setTitle(SUBJ_FULL[subj] + ': профессии и направления — Профессии·2030');
+setDescription('Профессии и направления, где нужен ЕГЭ по предмету «' + SUBJ_FULL[subj] + '»: ' + profs.length + ' профессий и ' + dirs.length + ' направлений с баллами.');
+app.innerHTML = '<div class="view">' +
+'<nav class="crumbs" aria-label="Хлебные крошки"><a href="' + h(pageHref('/')) + '">Главная</a><span aria-hidden="true">/</span>' +
+'<a href="' + h(pageHref('/ege')) + '">Предметы ЕГЭ</a><span aria-hidden="true">/</span><span>' + h(SUBJ_FULL[subj]) + '</span></nav>' +
+'<header class="detail-head">' +
+'<p class="eyebrow" style="margin-top:18px">ЕГЭ · ' + h(SUBJ_CODE[subj]) + '</p>' +
+'<h1>' + h(SUBJ_FULL[subj]) + '</h1>' +
+'<p class="lead">' + profs.length + ' ' + plural(profs.length, 'профессия', 'профессии', 'профессий') + ' и ' +
+dirs.length + ' ' + plural(dirs.length, 'направление', 'направления', 'направлений') + ', где этот предмет входит в набор ЕГЭ. ' +
+'Наборы различаются по вузам — сверяйтесь с перечнем вступительных испытаний.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary btn-sm" href="#/quiz?e=' + encodeURIComponent(subj) + '&step=2">Подобрать с этим предметом</a>' +
+'<a class="btn btn-sm" href="#/ege">Другие предметы</a></div>' +
+'</header>' +
+'<section class="sec-head reveal"><div><p class="eyebrow">Профессии</p><h2 class="sec">Куда ведёт ' + h(SUBJ_FULL[subj].toLowerCase()) + '</h2></div></section>' +
+(profs.length ? '<div class="fgrid">' + profs.slice(0, 12).map(fcard).join('') + '</div>' : '<p class="muted">Пока нет профессий с этим предметом.</p>') +
+(dirs.length ? '<section class="sec-head reveal"><div><p class="eyebrow">Направления</p><h2 class="sec">Коды и баллы</h2></div>' +
+'<a class="sec-link" href="' + h(pageHref('/specialties')) + '">Все направления →</a></section>' +
+'<div class="tbl-wrap"><table class="data"><thead><tr><th>Направление</th><th>Код</th><th>ЕГЭ</th><th>Мин. балл</th></tr></thead><tbody>' +
+dirs.slice(0, 40).map(function (s) {
+return '<tr><td><a href="' + h(pageHref('/specialties/' + s.slug)) + '">' + h(s.direction) + '</a></td>' +
+'<td class="mono">' + h(s.code) + '</td><td>' + h(s.ege) + '</td><td class="b">≈' + s.minBudget + '</td></tr>';
+}).join('') + '</tbody></table></div>' : '') +
+'</div>';
+}
+function renderPrograms(m, q) {
+var subj = SUBJ_BY_SLUG[q.get('e') || ''] || '';
+var min = parseInt(q.get('b'), 10);
+if (!(min >= 120 && min <= 300)) min = 0;
+var city = q.get('city') || '';
+var rows = [];
+DIRECTIONS.forEach(function (s) {
+if (subj && !directionHasSubject(s, subj)) return;
+(s.unis || []).forEach(function (r) {
+if (min && !(r.budget >= min)) return;
+if (city && String(r.uni ? r.uni.city : '').indexOf(city) < 0) return;
+rows.push({ s: s, r: r });
+});
+});
+rows.sort(function (a, b) { return b.r.budget - a.r.budget; });
+setTitle('Программы: баллы и вузы — Профессии·2030');
+app.innerHTML = '<div class="view">' +
+'<section class="hero" style="padding:44px 0 26px">' +
+'<p class="eyebrow">Раздел VI · Программы</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Программы: <em>вуз</em>, балл, ЕГЭ</h1>' +
+'<p class="lead">Одна строка — одно направление в конкретном вузе. Фильтруйте по предмету, минимальному баллу и городу. Баллы ориентировочные, по кампаниям 2024–2025 годов.</p>' +
+'</section>' +
+'<form class="toolbar prog-filter" id="progFilter" style="align-items:flex-end">' +
+'<label class="select-field"><span class="label">ЕГЭ</span><select name="e"><option value="">Любой предмет</option>' +
+SUBJECTS.map(function (s) { return '<option value="' + h(SUBJ_SLUG[s]) + '"' + (SUBJ_SLUG[s] === subj ? ' selected' : '') + '>' + h(SUBJ_FULL[s]) + '</option>'; }).join('') + '</select></label>' +
+'<label class="select-field"><span class="label">Мин. балл</span><input name="b" type="number" min="120" max="300" step="1" value="' + (min || '') + '" style="height:36px;width:110px;border:1px solid var(--rule-2);border-radius:7px;padding:0 8px;background:var(--bg-2);color:var(--ink)"></label>' +
+'<label class="search-field"><input name="city" type="text" placeholder="Город" value="' + h(city) + '"></label>' +
+'<button class="btn btn-primary btn-sm" type="submit">Показать</button>' +
+'<a class="btn btn-sm" href="#/programs">Сбросить</a>' +
+'</form>' +
+'<p class="muted tiny" style="margin-top:12px">Найдено: ' + rows.length + ' ' + plural(rows.length, 'программа', 'программы', 'программ') + '. Показаны первые 80 по убыванию балла.</p>' +
+'<div class="tbl-wrap"><table class="data"><thead><tr><th>Вуз</th><th>Направление</th><th>ЕГЭ</th><th>Бюджет</th><th>Платно</th></tr></thead><tbody>' +
+rows.slice(0, 80).map(function (x) {
+return '<tr><td><b>' + h(x.r.uni ? x.r.uni.short : '') + '</b><span>' + h(x.r.uni ? x.r.uni.city : '') + '</span></td>' +
+'<td><a href="' + h(pageHref('/specialties/' + x.s.slug)) + '">' + h(x.s.direction) + '</a><span class="code">' + h(x.s.code) + '</span></td>' +
+'<td>' + h(x.r.ege || x.s.ege) + '</td>' +
+'<td class="b">' + (x.r.budget ? '≈' + x.r.budget : '—') + '</td>' +
+'<td class="p">' + (x.r.paid ? '≈' + x.r.paid : '—') + '</td></tr>';
+}).join('') + '</tbody></table></div>' +
+'</div>';
+var form = document.getElementById('progFilter');
+if (form) {
+form.addEventListener('submit', function (e) {
+e.preventDefault();
+var p = new URLSearchParams();
+if (form.elements.e.value) p.set('e', form.elements.e.value);
+if (form.elements.b.value) p.set('b', form.elements.b.value);
+if (form.elements.city.value.trim()) p.set('city', form.elements.city.value.trim());
+location.hash = '#/programs' + (p.toString() ? '?' + p.toString() : '');
+});
+}
 }
 /* ---------- симулятор баллов ----------
    «Докуплю +5 к профильному предмету — куда попаду?» Перебираются все программы
