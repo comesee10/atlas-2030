@@ -105,33 +105,62 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 .nav-more-list a:hover{background:rgba(255,77,46,.1);color:var(--ink)}
 .nav-more-list a[aria-current="page"]{color:var(--accent);background:rgba(255,77,46,.12)}
 /* ---- маскот Pathway: пиксельный робот-питомец ---- */
-.mascot{position:fixed;right:24px;bottom:24px;z-index:80;width:96px;height:114px;opacity:0;transform:translateY(10px);transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);pointer-events:none}
-.mascot.is-ready{opacity:1;transform:none}
+.mascot{position:fixed;left:0;top:0;width:150px;height:183px;z-index:80;opacity:0;pointer-events:none;will-change:transform;transition:opacity .22s var(--ease-out)}
+.mascot.is-ready{opacity:1}
 .mascot[hidden]{display:none}
-.mascot-btn{pointer-events:auto;display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;border-radius:12px}
+.mascot-btn{pointer-events:auto;display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:grab;border-radius:14px;touch-action:none;user-select:none;-webkit-user-select:none}
 .mascot-btn:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.mascot-svg{display:block;width:100%;height:100%;overflow:visible;animation:m-idle 3.6s ease-in-out infinite}
+.mascot.is-drag .mascot-btn{cursor:grabbing}
+.mascot-svg{display:block;width:100%;height:100%;overflow:visible;animation:m-idle 3.8s ease-in-out infinite}
+.mascot.is-spawn .mascot-svg{animation:m-spawn .26s var(--ease-out),m-idle 3.8s ease-in-out .26s infinite}
+.mascot.is-drop .mascot-svg{animation:m-drop .22s var(--ease-out)}
+.mascot.is-greet .mascot-svg{animation:m-greet 1.4s var(--ease-out)}
 .m-hand{transform-box:fill-box;transform-origin:top center}
+.mascot.is-wave .m-hand{animation:m-wave .5s ease-in-out 2}
+.mascot.is-greet .m-hand{animation:m-wave .5s ease-in-out 2}
+.mascot.is-greet .m-antenna{animation:m-antenna .45s ease-in-out 2}
 .m-leg{transform-box:fill-box}
-.m-leg-b{animation-delay:.12s!important}
-.mascot.is-run{animation:m-run 560ms cubic-bezier(.2,.8,.2,1)}
-.mascot.is-run .m-leg{animation:m-step .24s steps(2,end) infinite alternate}
-.mascot.is-wave .m-hand{animation:m-wave .6s ease-in-out 2}
+.mascot.is-drag .m-leg-a{animation:m-step .22s steps(2,end) infinite alternate}
+.mascot.is-drag .m-leg-b{animation:m-step .22s steps(2,end) infinite alternate-reverse}
+.m-look{transform-box:fill-box;animation:m-look 9s ease-in-out infinite}
 .m-eyes{transform-box:fill-box;transform-origin:center;animation:m-blink 6.4s infinite}
-.m-text,.m-smile{transition:opacity .18s var(--ease-out)}
-.m-text{opacity:0}
-.mascot.is-text .m-text{opacity:1}
-.mascot.is-text .m-eyes,.mascot.is-text .m-smile{opacity:0}
-@keyframes m-run{from{transform:translateX(calc(-100vw + 150px))}to{transform:translateX(0)}}
-@keyframes m-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes m-step{from{transform:translateY(0)}to{transform:translateY(3px)}}
-@keyframes m-blink{0%,91%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.12)}}
+.m-face,.m-joy,.m-text,.m-hi,.m-dots,.m-heart,.m-q,.m-eq{opacity:0;transition:opacity .16s var(--ease-out)}
+.m-face{opacity:1}
+.mascot[data-face="joy"] .m-face,.mascot[data-face="text"] .m-face,.mascot[data-face="hi"] .m-face,.mascot[data-face="dots"] .m-face,.mascot[data-face="heart"] .m-face,.mascot[data-face="q"] .m-face,.mascot[data-face="eq"] .m-face{opacity:0}
+.mascot[data-face="joy"] .m-joy{opacity:1}
+.mascot[data-face="text"] .m-text{opacity:1}
+.mascot[data-face="hi"] .m-hi{opacity:1}
+.mascot[data-face="dots"] .m-dots{opacity:1}
+.mascot[data-face="heart"] .m-heart{opacity:1}
+.mascot[data-face="q"] .m-q{opacity:1}
+.mascot[data-face="eq"] .m-eq{opacity:1}
+.m-dots rect{animation:m-dot .9s ease-in-out infinite}
+.m-dots rect:nth-child(2){animation-delay:.15s}
+.m-dots rect:nth-child(3){animation-delay:.3s}
+.m-eq rect{transform-box:fill-box;transform-origin:bottom;animation:m-eq .5s ease-in-out infinite alternate}
+.m-eq rect:nth-child(2){animation-delay:.1s}
+.m-eq rect:nth-child(3){animation-delay:.2s}
+.m-eq rect:nth-child(4){animation-delay:.3s}
+.m-eq rect:nth-child(5){animation-delay:.4s}
+.m-scan{animation:m-scan 6s linear infinite}
+@keyframes m-idle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.008)}}
+@keyframes m-spawn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes m-drop{0%{transform:scale(.94)}60%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes m-greet{0%{transform:translateY(0) scale(1)}18%{transform:translateY(-10px) scale(1.03,.97)}36%{transform:translateY(0) scale(.97,1.03)}58%{transform:translateY(-5px) scale(1.01)}78%{transform:translateY(0) scale(.99,1.01)}100%{transform:translateY(0) scale(1)}}
+@keyframes m-step{from{transform:translateY(0)}to{transform:translateY(4px)}}
+@keyframes m-blink{0%,91%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.1)}}
+@keyframes m-look{0%,20%,100%{transform:translateX(0)}30%,45%{transform:translateX(-3px)}60%,75%{transform:translateX(3px)}}
 @keyframes m-wave{0%,100%{transform:rotate(0)}35%{transform:rotate(-38deg)}65%{transform:rotate(-14deg)}}
+@keyframes m-antenna{0%,100%{transform:rotate(0)}35%{transform:rotate(-14deg)}70%{transform:rotate(10deg)}}
+@keyframes m-dot{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-3px);opacity:1}}
+@keyframes m-eq{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+@keyframes m-scan{from{transform:translateY(0)}to{transform:translateY(16px)}}
 @media (max-width:760px){
-.mascot{width:68px;height:82px;right:12px;bottom:86px}
+.mascot{width:100px;height:122px}
 }
 @media (prefers-reduced-motion:reduce){
 .mascot,.mascot *{animation:none!important;transition:none!important}
+.mascot .m-joy,.mascot .m-text,.mascot .m-hi,.mascot .m-dots,.mascot .m-heart,.mascot .m-q,.mascot .m-eq{transition:none}
 }
 /* Пункт меню «Скрыть маскота» выглядит как остальные ссылки. */
 .nav-more-list button{display:block;width:100%;text-align:left;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink-2);border:0;border-radius:7px;background:none;cursor:pointer}
