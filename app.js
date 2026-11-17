@@ -2030,6 +2030,7 @@ hardenBlankLinks(document.querySelector('.ftr'));
 applySeo(r.path);
 fixLinks(document);
 setNav(r.path);
+mascotOnRoute(r.path);
 closeNav();
 var pal = document.getElementById('palette');
 if (pal) pal.hidden = true;
@@ -8357,12 +8358,135 @@ route();
 window.scrollTo(0, 0);
 }, shared);
 });
+/* ---------- маскот Pathway ----------
+   Пиксельный робот живёт поверх страниц. Экран показывает улыбку, по наведению —
+   слово Pathway, по клику машет лапкой. При переходе между разделами пробегает
+   по нижней кромке. Всё — transform/opacity; при reduced motion анимации выключены. */
+var MASCOT_FONT = {
+P: ['110', '101', '110', '100', '100'],
+A: ['010', '101', '111', '101', '101'],
+T: ['111', '010', '010', '010', '010'],
+H: ['101', '101', '111', '101', '101'],
+W: ['101', '101', '101', '111', '101'],
+Y: ['101', '101', '010', '010', '010']
+};
+var MASCOT_PATH = null;
+var mascotTextTimer = null;
+function mascotWordRects() {
+var word = 'PATHWAY', out = '', x = 18, y = 21;
+for (var i = 0; i < word.length; i++) {
+var rows = MASCOT_FONT[word[i]] || [];
+for (var r = 0; r < rows.length; r++) {
+for (var c = 0; c < rows[r].length; c++) {
+if (rows[r][c] === '1') out += '<rect x="' + (x + i * 4 + c) + '" y="' + (y + r) + '" width="1" height="1"/>';
+}
+}
+}
+return out;
+}
+function mascotSVG() {
+return '<svg class="mascot-svg" viewBox="0 0 64 76" aria-hidden="true" focusable="false">' +
+'<rect x="30" y="3" width="4" height="8" fill="#1c1a18"/>' +
+'<rect x="27" y="0" width="3" height="3" fill="#ff4d2e"/>' +
+'<rect x="4" y="26" width="6" height="13" fill="#e2431f"/>' +
+'<g class="m-hand"><rect x="54" y="26" width="6" height="13" fill="#e2431f"/></g>' +
+'<rect x="10" y="10" width="44" height="38" fill="#ff4d2e"/>' +
+'<rect x="10" y="10" width="44" height="3" fill="#ff6b4a"/>' +
+'<rect x="14" y="14" width="36" height="28" fill="#17120f"/>' +
+'<rect x="16" y="16" width="32" height="24" fill="#0f0c0a"/>' +
+'<g class="m-eyes" fill="#ffd9cf"><rect x="24" y="22" width="4" height="4"/><rect x="36" y="22" width="4" height="4"/></g>' +
+'<g class="m-smile" fill="#ffd9cf"><rect x="26" y="32" width="2" height="2"/><rect x="28" y="34" width="8" height="2"/><rect x="36" y="32" width="2" height="2"/></g>' +
+'<g class="m-text" fill="#ffd9cf">' + mascotWordRects() + '</g>' +
+'<rect class="m-leg m-leg-a" x="18" y="48" width="8" height="16" fill="#e2431f"/>' +
+'<rect class="m-leg m-leg-b" x="38" y="48" width="8" height="16" fill="#e2431f"/>' +
+'<rect x="15" y="64" width="13" height="4" fill="#1c1a18"/>' +
+'<rect x="36" y="64" width="13" height="4" fill="#1c1a18"/>' +
+'</svg>';
+}
+function mascotAllowed() { return !window.__ATLAS_PRERENDER__; }
+function mascotHidden() {
+try { return localStorage.getItem('atlas:mascot') === 'off'; } catch (e) { return false; }
+}
+function mascotReduced() {
+return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function updateMascotBtn() {
+var b = document.getElementById('mascotHide');
+if (b) b.textContent = mascotHidden() ? 'Показать маскота' : 'Скрыть маскота';
+}
+function ensureMascot() {
+if (!mascotAllowed()) return null;
+var el = document.getElementById('mascot');
+if (!el) {
+el = document.createElement('div');
+el.id = 'mascot';
+el.className = 'mascot';
+el.innerHTML = '<button class="mascot-btn" id="mascotBtn" type="button" aria-label="Маскот Pathway: помахать">' + mascotSVG() + '</button>';
+document.body.appendChild(el);
+var btn = el.querySelector('#mascotBtn');
+btn.addEventListener('click', function () {
+if (mascotReduced()) return;
+el.classList.remove('is-wave');
+void el.offsetWidth;
+el.classList.add('is-wave');
+setTimeout(function () { el.classList.remove('is-wave'); }, 1250);
+});
+var showText = function () {
+if (mascotReduced()) return;
+clearTimeout(mascotTextTimer);
+el.classList.add('is-text');
+mascotTextTimer = setTimeout(function () { el.classList.remove('is-text'); }, 2000);
+};
+btn.addEventListener('mouseenter', showText);
+btn.addEventListener('focus', showText);
+btn.addEventListener('mouseleave', function () { clearTimeout(mascotTextTimer); mascotTextTimer = setTimeout(function () { el.classList.remove('is-text'); }, 400); });
+btn.addEventListener('blur', function () { el.classList.remove('is-text'); });
+requestAnimationFrame(function () { el.classList.add('is-ready'); });
+/* Страховка для скрытой вкладки: кадры могут не идти. */
+setTimeout(function () { el.classList.add('is-ready'); }, 220);
+}
+el.hidden = mascotHidden();
+return el;
+}
+function mascotOnRoute(path) {
+if (!mascotAllowed()) return;
+var el = ensureMascot();
+if (!el) return;
+if (MASCOT_PATH === null) { MASCOT_PATH = path; return; }
+if (MASCOT_PATH === path) return;
+MASCOT_PATH = path;
+if (el.hidden || mascotReduced()) return;
+el.classList.remove('is-run');
+void el.offsetWidth;
+el.classList.add('is-run');
+setTimeout(function () { el.classList.remove('is-run'); }, 620);
+}
+function initMascot() {
+if (!mascotAllowed()) return;
+ensureMascot();
+updateMascotBtn();
+var hide = document.getElementById('mascotHide');
+if (hide && !hide.getAttribute('data-bound')) {
+hide.setAttribute('data-bound', '1');
+hide.addEventListener('click', function () {
+try { localStorage.setItem('atlas:mascot', mascotHidden() ? 'on' : 'off'); } catch (e) {}
+var el = document.getElementById('mascot');
+if (el) el.hidden = mascotHidden();
+updateMascotBtn();
+if (!mascotHidden()) {
+var m = ensureMascot();
+if (m) { m.classList.remove('is-ready'); requestAnimationFrame(function () { m.classList.add('is-ready'); }); }
+}
+});
+}
+}
 window.addEventListener('popstate', route);
 if (window.__ATLAS_STANDALONE__ && (!location.hash || location.hash === '#')) {
 history.replaceState(null, '', '#/');
 }
 updateChoice();
 updateFavoritesUI();
+initMascot();
 route();
 /* Сборщик статических страниц переиспользует один DOM и вызывает route()
    для каждого адреса: создавать 1500 jsdom-окон подряд дорого. */

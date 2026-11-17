@@ -104,7 +104,39 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 .nav-more-list a{display:block;padding:9px 10px;font-size:13.5px;color:var(--ink-2);border-radius:7px;border:0}
 .nav-more-list a:hover{background:rgba(255,77,46,.1);color:var(--ink)}
 .nav-more-list a[aria-current="page"]{color:var(--accent);background:rgba(255,77,46,.12)}
-/* ---- нижняя навигация на телефоне ---- */
+/* ---- маскот Pathway: пиксельный робот-питомец ---- */
+.mascot{position:fixed;right:24px;bottom:24px;z-index:80;width:96px;height:114px;opacity:0;transform:translateY(10px);transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);pointer-events:none}
+.mascot.is-ready{opacity:1;transform:none}
+.mascot[hidden]{display:none}
+.mascot-btn{pointer-events:auto;display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;border-radius:12px}
+.mascot-btn:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.mascot-svg{display:block;width:100%;height:100%;overflow:visible;animation:m-idle 3.6s ease-in-out infinite}
+.m-hand{transform-box:fill-box;transform-origin:top center}
+.m-leg{transform-box:fill-box}
+.m-leg-b{animation-delay:.12s!important}
+.mascot.is-run{animation:m-run 560ms cubic-bezier(.2,.8,.2,1)}
+.mascot.is-run .m-leg{animation:m-step .24s steps(2,end) infinite alternate}
+.mascot.is-wave .m-hand{animation:m-wave .6s ease-in-out 2}
+.m-eyes{transform-box:fill-box;transform-origin:center;animation:m-blink 6.4s infinite}
+.m-text,.m-smile{transition:opacity .18s var(--ease-out)}
+.m-text{opacity:0}
+.mascot.is-text .m-text{opacity:1}
+.mascot.is-text .m-eyes,.mascot.is-text .m-smile{opacity:0}
+@keyframes m-run{from{transform:translateX(calc(-100vw + 150px))}to{transform:translateX(0)}}
+@keyframes m-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes m-step{from{transform:translateY(0)}to{transform:translateY(3px)}}
+@keyframes m-blink{0%,91%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.12)}}
+@keyframes m-wave{0%,100%{transform:rotate(0)}35%{transform:rotate(-38deg)}65%{transform:rotate(-14deg)}}
+@media (max-width:760px){
+.mascot{width:68px;height:82px;right:12px;bottom:86px}
+}
+@media (prefers-reduced-motion:reduce){
+.mascot,.mascot *{animation:none!important;transition:none!important}
+}
+/* Пункт меню «Скрыть маскота» выглядит как остальные ссылки. */
+.nav-more-list button{display:block;width:100%;text-align:left;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink-2);border:0;border-radius:7px;background:none;cursor:pointer}
+.nav-more-list button:hover{background:rgba(255,77,46,.1);color:var(--ink)}
+
 .tabbar{display:none}
 /* ---- переключатель режима ---- */
 .role-switch{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--rule-2);border-radius:999px;margin-bottom:18px;background:rgba(23,25,24,.55)}
