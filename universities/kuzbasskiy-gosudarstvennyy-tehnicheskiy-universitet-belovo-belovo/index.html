@@ -33,7 +33,7 @@
 <meta name="twitter:title" content="Филиал федерального государственного бюджетного образовательного учреждения высшего образования «Кузбасский государственный технический университет имени Т.Ф. Горбачева» в г. Белово — Белово: официальные показатели — Профессии·2030">
 <meta name="twitter:description" content="Филиал федерального государственного бюджетного образовательного учреждения высшего образования «Кузбасский государственный технический университет имени Т.Ф. Горбачева» в г. Белово (Кузбасский государственный технический университет — Белово, Белово): средний балл ЕГЭ в расчёте на один предмет и численность студентов — официальные показатели мониторинга 2025 года.">
 <meta name="twitter:image" content="https://comesee10.github.io/atlas-2030/og.png">
-<link rel="stylesheet" href="/atlas-2030/styles.css?v=20261116-3">
+<link rel="stylesheet" href="/atlas-2030/styles.css?v=20261117-1">
 <link rel="preload" href="/atlas-2030/data-core.js?v=20261104-1" as="script" fetchpriority="high">
 <link rel="preload" href="/atlas-2030/data-universities-1.js?v=20261104-1" as="script">
 <link rel="preload" href="/atlas-2030/data-universities-2.js?v=20261104-1" as="script">
@@ -44,7 +44,7 @@
 <link rel="preload" href="/atlas-2030/data-organizations-1.js?v=20261116-1" as="script">
 <link rel="preload" href="/atlas-2030/data-organizations-2.js?v=20261116-1" as="script">
 <link rel="preload" href="/atlas-2030/data-merges.js?v=20261116-1" as="script">
-<link rel="preload" href="/atlas-2030/app.js?v=20261116-9" as="script" fetchpriority="high">
+<link rel="preload" href="/atlas-2030/app.js?v=20261117-1" as="script" fetchpriority="high">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none';">
 <!-- Тема ставится до первой отрисовки: иначе первый кадр тёмный, когда выбрана светлая. -->
 <script src="/atlas-2030/theme-boot.js?v=20261115-2"></script>
@@ -99,26 +99,35 @@
     </a>
 
     <nav class="nav" id="nav" aria-label="Основная навигация">
-      <a href="/atlas-2030/#/quiz" data-route="/quiz">Подобрать</a>
-      <a href="/atlas-2030/simulator/" data-route="/simulator">Симулятор</a>
       <a href="/atlas-2030/professions/" data-route="/professions">Профессии</a>
       <a href="/atlas-2030/universities/" data-route="/universities" aria-current="page">Вузы</a>
-      <a href="/atlas-2030/calendar/" data-route="/calendar">Календарь</a>
       <details class="nav-more" id="navMore">
         <summary>Ещё<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
         <div class="nav-more-list">
-          <a href="/atlas-2030/colleges/" data-route="/colleges">Колледжи после 9 класса</a>
-          <a href="/atlas-2030/specialties/" data-route="/specialties">Направления и коды</a>
-          <a href="/atlas-2030/admission/" data-route="/admission">Бюджетные места</a>
-          <a href="/atlas-2030/regions/" data-route="/regions">Регионы и округа</a>
-          <a href="/atlas-2030/#/map" data-route="/map">Карта России</a>
-          <a href="/atlas-2030/#/compare" data-route="/compare">Сравнение</a>
-          <a href="/atlas-2030/#/favorites" data-route="/favorites">Избранное</a>
-          <a href="/atlas-2030/teacher/" data-route="/teacher">Учителю и родителю</a>
-          <a href="/atlas-2030/methodology/" data-route="/methodology">Методология</a>
-          <a href="/atlas-2030/about/" data-route="/about">О проекте</a>
+          <div class="nav-group">
+            <p class="nav-group-t">Каталог</p>
+            <a href="/atlas-2030/colleges/" data-route="/colleges">Колледжи после 9 класса</a>
+            <a href="/atlas-2030/specialties/" data-route="/specialties">Направления и коды</a>
+            <a href="/atlas-2030/admission/" data-route="/admission">Бюджетные места</a>
+            <a href="/atlas-2030/calendar/" data-route="/calendar">Календарь приёма</a>
+            <a href="/atlas-2030/regions/" data-route="/regions">Регионы и округа</a>
+            <a href="/atlas-2030/#/map" data-route="/map">Карта России</a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-group-t">Инструменты</p>
+            <a href="/atlas-2030/simulator/" data-route="/simulator">Симулятор баллов</a>
+            <a href="/atlas-2030/#/compare" data-route="/compare">Сравнение</a>
+            <a href="/atlas-2030/#/favorites" data-route="/favorites">Избранное</a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-group-t">О проекте</p>
+            <a href="/atlas-2030/teacher/" data-route="/teacher">Учителю и родителю</a>
+            <a href="/atlas-2030/methodology/" data-route="/methodology">Методология</a>
+            <a href="/atlas-2030/about/" data-route="/about">О проекте</a>
+          </div>
         </div>
       </details>
+      <a class="nav-cta" href="/atlas-2030/#/quiz" data-route="/quiz">Подобрать профессию<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
     </nav>
 
     <div class="hdr-actions"><div class="atlas-tools" id="atlasTools"><button id="atlasTheme" type="button" aria-label="Включить тёмную тему"><span class="tt-ico" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></span><span class="tt-label">Тёмная</span></button><button id="atlasFocus" type="button" aria-label="Включить режим чтения" aria-pressed="false"><span class="tt-ico" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v18H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"></path><path d="M8 7h7M8 11h7"></path></svg></span><span class="tt-label">Фокус</span></button></div>
@@ -199,9 +208,9 @@
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"></path></svg>
     <span>Подобрать</span>
   </a>
-  <a href="/atlas-2030/simulator/" data-route="/simulator">
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11M17 7h4M3 17h4M10 17h11"></path><circle cx="15" cy="7" r="2.2"></circle><circle cx="8" cy="17" r="2.2"></circle></svg>
-    <span>Симулятор</span>
+  <a href="/atlas-2030/colleges/" data-route="/colleges">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-4.5L21 9l-9 4.5L3 9z"></path><path d="M7 11.2V16c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-4.8"></path><path d="M21 9v5"></path></svg>
+    <span>Колледжи</span>
   </a>
   <a href="/atlas-2030/professions/" data-route="/professions">
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"></path><path d="M8 5v14"></path></svg>
@@ -227,7 +236,7 @@
 <script defer="" src="/atlas-2030/data-organizations-1.js?v=20261116-1"></script>
 <script defer="" src="/atlas-2030/data-organizations-2.js?v=20261116-1"></script>
 <script defer="" src="/atlas-2030/data-merges.js?v=20261116-1"></script>
-<script defer="" src="/atlas-2030/app.js?v=20261116-9"></script>
+<script defer="" src="/atlas-2030/app.js?v=20261117-1"></script>
 
 
 <div class="cmp-bar" role="region" aria-label="Панель сравнения профессий"><span class="n"><b id="cmpN">0</b> выбрано</span><button class="btn btn-sm btn-primary" id="cmpOpen">Сравнить</button><button class="clear" id="cmpClear">Очистить</button></div><div class="palette" id="cmpModal" hidden=""><div class="palette-backdrop" data-cmpclose=""></div><div class="palette-box wide" role="dialog" aria-modal="true" aria-label="Сравнение профессий"><div class="cmp-head"><p>Сравнение профессий</p><button class="cmp-close" data-cmpclose="">esc</button></div><div class="cmp-scroll" id="cmpBody"></div><div class="cmp-foot"><span class="mono tiny">Максимум 3 профессии · данные атласа</span><span class="cmp-hint">Прокрутите таблицу вбок →</span><button class="btn btn-sm" data-cmpclose="">Закрыть</button></div></div></div><div class="palette" id="choiceModal" hidden=""><div class="palette-backdrop" data-choice-close=""></div><div class="palette-box mid" role="dialog" aria-modal="true" aria-label="Мой выбор"><div class="cmp-head"><p>Мой выбор</p><button class="cmp-close" data-choice-close="">esc</button></div><div class="choice-body" id="choiceBody"></div><div class="cmp-foot"><span class="mono tiny">Хранится только в этом браузере</span><a class="btn btn-sm" href="/atlas-2030/#/compare">Открыть сравнение</a><button class="btn btn-sm" data-choice-close="">Закрыть</button></div></div></div></body></html>
