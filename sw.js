@@ -1,7 +1,7 @@
-/* Профессии·2030 — офлайн-оболочка.
+/* Pathway — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v83';
+const VERSION = 'atlas-2030-v84';
 const SHELL = [
   './',
   './index.html',

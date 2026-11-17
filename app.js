@@ -1736,7 +1736,7 @@ url: SITE_URL,
 keywords: keywords,
 inLanguage: 'ru',
 isAccessibleForFree: true,
-creator: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL + '#/about' }
+creator: { '@type': 'Organization', name: 'Pathway', url: SITE_URL + '#/about' }
 };
 }
 function jsonLdFor(path, crumbs) {
@@ -1744,7 +1744,7 @@ var g = [];
 if (crumbs) g.push(breadcrumbLd(crumbs, path));
 var root = path.split('/').filter(Boolean)[0];
 if (path === '/professions') {
-g.push(datasetLd('Профессии 2027–2030 — Профессии·2030',
+g.push(datasetLd('Профессии 2027–2030 — Pathway',
 P.length + ' востребованных профессий с индексом спроса, ростом вакансий и зарплатным диапазоном.',
 'профессии, индекс спроса, вакансии, зарплата'));
 } else if (root === 'professions' && path.split('/').filter(Boolean)[1] && crumbs) {
@@ -1758,7 +1758,7 @@ url: absUrl('#' + path),
 inLanguage: 'ru',
 isAccessibleForFree: true,
 about: { '@type': 'Thing', name: p.sphere },
-provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+provider: { '@type': 'Organization', name: 'Pathway', url: SITE_URL }
 });
 }
 } else if (root === 'universities' && path.split('/').filter(Boolean)[1] && crumbs) {
@@ -1788,16 +1788,16 @@ description: spec.count + ' вузов в ' + spec.cities.length + ' город�
 url: SITE_URL + path.replace(/^\//, '') + '/',
 inLanguage: 'ru',
 isAccessibleForFree: true,
-provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+provider: { '@type': 'Organization', name: 'Pathway', url: SITE_URL }
 });
 }
 } else if (path === '/universities') {
-g.push(datasetLd('Вузы по регионам — Профессии·2030',
+g.push(datasetLd('Вузы по регионам — Pathway',
 U.length + ' вузов в ' + REGIONS.length + ' регионах и ' + DISTRICTS.length + ' федеральных округах с направлениями, наборами ЕГЭ и проходными баллами.',
 'вузы России, поступление, проходные баллы, ЕГЭ'));
 g.push({
 '@type': 'ItemList',
-name: 'Вузы России — Профессии·2030',
+name: 'Вузы России — Pathway',
 numberOfItems: U.length,
 itemListElement: U.map(function (u, i) {
 return {
@@ -1817,21 +1817,21 @@ addressCountry: 'RU'
 })
 });
 } else if (path === '/colleges') {
-g.push(datasetLd('После 9 класса: колледжи — Профессии·2030',
+g.push(datasetLd('После 9 класса: колледжи — Pathway',
 C.length + ' специальностей среднего профессионального образования: срок обучения, баллы аттестата и профессии.',
 'колледжи, СПО, после 9 класса, специальности'));
 } else if (path === '/specialties') {
-g.push(datasetLd('Направления вузов — Профессии·2030',
+g.push(datasetLd('Направления вузов — Pathway',
 DIRECTIONS.length + ' направлений с кодами, набором ЕГЭ, минимальным баллом и городами.',
 'направления подготовки, специальности, коды специальностей'));
 } else if (path === '/regions') {
-g.push(datasetLd('Регионы и вузы — Профессии·2030',
+g.push(datasetLd('Регионы и вузы — Pathway',
 REGIONS.length + ' регионов и ' + DISTRICTS.length + ' федеральных округов с вузами, программами и баллами.',
 'регионы России, федеральные округа, вузы по регионам'));
 } else if (path === '/calendar') {
 g.push({
 '@type': 'WebPage',
-name: 'Календарь приёмной кампании 2027 — Профессии·2030',
+name: 'Календарь приёмной кампании 2027 — Pathway',
 description: 'Ориентировочные этапы поступления в вуз после 11 класса и в колледж после 9 класса: подготовка, экзамены, подача документов и зачисление.',
 url: absUrl('#/calendar'),
 inLanguage: 'ru',
@@ -1840,7 +1840,7 @@ isAccessibleForFree: true
 } else if (path === '/simulator') {
 g.push({
 '@type': 'WebApplication',
-name: 'Симулятор баллов ЕГЭ — Профессии·2030',
+name: 'Симулятор баллов ЕГЭ — Pathway',
 applicationCategory: 'EducationalApplication',
 operatingSystem: 'Любой браузер',
 inLanguage: 'ru',
@@ -1859,7 +1859,7 @@ description: 'Подбор профессий и программ по пред�
 url: absUrl('#/quiz'),
 inLanguage: 'ru',
 isAccessibleForFree: true,
-provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+provider: { '@type': 'Organization', name: 'Pathway', url: SITE_URL }
 });
 } else if (path === '/quiz-oge') {
 g.push({
@@ -1869,12 +1869,12 @@ description: 'Подбор специальностей колледжей по 
 url: absUrl('#/quiz-oge'),
 inLanguage: 'ru',
 isAccessibleForFree: true,
-provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+provider: { '@type': 'Organization', name: 'Pathway', url: SITE_URL }
 });
 } else if (path === '/teacher') {
 g.push({
 '@type': 'LearningResource',
-name: 'Сценарий урока о профессиях будущего — Профессии·2030',
+name: 'Сценарий урока о профессиях будущего — Pathway',
 description: 'Готовое занятие на 25–30 минут для 8–11 классов: спрос, зарплата, предметы ЕГЭ, сравнение профессий и вопросы для обсуждения.',
 url: absUrl('#/teacher'),
 inLanguage: 'ru',
@@ -1882,7 +1882,7 @@ isAccessibleForFree: true,
 learningResourceType: 'Lesson plan',
 educationalLevel: '8–11 класс',
 about: 'Профориентация и выбор профессии',
-provider: { '@type': 'Organization', name: 'Профессии·2030', url: SITE_URL }
+provider: { '@type': 'Organization', name: 'Pathway', url: SITE_URL }
 });
 }
 return g;
@@ -1905,7 +1905,7 @@ if (path === '/quiz' && (q.has('e') || q.has('s') || q.has('b') || q.has('mlevel
 if (path === '/simulator' && (q.has('e') || q.has('s'))) shareUrl += '?' + q.toString();
 if (ogUrl) ogUrl.content = shareUrl;
 var report = path === '/quiz' && q.get('step') === '4';
-var socialTitle = report ? 'Мой результат опросника — Профессии·2030' : (path === '/quiz' ? 'Опросник: куда поступать — Профессии·2030' : document.title);
+var socialTitle = report ? 'Мой результат опросника — Pathway' : (path === '/quiz' ? 'Опросник: куда поступать — Pathway' : document.title);
 var socialDescription = report
 ? 'Мой результат подбора профессий и программ поступления. Пройди опросник и сравни свои варианты.'
 : (path === '/quiz' ? 'Подбери профессии и программы вузов по предметам ЕГЭ, интересам и ожидаемым баллам.' : (document.querySelector('meta[name="description"]') || {}).content || 'Атлас профессий, вузов и колледжей России.');
@@ -2052,7 +2052,7 @@ document.dispatchEvent(new CustomEvent('atlas:route', { detail: { path: r.path }
 }
 var routeCount = 0;
 function render404(path) {
-setTitle('Страница не найдена — Профессии·2030');
+setTitle('Страница не найдена — Pathway');
 app.innerHTML = '<div class="view" style="padding:70px 0">' +
 '<p class="eyebrow">Ошибка 404</p>' +
 '<h1 class="display">Такой страницы <em>нет</em></h1>' +
@@ -2785,7 +2785,7 @@ function addPrintRun(title) {
 if (document.getElementById('printRun')) return;
 var run = document.createElement('div');
 run.className = 'print-run'; run.id = 'printRun'; run.setAttribute('aria-hidden', 'true');
-run.innerHTML = '<span>' + h(title) + '</span><span>Профессии·2030</span>';
+run.innerHTML = '<span>' + h(title) + '</span><span>Pathway</span>';
 document.body.appendChild(run);
 }
 /* Фирменный титул печатного отчёта подбора: ответы, легенда статусов,
@@ -2803,7 +2803,7 @@ return '<li><span class="rc-n">' + (i + 1) + '</span><span>' + s + '</span></li>
 /* Ссылку на титуле читают с бумаги глазами, поэтому без %2C и %D0%9A… */
 var url = safeDecode(o.url);
 return '<div class="print-cover report-cover" data-report-title="' + h(o.title) + '">' +
-'<div class="rc-top"><div><p class="pc-brand">Профессии·2030</p>' +
+'<div class="rc-top"><div><p class="pc-brand">Pathway</p>' +
 '<p class="pc-tag">Атлас востребованных профессий</p></div>' +
 '<p class="rc-pg">Лист 1 из 2</p></div>' +
 '<div class="rc-title"><p class="rc-kicker">Результат подбора · распечатайте и обсудите</p>' +
@@ -2835,7 +2835,7 @@ var cov = document.createElement('div');
 cov.className = 'print-cover'; cov.id = 'printCover';
 /* Ссылку на страницу с титула убрали: на бумаге её набирают вручную,
    а колонтитул с названием проекта остаётся на каждом листе. */
-cov.innerHTML = '<div><p class="pc-brand">Профессии·2030</p>' +
+cov.innerHTML = '<div><p class="pc-brand">Pathway</p>' +
 '<p class="pc-tag">Атлас востребованных профессий</p></div>' +
 '<h1 class="pc-title">' + h(head.textContent) + '</h1>';
 app.insertBefore(cov, app.firstChild);
@@ -2946,7 +2946,7 @@ return '<div class="panel adv-card reveal"><span class="adv-num">' + n + '</span
 '<h3>' + h(title) + '</h3><p>' + h(text) + '</p></div>';
 }
 function renderHome() {
-setTitle('Профессии·2030 — атлас востребованных профессий');
+setTitle('Pathway — атлас востребованных профессий');
 var byIndex = P.slice().sort(function (a, b) { return b.index - a.index; });
 var top = byIndex.slice(0, 8);
 var featured = P.slice().sort(function (a, b) { return b.growth - a.growth; }).slice(0, 6);
@@ -3210,7 +3210,7 @@ return list;
 function renderProfessions(m, q) {
 var st = { q: q.get('q') || '', sphere: q.get('sphere') || '', sort: q.get('sort') || 'index', exams: parseExamParam(q.get('e')) };
 if (st.sphere && !SPHERES.some(function (s) { return s.code === st.sphere; })) st.sphere = '';
-setTitle('Профессии 2027–2030 — Профессии·2030');
+setTitle('Профессии 2027–2030 — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел III · Каталог</p>' +
@@ -3517,7 +3517,7 @@ function renderAdmission(m, q) {
 var st = { sort: q.get('sort') || 'places', district: q.get('district') || '' };
 if (['places', 'growth', 'score'].indexOf(st.sort) < 0) st.sort = 'places';
 if (st.district && !districtByCode(st.district)) st.district = '';
-setTitle('Бюджетные места и история баллов — Профессии·2030');
+setTitle('Бюджетные места и история баллов — Pathway');
 var rows = admissionRows(st);
 var places = rows.reduce(function (n, r) { return n + r.s.places; }, 0);
 var up = rows.filter(function (r) { return r.g > 0; }).length;
@@ -3584,7 +3584,7 @@ location.hash = '#/admission' + (p.toString() ? '?' + p.toString() : '');
 }
 function renderCalendar(m, q) {
 var level = q.get('level') === '9' ? '9' : '11';
-setTitle('Календарь приёмной кампании — Профессии·2030');
+setTitle('Календарь приёмной кампании — Pathway');
 var CAL_11 = [
 { ym: '2026-09', month: 'Сентябрь 2026', items: [
 'Определить обязательные и профильные предметы ЕГЭ, сверить их с перечнем вступительных испытаний на сайтах вузов.',
@@ -3737,7 +3737,7 @@ location.hash = '#/calendar' + (next === '9' ? '?level=9' : '');
 });
 }
 function renderFavorites() {
-setTitle('Избранное — Профессии·2030');
+setTitle('Избранное — Pathway');
 var list = favorites.map(function (slug) { return PROF_BY_SLUG[slug]; }).filter(Boolean);
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
@@ -3746,7 +3746,7 @@ app.innerHTML = '<div class="view">' +
 '<p class="lead">Профессии, отмеченные звёздочкой. Список хранится только в этом браузере и не ограничен по количеству; сравнение по-прежнему вмещает до трёх позиций.</p>' +
 (list.length ? '<div class="fav-print-head"><p class="label">Подборка для класса</p>' +
 '<h2 class="sec">' + list.length + ' ' + plural(list.length, 'профессия', 'профессии', 'профессий') + ' для обсуждения</h2>' +
-'<p class="muted">Атлас «Профессии·2030» · данные собраны 26 октября 2026 · проходные баллы — приёмные кампании 2024–2025</p></div>' +
+'<p class="muted">Атлас «Pathway» · данные собраны 26 октября 2026 · проходные баллы — приёмные кампании 2024–2025</p></div>' +
 '<div class="hero-cta"><a class="btn btn-primary" href="#/professions">Открыть каталог</a>' +
 '<button class="btn btn-sm" type="button" id="favPrint">Распечатать</button>' +
 '<button class="btn btn-sm" type="button" id="favClear">Очистить избранное</button></div>' : '') +
@@ -3781,7 +3781,7 @@ if (!rr) st.region = '';
 else if (st.district && rr.district !== st.district) st.region = '';
 else if (!st.district) st.district = rr.district;
 }
-setTitle('Вузы по регионам — Профессии·2030');
+setTitle('Вузы по регионам — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел IV · После 11 класса</p>' +
@@ -3957,7 +3957,7 @@ return b.count - a.count;
 function renderColleges(m, q) {
 var st = { q: q.get('q') || '', sphere: q.get('sphere') || '', sort: q.get('sort') || 'count' };
 if (st.sphere && !SPHERES.some(function (s) { return s.code === st.sphere; })) st.sphere = '';
-setTitle('После 9 класса: колледжи — Профессии·2030');
+setTitle('После 9 класса: колледжи — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел V · После 9 класса</p>' +
@@ -4062,7 +4062,7 @@ return b.count - a.count;
 function renderDirections(m, q) {
 var st = { q: q.get('q') || '', sphere: q.get('sphere') || '', sort: q.get('sort') || 'count' };
 if (st.sphere && !SPHERES.some(function (s) { return s.code === st.sphere; })) st.sphere = '';
-setTitle('Направления вузов — Профессии·2030');
+setTitle('Направления вузов — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел VI · Направления</p>' +
@@ -4127,7 +4127,7 @@ repaint();
 repaint();
 }
 function renderRegions() {
-setTitle('Регионы и вузы — Профессии·2030');
+setTitle('Регионы и вузы — Pathway');
 var avgBase = U.filter(function (u) { return u.programs.length && u.avg !== undefined; });
 var avg = avgBase.length ? Math.round(avgBase.reduce(function (n, u) { return n + u.avg; }, 0) / avgBase.length) : 0;
 var largest = DISTRICTS.slice().sort(function (a, b) { return b.count - a.count; });
@@ -4173,7 +4173,7 @@ heatSection() +
 renderHeatmap();
 }
 function renderAbout() {
-setTitle('О проекте и преимущества — Профессии·2030');
+setTitle('О проекте и преимущества — Pathway');
 var rows = [
 ['Маршрут «профессия → программа → ЕГЭ → балл»', 'Да, в одном сценарии', 'Обычно только профессии или только вузы', 'Только вуз и направления'],
 ['Прозрачная методика индекса', 'Формула, веса и допущения открыты', 'Рейтинг без формулы', 'Обычно нет'],
@@ -4201,10 +4201,10 @@ advCard('05', 'Данные можно проверить и переиспол�
 '<section class="sec-head reveal"><div><p class="eyebrow">Сравнение</p><h2 class="sec">Чем отличаемся от типичных сайтов</h2></div></section>' +
 '<p class="muted reveal" style="max-width:72ch">Сравнение обобщённое: конкретные сервисы устроены по-разному. Мы описываем типичные модели «агрегатора профессий» и «справочника вузов», а не оцениваем какой-то один сайт.</p>' +
 '<div class="tbl adv-table reveal" style="margin-top:16px"><table class="data">' +
-'<thead><tr><th>Критерий</th><th>Профессии·2030</th><th>Типичный агрегатор</th><th>Типичный справочник</th></tr></thead><tbody>' +
+'<thead><tr><th>Критерий</th><th>Pathway</th><th>Типичный агрегатор</th><th>Типичный справочник</th></tr></thead><tbody>' +
 rows.map(function (r) {
 return '<tr><th scope="row">' + h(r[0]) + '</th>' +
-'<td data-label="Профессии·2030" class="yes">' + h(r[1]) + '</td>' +
+'<td data-label="Pathway" class="yes">' + h(r[1]) + '</td>' +
 '<td data-label="Агрегатор">' + h(r[2]) + '</td>' +
 '<td data-label="Справочник">' + h(r[3]) + '</td></tr>';
 }).join('') +
@@ -4244,7 +4244,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '</div>';
 }
 function renderMethodology() {
-setTitle('Методология — Профессии·2030');
+setTitle('Методология — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел VIII · Методология</p>' +
@@ -4306,7 +4306,7 @@ if (targetUrl.origin !== location.origin) a.rel = 'noopener noreferrer';
 }
 /* ---------- страница для учителя и родителя ---------- */
 function renderTeacher() {
-setTitle('Учителю и родителю: сценарий урока — Профессии·2030');
+setTitle('Учителю и родителю: сценарий урока — Pathway');
 var steps = [
 { t: '0–3 мин', h: 'Вход и вопрос', d: 'Покажите на экране три профессии из разных сфер. Спросите: что общего у инженера машинного обучения, врача и специалиста по кибербезопасности? Подведите к мысли: всем им нужны точные предметы и привычка учиться дальше.', href: '#/professions', link: 'Открыть каталог' },
 { t: '3–8 мин', h: 'Разбор паспорта профессии', d: 'Откройте одну профессию. Разберите вместе индекс спроса, рост вакансий, зарплатный диапазон и минимальный балл. Отдельно проговорите: балл — ориентир, а не гарантия поступления.', href: '#/professions/ml-engineer', link: 'Пример: инженер ML' },
@@ -4933,7 +4933,7 @@ catch (e) { return ''; }
 }
 function printCover(kicker, title, lead, stats) {
 return '<section class="print-cover" aria-hidden="true">' +
-'<div class="pc-top"><span class="pc-mark">2030</span><span class="pc-brand">Профессии·2030<br>Атлас востребованных профессий</span></div>' +
+'<div class="pc-top"><span class="pc-mark">2030</span><span class="pc-brand">Pathway<br>Атлас востребованных профессий</span></div>' +
 '<div class="pc-mid"><p class="pc-kicker">' + h(kicker) + '</p><p class="pc-title">' + h(title) + '</p><p class="pc-lead">' + h(lead) + '</p>' +
 '<div class="pc-stats">' + stats.map(function (s) {
 return '<div><span>' + h(s[0]) + '</span><b>' + h(s[1]) + '</b></div>';
@@ -4941,13 +4941,13 @@ return '<div><span>' + h(s[0]) + '</span><b>' + h(s[1]) + '</b></div>';
 '<div class="pc-bottom"><span>' + h(printDate()) + '</span><span>comesee10.github.io/atlas-2030</span></div></section>';
 }
 function printFoot(title) {
-return '<div class="print-foot" aria-hidden="true"><b>Профессии·2030</b> · ' + h(title) + ' · comesee10.github.io/atlas-2030</div>';
+return '<div class="print-foot" aria-hidden="true"><b>Pathway</b> · ' + h(title) + ' · comesee10.github.io/atlas-2030</div>';
 }
 function renderProfession(slug) {
 var p = P.filter(function (x) { return x.slug === slug; })[0];
 var d = D[slug];
 if (!p || !d) { render404('/professions/' + slug); return; }
-setTitle(p.title + ' — Профессии·2030');
+setTitle(p.title + ' — Pathway');
 setDescription(p.title + ': ' + p.desc + ' Зарплата ' + p.salary + ', индекс спроса ' + p.index + '/100, рост вакансий +' + p.growth + '% к 2030 году.');
 var progs = PROG[slug] || [];
 var mb = minBudget(slug);
@@ -5044,7 +5044,7 @@ function renderCollege(slug) {
 var c = C.filter(function (x) { return x.slug === slug; })[0];
 var d = CD[slug];
 if (!c || !d) { render404('/colleges/' + slug); return; }
-setTitle(c.title + ' — Профессии·2030');
+setTitle(c.title + ' — Pathway');
 setDescription(c.title + ' после 9 класса: срок обучения, средний балл аттестата от ' + c.price + ', ' + c.count + ' колледжей в атласе.');
 var rows = (d.passport || []).map(function (row) {
 return '<div class="pp-row"><p class="pp-k">' + h(row.k) + '</p>' +
@@ -5091,8 +5091,8 @@ var u = UNI_BY_SLUG[slug];
 if (!u) { render404('/universities/' + slug); return; }
 var org = isOrgCard(u);
 setTitle(org
-? u.full + ' — ' + u.city + ': официальные показатели — Профессии·2030'
-: u.full + ' — ' + u.city + ': баллы и программы — Профессии·2030');
+? u.full + ' — ' + u.city + ': официальные показатели — Pathway'
+: u.full + ' — ' + u.city + ': баллы и программы — Pathway');
 setDescription(org
 ? u.full + ' (' + u.short + ', ' + u.city + '): средний балл ЕГЭ в расчёте на один предмет и численность студентов — официальные показатели мониторинга 2025 года.'
 : u.full + ' (' + u.short + ', ' + u.city + '): ' + u.programs.length + ' направлений подготовки, наборы ЕГЭ и ориентировочные проходные баллы на бюджет и платное отделение.');
@@ -5162,7 +5162,7 @@ return '<a class="panel reveal" href="' + h(pageHref('/universities/' + x.slug))
 function renderDirection(slug) {
 var s = DIRECTION_BY_SLUG[slug];
 if (!s) { render404('/specialties/' + slug); return; }
-setTitle(s.direction + ' (' + s.code + '): где учиться — Профессии·2030');
+setTitle(s.direction + ' (' + s.code + '): где учиться — Pathway');
 setDescription(s.direction + ', код ' + s.code + ': ' + s.count + ' ' + plural(s.count, 'вуз', 'вуза', 'вузов') + ' в ' + s.cities.length + ' ' +
 plural(s.cities.length, 'городе', 'городах', 'городах') + '. Набор ЕГЭ: ' + s.ege + '. Минимальный балл на бюджет ≈' + s.minBudget + '.');
 var prof = s.professionSlug ? PROF_BY_SLUG[s.professionSlug] : null;
@@ -5229,7 +5229,7 @@ function directionsForSubject(subj) {
 return DIRECTIONS.filter(function (s) { return directionHasSubject(s, subj); });
 }
 function renderScores() {
-setTitle('Баллы ЕГЭ и шансы на бюджет — Профессии·2030');
+setTitle('Баллы ЕГЭ и шансы на бюджет — Pathway');
 var minSort = DIRECTIONS.slice().sort(function (a, b) { return a.minBudget - b.minBudget; });
 var maxSort = DIRECTIONS.slice().sort(function (a, b) { return b.avgBudget - a.avgBudget; });
 function scoreTable(list, caption) {
@@ -5264,7 +5264,7 @@ scoreTable(maxSort.slice(0, 10), 'Направления с высоким ср�
 '</div>';
 }
 function renderEge() {
-setTitle('Профессии и направления по предметам ЕГЭ — Профессии·2030');
+setTitle('Профессии и направления по предметам ЕГЭ — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел V · Предметы</p>' +
@@ -5287,7 +5287,7 @@ var subj = SUBJ_BY_SLUG[slug];
 if (!subj) { render404('/ege/' + slug); return; }
 var profs = professionsForSubject(subj).sort(function (a, b) { return b.index - a.index; });
 var dirs = directionsForSubject(subj).sort(function (a, b) { return b.count - a.count; });
-setTitle(SUBJ_FULL[subj] + ': профессии и направления — Профессии·2030');
+setTitle(SUBJ_FULL[subj] + ': профессии и направления — Pathway');
 setDescription('Профессии и направления, где нужен ЕГЭ по предмету «' + SUBJ_FULL[subj] + '»: ' + profs.length + ' профессий и ' + dirs.length + ' направлений с баллами.');
 app.innerHTML = '<div class="view">' +
 '<nav class="crumbs" aria-label="Хлебные крошки"><a href="' + h(pageHref('/')) + '">Главная</a><span aria-hidden="true">/</span>' +
@@ -5327,7 +5327,7 @@ rows.push({ s: s, r: r });
 });
 });
 rows.sort(function (a, b) { return b.r.budget - a.r.budget; });
-setTitle('Программы: баллы и вузы — Профессии·2030');
+setTitle('Программы: баллы и вузы — Pathway');
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
 '<p class="eyebrow">Раздел VI · Программы</p>' +
@@ -5763,7 +5763,7 @@ function renderSimulator(m, q) {
 paintSim(simFromUrl(q));
 }
 function paintSim(st) {
-setTitle('Симулятор баллов ЕГЭ: куда поступить с вашими баллами — Профессии·2030');
+setTitle('Симулятор баллов ЕГЭ: куда поступить с вашими баллами — Pathway');
 setDescription('Симулятор приёма: баллы трёх ЕГЭ, допущение +3, +5 или +10 к профильному предмету и замена предмета — ' +
 'какие из ' + TOTAL_PROGRAMS + ' программ в ' + U.length + ' вузах открываются и до чего не хватает нескольких баллов.');
 var res = simAnalyze(st);
@@ -6307,7 +6307,7 @@ link('oge', '#/quiz-oge', 'После 9 класса · ОГЭ') +
 '</nav>';
 }
 function renderQuiz(m, q) {
-setTitle('Опросник: куда поступать — Профессии·2030');
+setTitle('Опросник: куда поступать — Pathway');
 var st = quizFromUrl(q);
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
@@ -6679,7 +6679,7 @@ ogeSync(st);
 initReveal(root);
 }
 function renderQuizOge(m, q) {
-setTitle('Опросник после 9 класса: колледжи — Профессии·2030');
+setTitle('Опросник после 9 класса: колледжи — Pathway');
 var st = ogeFromUrl(q);
 app.innerHTML = '<div class="view">' +
 '<section class="hero" style="padding:44px 0 26px">' +
@@ -7402,7 +7402,7 @@ function initRussiaMap() {
   window.addEventListener('resize', function () { drawRussia(); });
 }
 function renderMap() {
-  setTitle('Карта России с вузами — Профессии·2030');
+  setTitle('Карта России с вузами — Pathway');
   var cities = mapCities();
   var cityCount = {};
   U.forEach(function (u) { cityCount[u.city] = (cityCount[u.city] || 0) + 1; });
@@ -7585,7 +7585,7 @@ function renderCompare(m, q) {
 var unisParam = q.get('unis') || '';
 var picked = unisParam.split(',').map(function (s) { return uniByShort(s.trim()); }).filter(Boolean).slice(0, 3);
 var mode = q.get('mode') === 'uni' || picked.length ? 'uni' : 'prof';
-setTitle((mode === 'uni' ? 'Сравнение вузов' : 'Сравнение профессий') + ' — Профессии·2030');
+setTitle((mode === 'uni' ? 'Сравнение вузов' : 'Сравнение профессий') + ' — Pathway');
 var tabs = '<div class="seg-tabs" role="tablist">' +
 '<a role="tab" class="' + (mode === 'prof' ? 'active' : '') + '" href="#/compare">Профессии</a>' +
 '<a role="tab" class="' + (mode === 'uni' ? 'active' : '') + '" href="#/compare?mode=uni">Вузы</a></div>';
