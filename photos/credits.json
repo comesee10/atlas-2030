@@ -1076,5 +1076,169 @@
    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "source": "https://commons.wikimedia.org/wiki/File:Calumpang_NHS_ICT_AutoCAD_Activity.jpg"
   }
+ },
+ "directions": {
+  "spec-01-1": {
+   "file": "photos/spec-01-1-800.webp",
+   "title": "Goe SEM students working1.jpg",
+   "caption": "Студенты за рабочими станциями в лаборатории",
+   "author": "Daniel Schwen",
+   "license": "CC BY-SA 2.5",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+   "source": "https://commons.wikimedia.org/wiki/File:Goe_SEM_students_working1.jpg"
+  },
+  "spec-02-1": {
+   "file": "photos/spec-02-1-800.webp",
+   "title": "Students at a school in Bangalore, India learning to code on Progate.jpg",
+   "caption": "Ученики в компьютерном классе",
+   "author": "Nayakyashraj",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Students_at_a_school_in_Bangalore,_India_learning_to_code_on_Progate.jpg"
+  },
+  "spec-03-1": {
+   "file": "photos/spec-03-1-800.webp",
+   "title": "Laser experiment - Photonics Laboratory - Physics Department - Ateneo de Manila University.jpg",
+   "caption": "Лазерная установка в оптической лаборатории",
+   "author": "Physics Department Ateneo de Manila University",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Laser_experiment_-_Photonics_Laboratory_-_Physics_Department_-_Ateneo_de_Manila_University.jpg"
+  },
+  "spec-03-2": {
+   "file": "photos/spec-03-2-800.webp",
+   "title": "Setup to generate an extremely precise Wavelength of Infrared light.jpg",
+   "caption": "Стол оптической лаборатории",
+   "author": "Steve Jurvetson from Menlo Park, USA",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Setup_to_generate_an_extremely_precise_Wavelength_of_Infrared_light.jpg"
+  },
+  "spec-04-1": {
+   "file": "photos/spec-04-1-800.webp",
+   "title": "Research scientist works in the NCATS chemistry laboratory.jpg",
+   "caption": "Химик с колбой в лаборатории",
+   "author": "National Center for Advancing Translational Sciences from Bethesda, MD",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Research_scientist_works_in_the_NCATS_chemistry_laboratory.jpg"
+  },
+  "spec-04-2": {
+   "file": "photos/spec-04-2-800.webp",
+   "title": "Laboratoire de Chimie Moléculaire (LCM) (31470435162).jpg",
+   "caption": "Работа в химической лаборатории",
+   "author": "Ecole polytechnique Université Paris-Saclay",
+   "license": "CC BY-SA 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Laboratoire_de_Chimie_Mol%C3%A9culaire_(LCM)_(31470435162).jpg"
+  },
+  "spec-05-1": {
+   "file": "photos/spec-05-1-800.webp",
+   "title": "Coast Cam at the USACE Field Research Facility (96592).jpg",
+   "caption": "Полевая станция на побережье",
+   "author": "USGS Coastal and Marine Hazards and Resources Program",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Coast_Cam_at_the_USACE_Field_Research_Facility_(96592).jpg"
+  },
+  "spec-06-1": {
+   "file": "photos/spec-06-1-800.webp",
+   "title": "Pipetting activities.jpg",
+   "caption": "Лабораторная работа с пробиркой",
+   "author": "Diane A. Reid (Photographer)",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Pipetting_activities.jpg"
+  },
+  "spec-06-2": {
+   "file": "photos/spec-06-2-800.webp",
+   "title": "Pipetting (1).jpg",
+   "caption": "Дозатор в биологической лаборатории",
+   "author": "Diane A. Reid (Photographer)",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Pipetting_(1).jpg"
+  },
+  "spec-07-1": {
+   "file": "photos/spec-07-1-800.webp",
+   "title": "Old Town Architecture Reflected in Modern Facade - Geneva - Switzerland.jpg",
+   "caption": "Стеклянный фасад современного здания",
+   "author": "Adam Jones, Ph.D.",
+   "license": "CC BY-SA 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Old_Town_Architecture_Reflected_in_Modern_Facade_-_Geneva_-_Switzerland.jpg"
+  },
+  "spec-07-2": {
+   "file": "photos/spec-07-2-800.webp",
+   "title": "Modern Pachalik Building Facade in Kelaa M'Gouna.jpg",
+   "caption": "Современное общественное здание",
+   "author": "Rachidourkia",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Modern_Pachalik_Building_Facade_in_Kelaa_M%27Gouna.jpg"
+  },
+  "spec-08-1": {
+   "file": "photos/spec-08-1-800.webp",
+   "title": "Construction worker on a building site in Tulaghi, Central Province. (10690383443).jpg",
+   "caption": "Строитель на площадке",
+   "author": "Department of Foreign Affairs and Trade",
+   "license": "CC BY 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Construction_worker_on_a_building_site_in_Tulaghi,_Central_Province._(10690383443).jpg"
+  },
+  "spec-08-2": {
+   "file": "photos/spec-08-2-800.webp",
+   "title": "A break for the construction workers at the Rokin at the building site of the future metro station underground; free photo of Amsterdam streets by Fons Heijnsbroek, 2007.jpg",
+   "caption": "Стройплощадка в городе",
+   "author": "Fons Heijnsbroek",
+   "license": "CC0",
+   "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:A_break_for_the_construction_workers_at_the_Rokin_at_the_building_site_of_the_future_metro_station_underground;_free_photo_of_Amsterdam_streets_by_Fons_Heijnsbroek,_2007.jpg"
+  },
+  "spec-09-1": {
+   "file": "photos/spec-09-1-800.webp",
+   "title": "Super computer control room at EFPL, Lausanne (2015-05-22 02.43.48 by Mitch Altman).jpg",
+   "caption": "Пульт суперкомпьютерного центра",
+   "author": "Mitch Altman from San Francisco, USA",
+   "license": "CC BY-SA 2.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Super_computer_control_room_at_EFPL,_Lausanne_(2015-05-22_02.43.48_by_Mitch_Altman).jpg"
+  },
+  "spec-10-1": {
+   "file": "photos/spec-10-1-800.webp",
+   "title": "Technician with laptop working on server rack at NERSC.jpg",
+   "caption": "Техник у серверной стойки",
+   "author": "Derrick Coetzee from Berkeley, CA, USA",
+   "license": "CC0",
+   "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Technician_with_laptop_working_on_server_rack_at_NERSC.jpg"
+  },
+  "spec-10-2": {
+   "file": "photos/spec-10-2-800.webp",
+   "title": "Scientists and technicians ready an instrument rack for mounting in NASA's DC-8 flying laboratory.jpg",
+   "caption": "Монтаж аппаратной стойки",
+   "author": "NASA / Tom Tschida",
+   "license": "Public domain",
+   "licenseUrl": "",
+   "source": "https://commons.wikimedia.org/wiki/File:Scientists_and_technicians_ready_an_instrument_rack_for_mounting_in_NASA%27s_DC-8_flying_laboratory.jpg"
+  },
+  "spec-11-1": {
+   "file": "photos/spec-11-1-800.webp",
+   "title": "8 Śląski Festiwal Nauki, MCK, Katowice,, 09.12.2024, 1234.jpg",
+   "caption": "Монтаж платы в мастерской",
+   "author": "Krzysztof Popławski",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:8_%C5%9Al%C4%85ski_Festiwal_Nauki,_MCK,_Katowice,,_09.12.2024,_1234.jpg"
+  },
+  "spec-12-1": {
+   "file": "photos/spec-12-1-800.webp",
+   "title": "Test of the VLTI instrument VINCI at ESO Headquarters Optical Lab (eso0038a).jpg",
+   "caption": "Оптический стол в лаборатории",
+   "author": "ESO",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Test_of_the_VLTI_instrument_VINCI_at_ESO_Headquarters_Optical_Lab_(eso0038a).jpg"
+  }
  }
 }

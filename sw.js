@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v73';
+const VERSION = 'atlas-2030-v74';
 const SHELL = [
   './',
   './index.html',
@@ -71,6 +71,24 @@ const SHELL = [
   './photos/prof-digital-marketer-800.webp',
   './photos/prof-mechanical-engineer-800.webp',
   './photos/prof-bim-engineer-800.webp',
+  './photos/spec-12-1-800.webp',
+  './photos/spec-11-1-800.webp',
+  './photos/spec-10-2-800.webp',
+  './photos/spec-10-1-800.webp',
+  './photos/spec-09-1-800.webp',
+  './photos/spec-08-2-800.webp',
+  './photos/spec-08-1-800.webp',
+  './photos/spec-07-2-800.webp',
+  './photos/spec-07-1-800.webp',
+  './photos/spec-06-2-800.webp',
+  './photos/spec-06-1-800.webp',
+  './photos/spec-05-1-800.webp',
+  './photos/spec-04-2-800.webp',
+  './photos/spec-04-1-800.webp',
+  './photos/spec-03-2-800.webp',
+  './photos/spec-03-1-800.webp',
+  './photos/spec-02-1-800.webp',
+  './photos/spec-01-1-800.webp',
   './photos/prof-land-surveyor-800.webp',
   './photos/prof-metallurgist-800.webp',
   './photos/prof-supply-chain-800.webp',

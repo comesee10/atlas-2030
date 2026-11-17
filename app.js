@@ -385,6 +385,42 @@ var PHOTO_LIB = {
     alt: "Геодезисты в поле с прибором", big: 800 },
   "prof-bim-engineer": { by: "Zynell02", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Calumpang_NHS_ICT_AutoCAD_Activity.jpg",
     alt: "Инженер за работой в САПР", big: 800 },
+  "spec-01-1": { by: "Daniel Schwen", lic: "CC BY-SA 2.5", src: "https://commons.wikimedia.org/wiki/File:Goe_SEM_students_working1.jpg",
+    alt: "Студенты за рабочими станциями в лаборатории", big: 800 },
+  "spec-02-1": { by: "Nayakyashraj", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Students_at_a_school_in_Bangalore,_India_learning_to_code_on_Progate.jpg",
+    alt: "Ученики в компьютерном классе", big: 800 },
+  "spec-03-1": { by: "Physics Department Ateneo de Manila University", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Laser_experiment_-_Photonics_Laboratory_-_Physics_Department_-_Ateneo_de_Manila_University.jpg",
+    alt: "Лазерная установка в оптической лаборатории", big: 800 },
+  "spec-03-2": { by: "Steve Jurvetson from Menlo Park, USA", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Setup_to_generate_an_extremely_precise_Wavelength_of_Infrared_light.jpg",
+    alt: "Стол оптической лаборатории", big: 800 },
+  "spec-04-1": { by: "National Center for Advancing Translational Sciences from Bethesda, MD", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Research_scientist_works_in_the_NCATS_chemistry_laboratory.jpg",
+    alt: "Химик с колбой в лаборатории", big: 800 },
+  "spec-04-2": { by: "Ecole polytechnique Université Paris-Saclay", lic: "CC BY-SA 2.0", src: "https://commons.wikimedia.org/wiki/File:Laboratoire_de_Chimie_Mol%C3%A9culaire_(LCM)_(31470435162).jpg",
+    alt: "Работа в химической лаборатории", big: 800 },
+  "spec-05-1": { by: "USGS Coastal and Marine Hazards and Resources Program", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Coast_Cam_at_the_USACE_Field_Research_Facility_(96592).jpg",
+    alt: "Полевая станция на побережье", big: 800 },
+  "spec-06-1": { by: "Diane A. Reid (Photographer)", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Pipetting_activities.jpg",
+    alt: "Лабораторная работа с пробиркой", big: 800 },
+  "spec-06-2": { by: "Diane A. Reid (Photographer)", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Pipetting_(1).jpg",
+    alt: "Дозатор в биологической лаборатории", big: 800 },
+  "spec-07-1": { by: "Adam Jones, Ph.D.", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:Old_Town_Architecture_Reflected_in_Modern_Facade_-_Geneva_-_Switzerland.jpg",
+    alt: "Стеклянный фасад современного здания", big: 800 },
+  "spec-07-2": { by: "Rachidourkia", lic: "CC BY 4.0", src: "https://commons.wikimedia.org/wiki/File:Modern_Pachalik_Building_Facade_in_Kelaa_M%27Gouna.jpg",
+    alt: "Современное общественное здание", big: 800 },
+  "spec-08-1": { by: "Department of Foreign Affairs and Trade", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Construction_worker_on_a_building_site_in_Tulaghi,_Central_Province._(10690383443).jpg",
+    alt: "Строитель на площадке", big: 800 },
+  "spec-08-2": { by: "Fons Heijnsbroek", lic: "CC0", src: "https://commons.wikimedia.org/wiki/File:A_break_for_the_construction_workers_at_the_Rokin_at_the_building_site_of_the_future_metro_station_underground;_free_photo_of_Amsterdam_streets_by_Fons_Heijnsbroek,_2007.jpg",
+    alt: "Стройплощадка в городе", big: 800 },
+  "spec-09-1": { by: "Mitch Altman from San Francisco, USA", lic: "CC BY-SA 2.0", src: "https://commons.wikimedia.org/wiki/File:Super_computer_control_room_at_EFPL,_Lausanne_(2015-05-22_02.43.48_by_Mitch_Altman).jpg",
+    alt: "Пульт суперкомпьютерного центра", big: 800 },
+  "spec-10-1": { by: "Derrick Coetzee from Berkeley, CA, USA", lic: "CC0", src: "https://commons.wikimedia.org/wiki/File:Technician_with_laptop_working_on_server_rack_at_NERSC.jpg",
+    alt: "Техник у серверной стойки", big: 800 },
+  "spec-10-2": { by: "NASA / Tom Tschida", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Scientists_and_technicians_ready_an_instrument_rack_for_mounting_in_NASA%27s_DC-8_flying_laboratory.jpg",
+    alt: "Монтаж аппаратной стойки", big: 800 },
+  "spec-11-1": { by: "Krzysztof Popławski", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:8_%C5%9Al%C4%85ski_Festiwal_Nauki,_MCK,_Katowice,,_09.12.2024,_1234.jpg",
+    alt: "Монтаж платы в мастерской", big: 800 },
+  "spec-12-1": { by: "ESO", lic: "CC BY 4.0", src: "https://commons.wikimedia.org/wiki/File:Test_of_the_VLTI_instrument_VINCI_at_ESO_Headquarters_Optical_Lab_(eso0038a).jpg",
+    alt: "Оптический стол в лаборатории", big: 800 },
 };
 var UNI_PHOTO = {
   'mgu-moskva': 'uni-mgu',
@@ -481,7 +517,7 @@ function uniPlate(u) {
   return p ? photoPlate(key, 'Иллюстрация: ' + lower1(p.alt) + '. Это не здание данного вуза') : '';
 }
 /* Группа фото по префиксу ключа: нужна для списка источников. */
-var PHOTO_GROUPS = { sphere: 'Сферы профессий', prof: 'Профессии', uni: 'Здания вузов', dist: 'Панорамы федеральных округов', life: 'Учебные сцены' };
+var PHOTO_GROUPS = { sphere: 'Сферы профессий', prof: 'Профессии', spec: 'Направления', uni: 'Здания вузов', dist: 'Панорамы федеральных округов', life: 'Учебные сцены' };
 function photoGroupOf(key) { return String(key).split('-')[0]; }
 /* Полный список снимков: превью, сюжет, автор, лицензия, ссылка на Commons. */
 function photoCreditsHtml() {
@@ -520,10 +556,33 @@ var SPHERE_PHOTOS = {
   'D-09': ['life-walk', 'life-campus'],
   'D-10': ['life-lab', 'life-lawn']
 };
+/* Кадры направлений по укрупнённым группам кодов: две сцены на группу,
+   чтобы соседние карточки не повторялись. */
+var SPEC_DIR_PHOTOS = {
+  '01': ['spec-01-1'],
+  '02': ['spec-02-1'],
+  '03': ['spec-03-1', 'spec-03-2'],
+  '04': ['spec-04-1', 'spec-04-2'],
+  '05': ['spec-05-1'],
+  '06': ['spec-06-1', 'spec-06-2'],
+  '07': ['spec-07-1', 'spec-07-2'],
+  '08': ['spec-08-1', 'spec-08-2'],
+  '09': ['spec-09-1'],
+  '10': ['spec-10-1', 'spec-10-2'],
+  '11': ['spec-11-1'],
+  '12': ['spec-12-1']
+};
 function spherePhotoAt(code, i) {
   var keys = SPHERE_PHOTOS[code];
   if (!keys) return sphereMainKey(code);
   return keys[Math.abs(i || 0) % keys.length];
+}
+/* Кадр направления: сначала своя сцена группы кодов, потом сцена сферы. */
+function specPhotoAt(s, i) {
+  var g = s && s.code ? String(s.code).slice(0, 2) : '';
+  var keys = SPEC_DIR_PHOTOS[g];
+  if (keys && keys.length) return keys[Math.abs(i || 0) % keys.length];
+  return spherePhotoAt(s ? s.sphereCode : '', i);
 }
 /* Кадр «как выглядит работа»: подпись привязана к конкретной профессии. */
 function workPlate(code, subject) {
@@ -3691,7 +3750,7 @@ function specCard(s, i) {
 var cities = s.cities.slice(0, 4).join(' · ');
 if (s.cities.length > 4) cities += ' +' + (s.cities.length - 4);
 return '<a class="panel spec-card reveal" data-flip="' + h(s.slug) + '" href="#/specialties/' + h(s.slug) + '">' +
-photoStrip(spherePhotoAt(s.sphereCode, i)) +
+photoStrip(specPhotoAt(s, i)) +
 '<div class="spec-top"><span class="mono">' + h(s.code) + '</span><span class="tag">' + h(s.sphereCode) + '</span></div>' +
 '<h3>' + h(s.direction) + '</h3>' +
 '<p class="spec-prof">' + h(s.profession) + '</p>' +
@@ -3875,6 +3934,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Кадры направлений.</b> Карточки направлений больше не берут общий снимок сферы: у физики — лазерная лаборатория, у химии — работа с колбами, у строительства — площадка, у информатики — серверный зал, у архитектуры — современный фасад. Кадры сгруппированы по укрупнённым кодам, автор и лицензия — в списке фотографий.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры профессий.</b> У сорока двух профессий вместо общей сцены сферы — собственный снимок: центр кибербезопасности, приём у врача, чистый зал микроэлектроники, пульт энергосистемы, стройплощадка, лаборатория материалов, сборка космического аппарата, класс, аптека, кабина синхронного перевода, сталеплавильный цех. Автор и лицензия указаны под каждым кадром, полный список — выше.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Короткая шапка.</b> Вход в подбор стал кнопкой «Подобрать профессию», а второстепенные разделы собраны в «Ещё» тремя группами: каталог, инструменты, о проекте. Симулятор убран из меню, но остался в результатах подбора и на странице бюджетных мест.</div></li>' +
 '<li><span class="mono">15 ноября 2026</span><div><b>Живая шкала спроса.</b> График на главной перестроен: строка — сфера, точка — профессия, число справа — средний индекс. Ползунок задаёт порог: точки ниже гаснут, а сверху в реальном времени пересчитывается, сколько профессий остаётся и кто лидер. Больше никаких мелких пузырьков разного размера и горизонтальной прокрутки.</div></li>' +
