@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v75';
+const VERSION = 'atlas-2030-v77';
 const SHELL = [
   './',
   './index.html',
@@ -71,6 +71,32 @@ const SHELL = [
   './photos/prof-digital-marketer-800.webp',
   './photos/prof-mechanical-engineer-800.webp',
   './photos/prof-bim-engineer-800.webp',
+  './photos/spec-54-1-800.webp',
+  './photos/spec-45-1-800.webp',
+  './photos/spec-41-1-800.webp',
+  './photos/spec-39-1-800.webp',
+  './photos/spec-37-1-800.webp',
+  './photos/spec-51-1-800.webp',
+  './photos/spec-47-1-800.webp',
+  './photos/spec-46-2-800.webp',
+  './photos/spec-46-1-800.webp',
+  './photos/spec-44-1-800.webp',
+  './photos/spec-43-1-800.webp',
+  './photos/spec-42-2-800.webp',
+  './photos/spec-42-1-800.webp',
+  './photos/spec-40-2-800.webp',
+  './photos/spec-40-1-800.webp',
+  './photos/spec-38-1-800.webp',
+  './photos/spec-36-2-800.webp',
+  './photos/spec-36-1-800.webp',
+  './photos/spec-35-1-800.webp',
+  './photos/spec-34-1-800.webp',
+  './photos/spec-33-1-800.webp',
+  './photos/spec-32-1-800.webp',
+  './photos/spec-31-1-800.webp',
+  './photos/spec-30-2-800.webp',
+  './photos/spec-30-1-800.webp',
+  './photos/spec-28-1-800.webp',
   './photos/spec-27-1-800.webp',
   './photos/spec-26-1-800.webp',
   './photos/spec-25-1-800.webp',
