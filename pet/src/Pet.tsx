@@ -62,9 +62,9 @@ export default function Pet() {
 
   const clampOffset = useCallback(
     (x: number, y: number, s = size) => {
-      const bottom = window.innerWidth <= 760 ? 70 : 24;
+      const pad = window.innerWidth <= 760 ? 70 : 24;
       const maxLeft = -(window.innerWidth - s.w - 48);
-      const maxUp = -(window.innerHeight - s.h - bottom - 24);
+      const maxUp = -(window.innerHeight - s.h - pad);
       return { x: Math.min(0, Math.max(maxLeft, x)), y: Math.min(0, Math.max(maxUp, y)) };
     },
     [size]
@@ -77,9 +77,10 @@ export default function Pet() {
       setSize(s);
       const saved = readJson<{ cx: number; cy: number }>(STORAGE_POS);
       if (saved) {
+        const pad = window.innerWidth <= 760 ? 70 : 24;
         const left = saved.cx * window.innerWidth - s.w / 2;
         const top = saved.cy * window.innerHeight - s.h / 2;
-        setOffset(clampOffset(left - (window.innerWidth - s.w - 24), top - (window.innerHeight - s.h - 24), s));
+        setOffset(clampOffset(left - (window.innerWidth - s.w - 24), top - (window.innerHeight - s.h - pad), s));
       } else {
         setOffset(clampOffset(0, 0, s));
       }
@@ -92,7 +93,7 @@ export default function Pet() {
   const savePosition = useCallback(
     (x: number, y: number) => {
       const left = window.innerWidth - size.w - 24 + x;
-      const top = window.innerHeight - size.h - 24 + y;
+      const top = window.innerHeight - size.h - (window.innerWidth <= 760 ? 70 : 24) + y;
       try {
         localStorage.setItem(
           STORAGE_POS,
@@ -327,8 +328,8 @@ export default function Pet() {
             onHoverStart={onHoverStart}
             style={{
               position: 'fixed',
-              left: window.innerWidth - size.w - 24 + offset.x,
-              top: window.innerHeight - size.h - (window.innerWidth <= 760 ? 70 : 24) + offset.y,
+              right: 24 - offset.x,
+              bottom: (window.innerWidth <= 760 ? 70 : 24) - offset.y,
               width: size.w,
               height: size.h,
               touchAction: 'none',
