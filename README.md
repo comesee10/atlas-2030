@@ -265,7 +265,7 @@ $j.professions.Count; $j.universities.Count; $j.colleges.Count
 
 ## Питомец Pathway
 
-Питомец — отдельный React-компонент (React 19 + TypeScript + Tailwind + Framer Motion) в папке `pet/`. Собранный бандл лежит в `pet/dist/pet.js` и `pet/dist/pet.css`; сайт подключает его как модуль и монтирует в `#pet-root`.
+Питомец — отдельный React-компонент (React 19 + TypeScript + Tailwind + Framer Motion + Three.js) в папке `pet/`. Модель процедурная: скруглённые боксы и капсулы, коралловый корпус, пламя на шейдере, лицо на canvas-текстуре. Собранный бандл лежит в `pet/dist/pet.js` и `pet/dist/pet.css`; сайт подключает его как модуль и монтирует в `#pet-root`.
 
 ```powershell
 cd pet

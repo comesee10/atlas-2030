@@ -3,6 +3,65 @@
 @tailwind utilities;
 
 /* Питомец */
+.pet3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.pet3d canvas {
+  display: block;
+}
+.pet3d::before {
+  content: "";
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 14%;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(23, 18, 15, 0.25), transparent 68%);
+  filter: blur(1.5px);
+}
+.pet-thought {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 10px;
+  padding: 8px 13px;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #17120f;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(23, 18, 15, 0.14);
+  pointer-events: none;
+}
+.pet-thought::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #ffffff;
+  transform: translateX(-50%) rotate(45deg);
+}
+.pet-thought::before {
+  content: "";
+  position: absolute;
+  left: 22%;
+  bottom: -10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: -7px 6px 0 -1px #ffffff;
+}
 .pet-svg {
   display: block;
   width: 100%;
