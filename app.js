@@ -527,6 +527,36 @@ var PHOTO_LIB = {
     alt: "Корпус РЭУ имени Плеханова", big: 1600 },
   "uni-pnipu": { by: "NoGo", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B5%D1%80%D0%BC%D1%81%D0%BA%D0%B8%D0%B9_%D0%BD%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D0%B8%D1%81%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%82%D0%B5%D1%82.jpg",
     alt: "Корпус Пермского политехнического университета", big: 1600 },
+  "uni-yursu": { by: "Maxiss (c)", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:South_Ural_State_University_1_.jpg",
+    alt: "Главный корпус ЮУрГУ в Челябинске", big: 1600 },
+  "uni-timir": { by: "Fastboy", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:Main_building_of_the_Timiryazev_Academy_of_Agriculture.jpg",
+    alt: "Главное здание Тимирязевской академии", big: 1600 },
+  "uni-mai": { by: "Александр Сигачёв", lic: "CC0", src: "https://commons.wikimedia.org/wiki/File:Moscow_-_MAI_building_-_p1.jpg",
+    alt: "Учебный корпус МАИ", big: 1600 },
+  "uni-mirea": { by: "Stolbovsky", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:MIREA_building.jpg",
+    alt: "Учебный корпус МИРЭА", big: 1600 },
+  "uni-tyumgu": { by: "RG72", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Amaslo%C4%9Dejo_por_eksterlandaj_studentoj_de_la_Tjumena_%C5%9Ctata_Universitato.jpg",
+    alt: "Корпус Тюменского университета", big: 1600 },
+  "uni-volggtu": { by: "Павел Тарасов", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:%D0%92%D0%BE%D0%BB%D0%B3%D0%BE%D0%B3%D1%80%D0%B0%D0%B4%D1%81%D0%BA%D0%B8%D0%B9_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9_%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%82%D0%B5%D1%82_-_panoramio_(1).jpg",
+    alt: "Корпус ВолгГТУ", big: 1600 },
+  "uni-pengu": { by: "Zxc123", lic: "CC BY 3.0", src: "https://commons.wikimedia.org/wiki/File:Penza_State_University_building_1.jpg",
+    alt: "Учебный корпус ПГУ в Пензе", big: 1600 },
+  "uni-yargu": { by: "Cherttod", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:Yaroslavl_State_University,_4_corpus.JPG",
+    alt: "Корпус ЯрГУ им. Демидова", big: 1600 },
+  "uni-tvgu": { by: "Emil Dalalyan", lic: "CC BY 4.0", src: "https://commons.wikimedia.org/wiki/File:Tvstu_february.jpg",
+    alt: "Корпус ТвГТУ в Твери", big: 1600 },
+  "spec-09-2": { by: "Cassidy (Wiki Ed)", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Wiki_Education_at_UC_Berkeley_April_2018_111.jpg",
+    alt: "Студентка за ноутбуком в аудитории", big: 800 },
+  "spec-01-2": { by: "English: Andrew Krizhanovsky Русский: Андрей Крижановский", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Math_student_IMIT_PetrSU_2021.jpg",
+    alt: "Лекция по математике у доски", big: 800 },
+  "spec-35-2": { by: "Gillsaab1998", lic: "CC0", src: "https://commons.wikimedia.org/wiki/File:Farmer_working_in_the_field_with_their_tractor.jpg",
+    alt: "Работа в поле на зелёных посевах", big: 800 },
+  "spec-44-2": { by: "Knowledge and philosophy", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Students_seated_in_class_for_lesson.jpg",
+    alt: "Ученики в классе на уроке", big: 800 },
+  "spec-10-3": { by: "Rubin Observatory/NSF/AURA", lic: "CC BY 4.0", src: "https://commons.wikimedia.org/wiki/File:Summit_Computer_Room_Installation_(rubin-2018-05-02-192548).jpg",
+    alt: "Монтаж оборудования в серверном зале", big: 800 },
+  "spec-21-3": { by: "Arne Hückelheim", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:LostHillsPumpjacksSunset.JPG",
+    alt: "Нефтепромысел на закате", big: 800 },
 };
 var UNI_PHOTO = {
   'mgu-moskva': 'uni-mgu',
@@ -551,7 +581,16 @@ var UNI_PHOTO = {
   'spbgetu-leti-sankt-peterburg': 'uni-leti',
   'niu-mgsu-moskva': 'uni-mgsu',
   'reu-im-plehanova-moskva': 'uni-plekhanov',
-  'pnipu-perm': 'uni-pnipu'
+  'pnipu-perm': 'uni-pnipu',
+  'yuurgu-chelyabinsk': 'uni-yursu',
+  'timiryazevka-moskva': 'uni-timir',
+  'mai-moskva': 'uni-mai',
+  'rtu-mirea-moskva': 'uni-mirea',
+  'tyumgu-tyumen': 'uni-tyumgu',
+  'volggtu-volgograd': 'uni-volggtu',
+  'pgu-penza': 'uni-pengu',
+  'yargu-im-demidova-yaroslavl': 'uni-yargu',
+  'tverskoy-gosudarstvennyy-tehnicheskiy-universitet-tver': 'uni-tvgu'
 };
 var DISTRICT_PHOTO = {
   'ЦФО': 'dist-cfo', 'СЗФО': 'dist-nw', 'ЮФО': 'dist-south', 'СКФО': 'dist-caucasus',
@@ -678,7 +717,7 @@ var SPHERE_PHOTOS = {
 /* Кадры направлений по укрупнённым группам кодов: две сцены на группу,
    чтобы соседние карточки не повторялись. */
 var SPEC_DIR_PHOTOS = {
-  '01': ['spec-01-1'],
+  '01': ['spec-01-1', 'spec-01-2'],
   '02': ['spec-02-1'],
   '03': ['spec-03-1', 'spec-03-2'],
   '04': ['spec-04-1', 'spec-04-2'],
@@ -686,8 +725,8 @@ var SPEC_DIR_PHOTOS = {
   '06': ['spec-06-1', 'spec-06-2'],
   '07': ['spec-07-1', 'spec-07-2'],
   '08': ['spec-08-1', 'spec-08-2'],
-  '09': ['spec-09-1'],
-  '10': ['spec-10-1', 'spec-10-2'],
+  '09': ['spec-09-1', 'spec-09-2'],
+  '10': ['spec-10-1', 'spec-10-2', 'spec-10-3'],
   '11': ['spec-11-1'],
   '12': ['spec-12-1'],
   '13': ['spec-13-1'],
@@ -695,7 +734,7 @@ var SPEC_DIR_PHOTOS = {
   '15': ['spec-15-1'],
   '19': ['spec-19-1'],
   '20': ['spec-20-1'],
-  '21': ['spec-21-1', 'spec-21-2'],
+  '21': ['spec-21-1', 'spec-21-2', 'spec-21-3'],
   '22': ['spec-22-1'],
   '23': ['spec-23-1'],
   '24': ['spec-24-1', 'spec-24-2'],
@@ -708,13 +747,13 @@ var SPEC_DIR_PHOTOS = {
   '32': ['spec-32-1'],
   '33': ['spec-33-1'],
   '34': ['spec-34-1'],
-  '35': ['spec-35-1'],
+  '35': ['spec-35-1', 'spec-35-2'],
   '36': ['spec-36-1', 'spec-36-2'],
   '38': ['spec-38-1'],
   '40': ['spec-40-1', 'spec-40-2'],
   '42': ['spec-42-1', 'spec-42-2'],
   '43': ['spec-43-1'],
-  '44': ['spec-44-1'],
+  '44': ['spec-44-1', 'spec-44-2'],
   '46': ['spec-46-1', 'spec-46-2'],
   '47': ['spec-47-1'],
   '51': ['spec-51-1'],
@@ -732,9 +771,10 @@ function spherePhotoAt(code, i) {
 /* Кадр направления: сначала своя сцена группы кодов, потом сцена сферы. */
 function specPhotoAt(s, i) {
   var g = s && s.code ? String(s.code).slice(0, 2) : '';
-  var keys = SPEC_DIR_PHOTOS[g];
-  if (keys && keys.length) return keys[Math.abs(i || 0) % keys.length];
-  return spherePhotoAt(s ? s.sphereCode : '', i);
+  var keys = (SPEC_DIR_PHOTOS[g] || []).concat(
+    SPHERE_PHOTOS[s ? s.sphereCode : ''] || [], LIFE_PHOTOS);
+  if (!keys.length) return '';
+  return keys[Math.abs(i || 0) % keys.length];
 }
 /* Кадр «как выглядит работа»: подпись привязана к конкретной профессии. */
 function workPlate(code, subject) {
@@ -4086,6 +4126,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Кадры без повторов.</b> Карточки направлений берут кадры по кругу из своей группы, сфер и учебных сцен — на странице направлений соседи больше не дублируются. У крупных групп свои вторые и третьи сцены, у двадцати двух вузов — подтверждённые снимки корпусов.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры направлений.</b> Карточки направлений больше не берут общий снимок сферы: у физики — лазерная лаборатория, у химии — работа с колбами, у строительства — площадка, у информатики — серверный зал, у архитектуры — современный фасад. Кадры сгруппированы по укрупнённым кодам, автор и лицензия — в списке фотографий.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры профессий.</b> У сорока двух профессий вместо общей сцены сферы — собственный снимок: центр кибербезопасности, приём у врача, чистый зал микроэлектроники, пульт энергосистемы, стройплощадка, лаборатория материалов, сборка космического аппарата, класс, аптека, кабина синхронного перевода, сталеплавильный цех. Автор и лицензия указаны под каждым кадром, полный список — выше.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Короткая шапка.</b> Вход в подбор стал кнопкой «Подобрать профессию», а второстепенные разделы собраны в «Ещё» тремя группами: каталог, инструменты, о проекте. Симулятор убран из меню, но остался в результатах подбора и на странице бюджетных мест.</div></li>' +

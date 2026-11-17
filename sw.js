@@ -1,7 +1,7 @@
 /* Профессии·2030 — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v78';
+const VERSION = 'atlas-2030-v81';
 const SHELL = [
   './',
   './index.html',
@@ -71,6 +71,30 @@ const SHELL = [
   './photos/prof-digital-marketer-800.webp',
   './photos/prof-mechanical-engineer-800.webp',
   './photos/prof-bim-engineer-800.webp',
+  './photos/spec-21-3-800.webp',
+  './photos/spec-10-3-800.webp',
+  './photos/spec-44-2-800.webp',
+  './photos/spec-35-2-800.webp',
+  './photos/spec-01-2-800.webp',
+  './photos/spec-09-2-800.webp',
+  './photos/uni-yursu-800.webp',
+  './photos/uni-yursu-1600.webp',
+  './photos/uni-timir-800.webp',
+  './photos/uni-timir-1600.webp',
+  './photos/uni-mai-800.webp',
+  './photos/uni-mai-1600.webp',
+  './photos/uni-mirea-800.webp',
+  './photos/uni-mirea-1600.webp',
+  './photos/uni-tyumgu-800.webp',
+  './photos/uni-tyumgu-1600.webp',
+  './photos/uni-volggtu-800.webp',
+  './photos/uni-volggtu-1600.webp',
+  './photos/uni-pengu-800.webp',
+  './photos/uni-pengu-1600.webp',
+  './photos/uni-yargu-800.webp',
+  './photos/uni-yargu-1600.webp',
+  './photos/uni-tvgu-800.webp',
+  './photos/uni-tvgu-1600.webp',
   './photos/uni-spbpu-800.webp',
   './photos/uni-spbpu-1600.webp',
   './photos/uni-mephi-800.webp',
