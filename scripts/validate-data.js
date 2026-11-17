@@ -239,6 +239,27 @@ if (fs.existsSync(path.join(ROOT, 'photos'))) {
       }
     }
   }
+  /* Фотобанк профессий: у каждого снимка есть автор, лицензия, источник
+     и подпись, а файл лежит в репозитории. Агрегаторы и «стоки» не годятся. */
+  const creditsFile = path.join(ROOT, 'photos', 'credits.json');
+  if (fs.existsSync(creditsFile)) {
+    let credits = {};
+    try { credits = JSON.parse(fs.readFileSync(creditsFile, 'utf8')); } catch (e) { err('photos/credits.json: ' + e.message); }
+    const prof = credits.professions || {};
+    const keys = Object.keys(prof);
+    if (!keys.length) warn('photos/credits.json: нет раздела профессий');
+    const ALLOWED = /^(CC BY(?!-NC|-ND)|CC0|Public domain)/i;
+    for (const key of keys) {
+      const p = prof[key];
+      if (!p.file || !fs.existsSync(path.join(ROOT, p.file))) err('photos: нет файла ' + key);
+      if (!p.author) err('photos: нет автора ' + key);
+      if (!ALLOWED.test(p.license || '')) err('photos: лицензия ' + key + ' — ' + p.license);
+      if (!/^https:\/\/commons\.wikimedia\.org\//.test(p.source || '')) err('photos: источник ' + key + ' не Commons');
+      if (!p.caption) err('photos: нет подписи ' + key);
+    }
+  } else {
+    warn('photos/credits.json не найден');
+  }
 } else {
   warn('папка photos не найдена (в CI она есть из checkout)');
 }

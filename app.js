@@ -301,6 +301,46 @@ var PHOTO_LIB = {
     alt: "Кампус университета: газон и корпуса", big: 1200 },
   "life-walk": { by: "Tulane Public Relations", lic: "CC BY 2.0", src: "https:\/\/commons.wikimedia.org\/wiki\/File:Three_walking_students,_Tulane_University_New_Orleans,_March_2008.jpg",
     alt: "Студенты на кампусе", big: 1200 },
+  "prof-cybersecurity": { by: "U.S. Space Force S4S by David Dozoretz", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Combined_Space_Operations_Center_(CSpOC)_staff_monitors_workstations_(Screen_images_have_been_altered_for_operational_security)_(9169412).jpg",
+    alt: "Специалист за монитором в центре кибербезопасности", big: 800 },
+  "prof-clinician": { by: "Shixart1985", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Doctor_giving_medication_to_child_during_a_consultation_in_a_modern_medical_office_undefined.jpg",
+    alt: "Врач на приёме у пациента", big: 800 },
+  "prof-microelectronics": { by: "The White House", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:P20220909KR-0277_(52517328564).jpg",
+    alt: "Работа с кремниевой пластиной в чистом помещении", big: 800 },
+  "prof-power-engineer": { by: "Janejenkins", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Kazi_at_100MW_Solar_Power_Plant_Bahawalpur_Control_Room.jpg",
+    alt: "Диспетчер энергосистемы за пультом управления", big: 800 },
+  "prof-fullstack-developer": { by: "Lbronn", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Programmers.jpg",
+    alt: "Разработчики за работой над кодом", big: 800 },
+  "prof-construction-engineer": { by: "YellowstoneNPS", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Kyle_Stone,_Civil_Engineer,_going_over_plans_with_a_consulting_building_inspector_at_the_YACC_Camp_project_site_(50376401627).jpg",
+    alt: "Инженеры на площадке со строительными планами", big: 800 },
+  "prof-data-analyst": { by: "Dwalsh3", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Solar_Data_Analyst_at_Work_in_Kenya.jpg",
+    alt: "Аналитик данных за ноутбуком", big: 800 },
+  "prof-mining-engineer": { by: "MEDIA WNET", lic: "CC BY-SA 2.0", src: "https://commons.wikimedia.org/wiki/File:Workers_and_a_Star_944_truck_at_the_Tur%C3%B3w_Coal_Mine_4.jpg",
+    alt: "Горные инженеры у карьерного самосвала", big: 800 },
+  "prof-quantum": { by: "U.S. Army RDECOM from Aberdeen Proving Ground, MD, USA", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:ARL_Laser_Fiber_Laboratory_(34244381943).jpg",
+    alt: "Настройка оптической установки в лаборатории", big: 800 },
+  "prof-materials": { by: "U.S. Navy photo by John F. Williams", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:US_Navy_100504-N-7676W-014_Dr._Peter_Matic,_head_of_the_multifunctional_materials_branch_at_the_Naval_Research_Laboratory,_explains_his_work_to_Rear_Adm._Nevin_Carr,_Chief_of_Naval_Research,.jpg",
+    alt: "Исследователь новых материалов в лаборатории", big: 800 },
+  "prof-space-systems": { by: "NASA", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:SPacecraft_Psyche%27s_Thruster_Integration_Underway_PIA24789.jpg",
+    alt: "Сборка космического аппарата в чистовом зале", big: 800 },
+  "prof-biomedical-engineer": { by: "U.S. Air Force photo by Andrea Jenkins", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Biomedical_Equipment_Technicians_Keep_Medical_Equipment_Running_in_St_Lucia_(8903443).jpg",
+    alt: "Настройка медицинского оборудования", big: 800 },
+  "prof-nuclear-engineer": { by: "RadioFan", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Shearon_Harris_Nuclear_Power_Plant_control_room.jpg",
+    alt: "Пульт управления атомной станции", big: 800 },
+  "prof-climate-specialist": { by: "USEPA Environmental-Protection-Agency", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:Scientists_collecting_water_samples_for_analysis._(15012086289).jpg",
+    alt: "Отбор проб воды для климатических исследований", big: 800 },
+  "prof-psychologist": { by: "Mike Renlund", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:A_session_with_a_psychotherapist_(751707089).jpg",
+    alt: "Консультация психолога", big: 800 },
+  "prof-veterinarian": { by: "Nenad Stojkovic", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Close-up_of_a_veterinarian_examining_a_maltese_dog_with_a_stethoscope._(51687314898).jpg",
+    alt: "Ветеринар осматривает собаку", big: 800 },
+  "prof-agrotech": { by: "Narek75", lic: "CC BY-SA 4.0", src: "https://commons.wikimedia.org/wiki/File:Hydroponic_Greenhouse_in_Armenia.jpg",
+    alt: "Гидропонная теплица", big: 800 },
+  "prof-tourism-manager": { by: "Daniel Case", lic: "CC BY-SA 3.0", src: "https://commons.wikimedia.org/wiki/File:Norwegian_tour_group_being_led_by_guide_at_Temple_of_Heaven.jpg",
+    alt: "Гид с группой туристов", big: 800 },
+  "prof-digital-marketer": { by: "Virginia State Parks staff", lic: "CC BY 2.0", src: "https://commons.wikimedia.org/wiki/File:Marketing_Team_Meeting_First_Landing_2012_(9316218233).jpg",
+    alt: "Команда маркетинга на встрече", big: 800 },
+  "prof-mechanical-engineer": { by: "USDAgov", lic: "Public domain", src: "https://commons.wikimedia.org/wiki/File:APHIS-Aircraft_and_Equipment_Operations_(AEO),_Aircraft_Operations_and_Warehouse_(20230622-CDP-APHIS-0829).jpg",
+    alt: "Механик за шлифовальным станком", big: 800 },
 };
 var UNI_PHOTO = {
   'mgu-moskva': 'uni-mgu',
@@ -367,11 +407,19 @@ function photoPlate(key, alt, sizes) {
   var small = photoSrc(key, '800');
   if (!small || !p) return '';
   var big = photoSrc(key, String(p.big));
+  var set = p.big > 800 ? ' srcset="' + h(small) + ' 800w, ' + h(big) + ' ' + p.big + 'w" ' : '';
   return '<figure class="photo-fig cover">' +
-    '<div class="cover-img"><img src="' + h(small) + '" srcset="' + h(small) + ' 800w, ' + h(big) + ' ' + p.big + 'w" ' +
-    'sizes="' + (sizes || '(max-width:760px) 92vw, 1152px') + '" alt="' + h(alt || p.alt) + '" loading="lazy" decoding="async">' +
+    '<div class="cover-img"><img src="' + h(small) + '"' + set +
+    ' sizes="' + (sizes || '(max-width:760px) 92vw, 1152px') + '" alt="' + h(alt || p.alt) + '" loading="lazy" decoding="async">' +
     '<div class="cover-ov"><span class="cover-name">' + h(alt || p.alt) + '</span></div></div>' +
     '<figcaption>' + photoCreditOf(key) + '</figcaption></figure>';
+}
+/* Кадр профессии: свой снимок, если он есть в фотобанке. */
+function profPlate(p) {
+  if (!PHOTOS_ON || !p) return '';
+  var key = 'prof-' + p.slug;
+  if (!PHOTO_LIB[key]) return '';
+  return photoPlate(key, p.title);
 }
 function uniPhotoKey(u, i) {
   /* Свой корпус — если снимок есть; иначе нейтральная учебная сцена.
@@ -389,7 +437,7 @@ function uniPlate(u) {
   return p ? photoPlate(key, 'Иллюстрация: ' + lower1(p.alt) + '. Это не здание данного вуза') : '';
 }
 /* Группа фото по префиксу ключа: нужна для списка источников. */
-var PHOTO_GROUPS = { sphere: 'Сферы профессий', uni: 'Здания вузов', dist: 'Панорамы федеральных округов', life: 'Учебные сцены' };
+var PHOTO_GROUPS = { sphere: 'Сферы профессий', prof: 'Профессии', uni: 'Здания вузов', dist: 'Панорамы федеральных округов', life: 'Учебные сцены' };
 function photoGroupOf(key) { return String(key).split('-')[0]; }
 /* Полный список снимков: превью, сюжет, автор, лицензия, ссылка на Commons. */
 function photoCreditsHtml() {
@@ -4571,7 +4619,7 @@ return '<a href="#/professions/' + s.slug + '"><span>' + h(s.title) + '</span><s
 }).join('') + '</div>' : '') +
 '</aside>' +
 '</div>' +
-workPlate(p.sphereCode, p.title) +
+(profPlate(p) || workPlate(p.sphereCode, p.title)) +
 printFoot(p.title) +
 '</div>';
 var rich = document.getElementById('rich');
