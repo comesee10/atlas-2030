@@ -263,6 +263,18 @@ $j.professions.Count; $j.universities.Count; $j.colleges.Count
 - PWA: манифест, service worker, офлайн-кеш всей оболочки, установка на домашний экран и ярлыки на приём и опросник.
 - Шрифт Onest размещён локально (woff2, латиница и кириллица) — без обращений к Google Fonts.
 
+## Питомец Pathway
+
+Питомец — отдельный React-компонент (React 19 + TypeScript + Tailwind + Framer Motion) в папке `pet/`. Собранный бандл лежит в `pet/dist/pet.js` и `pet/dist/pet.css`; сайт подключает его как модуль и монтирует в `#pet-root`.
+
+```powershell
+cd pet
+npm install
+npm run build
+```
+
+После сборки обновите версии `pet.css` и `pet.js` в `index.html` и в `sw.js`.
+
 ## Фотографии
 
 В вёрстке пять групп снимков — все из Wikimedia Commons, все со свободными лицензиями.

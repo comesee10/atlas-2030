@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Питомец */
+.pet-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.pet-antenna {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+.pet-hand {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+.pet-wave .pet-hand {
+  animation: pet-wave 0.5s ease-in-out 2;
+}
+.pet-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pet-blink 6.4s infinite;
+}
+.pet-look {
+  transform-box: fill-box;
+  animation: pet-look 9s ease-in-out infinite;
+}
+.pet-scan {
+  animation: pet-scan 6s linear infinite;
+}
+.pet-dot {
+  transform-box: fill-box;
+  animation: pet-dot 0.9s ease-in-out infinite;
+}
+.pet-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.pet-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.pet-eq rect {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: pet-eq 0.5s ease-in-out infinite alternate;
+}
+.pet-eq rect:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.pet-eq rect:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.pet-eq rect:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.pet-eq rect:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.pet-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pet-glow {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 77, 46, 0.38), transparent 65%);
+  pointer-events: none;
+  animation: pet-glow 0.85s ease-out forwards;
+}
+@keyframes pet-glow {
+  from { transform: scale(0.6); opacity: 0.8; }
+  to { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes pet-blink {
+  0%, 91%, 100% { transform: scaleY(1); }
+  94%, 96% { transform: scaleY(0.1); }
+}
+@keyframes pet-look {
+  0%, 20%, 100% { transform: translateX(0); }
+  30%, 45% { transform: translateX(-3px); }
+  60%, 75% { transform: translateX(3px); }
+}
+@keyframes pet-wave {
+  0%, 100% { transform: rotate(0); }
+  35% { transform: rotate(-38deg); }
+  65% { transform: rotate(-14deg); }
+}
+@keyframes pet-scan {
+  from { transform: translateY(0); }
+  to { transform: translateY(16px); }
+}
+@keyframes pet-dot {
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
+@keyframes pet-eq {
+  from { transform: scaleY(0.35); }
+  to { transform: scaleY(1); }
+}
+
+/* Волна при выборе карточки питомца */
+.tw-ripple {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(255, 77, 46, 0.35);
+  transform: scale(0);
+  animation: tw-ripple 0.55s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes tw-ripple {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-svg *,
+  .pet-root * {
+    animation: none !important;
+  }
+  .tw-ripple {
+    display: none;
+  }
+}

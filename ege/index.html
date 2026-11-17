@@ -33,7 +33,8 @@
 <meta name="twitter:title" content="Профессии и направления по предметам ЕГЭ — Pathway">
 <meta name="twitter:description" content="Симулятор приёма: баллы трёх ЕГЭ, допущение +3, +5 или +10 к профильному предмету и замена предмета — какие из 1555 программ в 1223 вузах открываются и до чего не хватает нескольких баллов.">
 <meta name="twitter:image" content="https://comesee10.github.io/atlas-2030/og.png">
-<link rel="stylesheet" href="/atlas-2030/styles.css?v=20261117-5">
+<link rel="stylesheet" href="/atlas-2030/styles.css?v=20261117-6">
+<link rel="stylesheet" href="/atlas-2030/pet/dist/pet.css?v=20261117-3">
 <link rel="preload" href="/atlas-2030/data-core.js?v=20261104-1" as="script" fetchpriority="high">
 <link rel="preload" href="/atlas-2030/data-universities-1.js?v=20261104-1" as="script">
 <link rel="preload" href="/atlas-2030/data-universities-2.js?v=20261104-1" as="script">
@@ -44,7 +45,7 @@
 <link rel="preload" href="/atlas-2030/data-organizations-1.js?v=20261116-1" as="script">
 <link rel="preload" href="/atlas-2030/data-organizations-2.js?v=20261116-1" as="script">
 <link rel="preload" href="/atlas-2030/data-merges.js?v=20261116-1" as="script">
-<link rel="preload" href="/atlas-2030/app.js?v=20261117-27" as="script" fetchpriority="high">
+<link rel="preload" href="/atlas-2030/app.js?v=20261117-29" as="script" fetchpriority="high">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none';">
 <!-- Тема ставится до первой отрисовки: иначе первый кадр тёмный, когда выбрана светлая. -->
 <script src="/atlas-2030/theme-boot.js?v=20261115-2"></script>
@@ -126,7 +127,8 @@
             <a href="/atlas-2030/teacher/" data-route="/teacher">Учителю и родителю</a>
             <a href="/atlas-2030/methodology/" data-route="/methodology">Методология</a>
             <a href="/atlas-2030/about/" data-route="/about">О проекте</a>
-            <button class="nav-mascot" id="mascotHide" type="button">Скрыть маскота</button>
+            <button class="nav-mascot" id="petPick" type="button">Выбрать питомца</button>
+            <button class="nav-mascot" id="mascotHide" type="button">Скрыть питомца</button>
           </div>
         </div>
       </details>
@@ -156,6 +158,7 @@
 </header>
 
 <main id="app" class="wrap" tabindex="-1"><div class="view"><section class="hero" style="padding:44px 0 26px"><p class="eyebrow">Раздел V · Предметы</p><h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Профессии по <em>предметам</em> ЕГЭ</h1><p class="lead">Выберите предмет — увидите профессии и направления, где он входит в набор вступительных испытаний. Наборы различаются по вузам, поэтому всегда сверяйтесь с перечнем на сайте приёмной комиссии.</p></section><div class="subj-grid reveal in"><a class="panel subj-card" href="/atlas-2030/ege/russkiy/"><b>Русский язык</b><span>47 профессий · 172 направления</span></a><a class="panel subj-card" href="/atlas-2030/ege/matematika/"><b>Математика</b><span>44 профессии · 141 направление</span></a><a class="panel subj-card" href="/atlas-2030/ege/informatika/"><b>Информатика</b><span>31 профессия · 82 направления</span></a><a class="panel subj-card" href="/atlas-2030/ege/fizika/"><b>Физика</b><span>33 профессии · 99 направлений</span></a><a class="panel subj-card" href="/atlas-2030/ege/himiya/"><b>Химия</b><span>15 профессий · 41 направление</span></a><a class="panel subj-card" href="/atlas-2030/ege/biologiya/"><b>Биология</b><span>13 профессий · 35 направлений</span></a><a class="panel subj-card" href="/atlas-2030/ege/obshchestvoznanie/"><b>Обществознание</b><span>15 профессий · 45 направлений</span></a><a class="panel subj-card" href="/atlas-2030/ege/istoriya/"><b>История</b><span>8 профессий · 21 направление</span></a><a class="panel subj-card" href="/atlas-2030/ege/literatura/"><b>Литература</b><span>7 профессий · 8 направлений</span></a><a class="panel subj-card" href="/atlas-2030/ege/inostrannyy/"><b>Иностранный язык</b><span>12 профессий · 27 направлений</span></a><a class="panel subj-card" href="/atlas-2030/ege/geografiya/"><b>География</b><span>4 профессии · 10 направлений</span></a></div><div class="cta-block reveal in"><a class="btn btn-primary" href="/atlas-2030/#/quiz">Подобрать по трём предметам →</a></div></div></main>
+<div id="pet-root"></div>
 
 
 <footer class="ftr">
@@ -240,6 +243,7 @@
 <script defer="" src="/atlas-2030/data-organizations-2.js?v=20261116-1"></script>
 <script defer="" src="/atlas-2030/data-merges.js?v=20261116-1"></script>
 <script defer="" src="/atlas-2030/app.js?v=20261117-27"></script>
+<script type="module" src="/atlas-2030/pet/dist/pet.js?v=20261117-3"></script>
 
 
 <div class="cmp-bar" role="region" aria-label="Панель сравнения профессий"><span class="n"><b id="cmpN">0</b> выбрано</span><button class="btn btn-sm btn-primary" id="cmpOpen">Сравнить</button><button class="clear" id="cmpClear">Очистить</button></div><div class="palette" id="cmpModal" hidden=""><div class="palette-backdrop" data-cmpclose=""></div><div class="palette-box wide" role="dialog" aria-modal="true" aria-label="Сравнение профессий"><div class="cmp-head"><p>Сравнение профессий</p><button class="cmp-close" data-cmpclose="">esc</button></div><div class="cmp-scroll" id="cmpBody"></div><div class="cmp-foot"><span class="mono tiny">Максимум 3 профессии · данные атласа</span><span class="cmp-hint">Прокрутите таблицу вбок →</span><button class="btn btn-sm" data-cmpclose="">Закрыть</button></div></div></div><div class="palette" id="choiceModal" hidden=""><div class="palette-backdrop" data-choice-close=""></div><div class="palette-box mid" role="dialog" aria-modal="true" aria-label="Мой выбор"><div class="cmp-head"><p>Мой выбор</p><button class="cmp-close" data-choice-close="">esc</button></div><div class="choice-body" id="choiceBody"></div><div class="cmp-foot"><span class="mono tiny">Хранится только в этом браузере</span><a class="btn btn-sm" href="/atlas-2030/#/compare">Открыть сравнение</a><button class="btn btn-sm" data-choice-close="">Закрыть</button></div></div></div></body></html>
