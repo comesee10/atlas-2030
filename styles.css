@@ -105,8 +105,11 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 .nav-more-list a{display:block;padding:9px 10px;font-size:13.5px;color:var(--ink-2);border-radius:7px;border:0}
 .nav-more-list a:hover{background:rgba(255,77,46,.1);color:var(--ink)}
 .nav-more-list a[aria-current="page"]{color:var(--accent);background:rgba(255,77,46,.12)}
-/* Пункт меню «Скрыть помощника» выглядит как остальные ссылки. */
+/* Пункт меню «Скрыть помощника» выглядит как остальные ссылки.
+   Показываем его только там, где загрузчик разрешил 3D-помощника. */
 .nav-more-list button{display:block;width:100%;text-align:left;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink-2);border:0;border-radius:7px;background:none;cursor:pointer}
+.nav-more-list .nav-mascot{display:none}
+.pet-ready .nav-more-list .nav-mascot{display:block}
 .nav-more-list button:hover{background:rgba(255,77,46,.1);color:var(--ink)}
 
 .tabbar{display:none}

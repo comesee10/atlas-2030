@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import type { Pet3DHandle, PetMood } from './Pet3D';
-import { PetArt, SKINS } from './PetArt';
 
 const SIZE = { w: 190, h: 232 };
 const SIZE_MOBILE = { w: 132, h: 161 };
@@ -59,6 +58,7 @@ export default function Pet() {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [webgl] = useState(hasWebGL);
   const [Pet3DView, setPet3DView] = useState<typeof import('./Pet3D')['default'] | null>(null);
+  const [pet3DFailed, setPet3DFailed] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const badgeRef = useRef<HTMLButtonElement | null>(null);
   const askRef = useRef<HTMLDivElement | null>(null);
@@ -72,7 +72,6 @@ export default function Pet() {
   const petApi = useRef<Pet3DHandle | null>(null);
   const pathwayShown = useRef(false);
   const controls = useAnimationControls();
-  const fallback = SKINS[0];
 
   const clampOffset = useCallback((x: number, y: number, s = size) => {
     const pad = window.innerWidth <= 760 ? 70 : 24;
@@ -115,45 +114,28 @@ export default function Pet() {
     return () => window.removeEventListener('resize', onResize);
   }, [clampOffset]);
 
-  /* 3D-модель грузится отдельным чанком после простоя и только когда нужна.
-     На экономии трафика и слабом соединении остаётся SVG-рисунок. */
+  /* Загрузчик уже проверил устройство и сеть. Здесь только сам 3D-чанк:
+     без SVG-подмены. Если чанк не загрузился, помощник не показываем. */
   useEffect(() => {
-    if (!webgl || hidden || Pet3DView) return;
-    /* На телефонах оставляем лёгкий SVG: 3D-чанк там дороже, чем даёт. */
-    if (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) return;
-    const connection = (navigator as Navigator & {
-      connection?: { saveData?: boolean; effectiveType?: string; downlink?: number; rtt?: number };
-    }).connection;
-    if (connection && (
-      connection.saveData ||
-      /(^|-)2g$|^3g$/.test(connection.effectiveType || '') ||
-      (connection.downlink !== undefined && connection.downlink < 1) ||
-      (connection.rtt !== undefined && connection.rtt > 500)
-    )) return;
+    if (!webgl) {
+      document.documentElement.classList.remove('pet-ready');
+      return;
+    }
+    if (hidden || Pet3DView || pet3DFailed) return;
     let cancelled = false;
-    const load = () => {
-      import('./Pet3D')
-        .then((mod) => {
-          if (!cancelled) setPet3DView(() => mod.default);
-        })
-        .catch(() => {
-          /* остаёмся на SVG */
-        });
-    };
-    const win = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-    let idleId = 0;
-    let timerId = 0;
-    if (win.requestIdleCallback) idleId = win.requestIdleCallback(load, { timeout: 2500 });
-    else timerId = window.setTimeout(load, 1200);
+    import('./Pet3D')
+      .then((mod) => {
+        if (!cancelled) setPet3DView(() => mod.default);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setPet3DFailed(true);
+        document.documentElement.classList.remove('pet-ready');
+      });
     return () => {
       cancelled = true;
-      if (idleId && win.cancelIdleCallback) win.cancelIdleCallback(idleId);
-      if (timerId) window.clearTimeout(timerId);
     };
-  }, [hidden, webgl, Pet3DView]);
+  }, [hidden, webgl, Pet3DView, pet3DFailed]);
 
   const showBubble = useCallback((ms = 2600) => {
     setBubble(true);
@@ -307,24 +289,16 @@ export default function Pet() {
     return () => document.removeEventListener('atlas:route', onRoute as EventListener);
   }, [hidden, reduce, controls, closeAsk]);
 
-  /* меню: скрыть/показать */
+  /* Пунктом меню управляет pet/boot.js — он работает и до загрузки React.
+     Здесь только слушаем его переключатель. */
   useEffect(() => {
-    const hideBtn = document.getElementById('mascotHide');
-    if (hideBtn) hideBtn.textContent = hidden ? 'Показать помощника' : 'Скрыть помощника';
-    const onClick = () => {
-      setHidden((prev) => {
-        const next = !prev;
-        try {
-          localStorage.setItem(STORAGE_HIDDEN, next ? 'off' : 'on');
-        } catch {
-          /* ignore */
-        }
-        return next;
-      });
+    const onPref = (event: Event) => {
+      const detail = (event as CustomEvent<{ hidden?: boolean }>).detail;
+      if (detail && typeof detail.hidden === 'boolean') setHidden(detail.hidden);
     };
-    hideBtn?.addEventListener('click', onClick);
-    return () => hideBtn?.removeEventListener('click', onClick);
-  }, [hidden]);
+    window.addEventListener('atlas:pet-pref', onPref);
+    return () => window.removeEventListener('atlas:pet-pref', onPref);
+  }, []);
 
   const onHover = () => {
     if (reduce || dragRef.current.active || askOpen) return;
@@ -356,7 +330,7 @@ export default function Pet() {
   return (
     <>
       <AnimatePresence>
-        {!hidden && (
+        {!hidden && webgl && Pet3DView && (
           <motion.div
             key="pet"
             ref={rootRef}
@@ -521,11 +495,7 @@ export default function Pet() {
               </button>
             )}
             <motion.div animate={controls} style={{ width: '100%', height: '100%' }} aria-hidden="true">
-              {webgl && Pet3DView ? (
-                <Pet3DView ref={petApi} mood={mood} reduce={!!reduce} />
-              ) : (
-                <PetArt skin={fallback} mood="smile" className="pet-svg" />
-              )}
+              <Pet3DView ref={petApi} mood={mood} reduce={!!reduce} />
             </motion.div>
           </motion.div>
         )}
