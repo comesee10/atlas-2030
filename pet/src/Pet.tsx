@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion';
-import Pet3D, { type Pet3DHandle, type PetMood } from './Pet3D';
+import type { Pet3DHandle, PetMood } from './Pet3D';
 import { PetArt, SKINS } from './PetArt';
 
 const SIZE = { w: 190, h: 232 };
@@ -58,6 +58,7 @@ export default function Pet() {
   );
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [webgl] = useState(hasWebGL);
+  const [Pet3DView, setPet3DView] = useState<typeof import('./Pet3D')['default'] | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const badgeRef = useRef<HTMLButtonElement | null>(null);
   const askRef = useRef<HTMLDivElement | null>(null);
@@ -113,6 +114,46 @@ export default function Pet() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [clampOffset]);
+
+  /* 3D-модель грузится отдельным чанком после простоя и только когда нужна.
+     На экономии трафика и слабом соединении остаётся SVG-рисунок. */
+  useEffect(() => {
+    if (!webgl || hidden || Pet3DView) return;
+    /* На телефонах оставляем лёгкий SVG: 3D-чанк там дороже, чем даёт. */
+    if (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) return;
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string; downlink?: number; rtt?: number };
+    }).connection;
+    if (connection && (
+      connection.saveData ||
+      /(^|-)2g$|^3g$/.test(connection.effectiveType || '') ||
+      (connection.downlink !== undefined && connection.downlink < 1) ||
+      (connection.rtt !== undefined && connection.rtt > 500)
+    )) return;
+    let cancelled = false;
+    const load = () => {
+      import('./Pet3D')
+        .then((mod) => {
+          if (!cancelled) setPet3DView(() => mod.default);
+        })
+        .catch(() => {
+          /* остаёмся на SVG */
+        });
+    };
+    const win = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    let idleId = 0;
+    let timerId = 0;
+    if (win.requestIdleCallback) idleId = win.requestIdleCallback(load, { timeout: 2500 });
+    else timerId = window.setTimeout(load, 1200);
+    return () => {
+      cancelled = true;
+      if (idleId && win.cancelIdleCallback) win.cancelIdleCallback(idleId);
+      if (timerId) window.clearTimeout(timerId);
+    };
+  }, [hidden, webgl, Pet3DView]);
 
   const showBubble = useCallback((ms = 2600) => {
     setBubble(true);
@@ -269,7 +310,7 @@ export default function Pet() {
   /* меню: скрыть/показать */
   useEffect(() => {
     const hideBtn = document.getElementById('mascotHide');
-    if (hideBtn) hideBtn.textContent = hidden ? 'Показать питомца' : 'Скрыть питомца';
+    if (hideBtn) hideBtn.textContent = hidden ? 'Показать помощника' : 'Скрыть помощника';
     const onClick = () => {
       setHidden((prev) => {
         const next = !prev;
@@ -408,7 +449,7 @@ export default function Pet() {
               cursor: dragRef.current.rotate ? 'ew-resize' : 'grab'
             }}
             role="group"
-            aria-label="Питомец Pathway"
+            aria-label="Помощник Pathway"
           >
             <AnimatePresence>
               {bubble && !askOpen && (
@@ -465,8 +506,8 @@ export default function Pet() {
                 ref={badgeRef}
                 className="pet-badge"
                 type="button"
-                aria-label="Спросить питомца"
-                title="Спросить питомца"
+                aria-label="Спросить помощника"
+                title="Спросить помощника"
                 aria-expanded={askOpen}
                 aria-controls="petAsk"
                 onPointerDown={(e) => e.stopPropagation()}
@@ -480,8 +521,8 @@ export default function Pet() {
               </button>
             )}
             <motion.div animate={controls} style={{ width: '100%', height: '100%' }} aria-hidden="true">
-              {webgl ? (
-                <Pet3D ref={petApi} mood={mood} reduce={!!reduce} />
+              {webgl && Pet3DView ? (
+                <Pet3DView ref={petApi} mood={mood} reduce={!!reduce} />
               ) : (
                 <PetArt skin={fallback} mood="smile" className="pet-svg" />
               )}

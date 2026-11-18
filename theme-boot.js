@@ -11,4 +11,10 @@
     cl.remove('theme-dark');
     cl.add('theme-light');
   }
+  /* Подвал скрыт только на время первой отрисовки. Если app.js не дойдёт,
+     load или страховочный таймер вернут его без участия основного скрипта. */
+  cl.add('booting');
+  var done = function () { cl.remove('booting'); };
+  window.addEventListener('load', function () { setTimeout(done, 300); });
+  setTimeout(done, 8000);
 }());

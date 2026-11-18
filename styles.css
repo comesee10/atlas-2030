@@ -25,7 +25,8 @@ unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+
 --space-1:8px;--space-2:14px;--space-3:22px;--space-4:36px;--space-5:56px;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg)}
+html{scroll-behavior:smooth;background:var(--bg);scrollbar-gutter:stable}
+@supports not (scrollbar-gutter:stable){html{overflow-y:scroll}}
 body{
 margin:0;background:var(--bg);color:var(--ink);
 font-family:var(--sans);font-size:var(--fs-m);line-height:1.55;
@@ -104,7 +105,7 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 .nav-more-list a{display:block;padding:9px 10px;font-size:13.5px;color:var(--ink-2);border-radius:7px;border:0}
 .nav-more-list a:hover{background:rgba(255,77,46,.1);color:var(--ink)}
 .nav-more-list a[aria-current="page"]{color:var(--accent);background:rgba(255,77,46,.12)}
-/* Пункт меню «Скрыть маскота» выглядит как остальные ссылки. */
+/* Пункт меню «Скрыть помощника» выглядит как остальные ссылки. */
 .nav-more-list button{display:block;width:100%;text-align:left;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink-2);border:0;border-radius:7px;background:none;cursor:pointer}
 .nav-more-list button:hover{background:rgba(255,77,46,.1);color:var(--ink)}
 
@@ -157,7 +158,11 @@ transition:border-color .15s var(--ease),color .15s var(--ease),background .15s 
 @media (max-width:900px){.lesson-board{grid-template-columns:1fr}.lesson-side{position:static}}
 @media (max-width:560px){.lesson-step{grid-template-columns:1fr;gap:6px}.lesson-time{padding-top:0}}
 main{min-height:60vh;padding-bottom:80px}
-.view{animation:viewIn .22s var(--ease-out) both}
+/* Пока первый экран не отрисован, подвал не участвует в раскладке:
+   иначе он уезжает вниз и создаёт скачок CLS. */
+.booting .ftr{display:none}
+/* flow-root не даёт верхнему отступу первой секции сдвигать сам main. */
+.view{display:flow-root;animation:viewIn .22s var(--ease-out) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .eyebrow{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .eyebrow::before{content:"";width:26px;height:2px;background:currentColor;display:block}
@@ -1326,6 +1331,9 @@ table.adm-table td:nth-child(7){display:flex;align-items:center;gap:10px}
 table.adm-table td .code{font-size:10px;line-height:1.4}
 }
 /* ---- Insights: cartogram, charts, graph, compare tabs ---- */
+/* Место под инструменты резервируется до загрузки app.js: шапка не дёргается. */
+.atlas-tools-slot{display:none}
+@media (min-width:1100px){.atlas-tools-slot{display:block;width:74px;height:32px;margin-left:8px;flex:0 0 auto}}
 .atlas-tools{display:flex;align-items:center;gap:6px;margin-left:8px;flex-shrink:0}
 .atlas-tools a,.atlas-tools button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 9px;border:1px solid var(--rule-2);border-radius:6px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3);background:transparent;cursor:pointer;text-decoration:none;flex:0 0 auto}
 .atlas-tools button{width:34px;min-width:34px;padding:0;justify-content:center}
@@ -1372,8 +1380,8 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .sph-row::-webkit-scrollbar{display:none}
 .sph-card{position:relative;display:block;overflow:hidden;isolation:isolate;border:1px solid var(--rule);border-radius:14px;background:linear-gradient(150deg,#22251f,#171918);text-decoration:none;transition:border-color .25s var(--ease),transform .25s var(--ease),box-shadow .25s var(--ease)}
 .sph-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 20px 40px -26px rgba(226,73,43,.85)}
-.sph-card .sph-ph{position:absolute;inset:0;z-index:-1;background:linear-gradient(150deg,#2a2d27,#1c1f1b);background-size:cover;background-position:center;transform:scale(1.001);transition:transform .55s var(--ease),filter .45s var(--ease)}
-.sph-card.has-photo .sph-ph{background-image:var(--ph)}
+.sph-card .sph-ph{position:absolute;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(150deg,#2a2d27,#1c1f1b);background-size:cover;background-position:center;transform:scale(1.001);transition:transform .55s var(--ease),filter .45s var(--ease)}
+.sph-ph img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
 .sph-card.has-photo::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(14,15,14,.74) 0%,rgba(14,15,14,.3) 26%,rgba(14,15,14,.66) 55%,rgba(14,15,14,.95) 82%,rgba(14,15,14,.98) 100%);transition:opacity .4s var(--ease)}
 .sph-card.has-photo .sph-body{text-shadow:0 1px 3px rgba(0,0,0,.78),0 2px 18px rgba(0,0,0,.55)}
 .sph-card:hover .sph-ph{transform:scale(1.07)}
@@ -1401,8 +1409,10 @@ table.adm-table td .code{font-size:10px;line-height:1.4}
 .cover-code{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:#ff4d2e}
 .cover-name{font-family:var(--serif);font-weight:700;font-size:clamp(17px,2.1vw,26px);line-height:1.15}
 /* ---- фото в карточках разделов и полоса-иллюстрация в шапке ---- */
-.card-ph{display:block;position:relative;height:132px;margin:0 0 12px;border-radius:10px;background-color:var(--panel-2);background-size:cover;background-position:center 35%;box-shadow:inset 0 0 0 1px var(--rule);transition:transform .3s var(--ease-out)}
-.card-ph-credit{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:9px;letter-spacing:.02em;color:#ffffff;background:rgba(14,15,14,.68);border-radius:999px;padding:2px 8px}
+.card-ph{display:block;position:relative;height:132px;margin:0 0 12px;border-radius:10px;background-color:var(--panel-2);background-size:cover;background-position:center 35%;overflow:hidden;box-shadow:inset 0 0 0 1px var(--rule);transition:transform .3s var(--ease-out)}
+.card-ph>img{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center 35%}
+.card-ph::after{content:"";position:absolute;inset:0;z-index:1;border-radius:inherit;box-shadow:inset 0 0 0 1px var(--rule);pointer-events:none}
+.card-ph-credit{position:absolute;left:8px;bottom:8px;z-index:2;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:9px;letter-spacing:.02em;color:#ffffff;background:rgba(14,15,14,.68);border-radius:999px;padding:2px 8px}
 .hero-ph{margin:6px 0 26px;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--panel)}
 .hero-ph img{display:block;width:100%;height:clamp(150px,24vw,280px);object-fit:cover;object-position:center 40%}
 .hero-ph figcaption{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}

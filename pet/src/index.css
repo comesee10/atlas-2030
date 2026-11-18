@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Питомец */
+/* Помощник */
 .pet3d {
   position: relative;
   width: 100%;
@@ -313,7 +313,7 @@
   to { transform: scaleY(1); }
 }
 
-/* Волна при выборе карточки питомца */
+/* Волна при выборе карточки помощника */
 .tw-ripple {
   position: absolute;
   border-radius: 9999px;

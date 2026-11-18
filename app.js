@@ -633,9 +633,12 @@ function photoCreditOf(key) {
    mark: слово «иллюстрация» для кадров, которые не относятся к карточке напрямую. */
 function photoStrip(key, alt, mark) {
   var p = PHOTO_LIB[key];
+  var src4 = photoSrc(key, '400');
   var src8 = photoSrc(key, '800');
-  if (!src8 || !p) return '';
-  return '<span class="card-ph" style="background-image:url(&quot;' + src8 + '&quot;)">' +
+  if (!src4 || !p) return '';
+  return '<span class="card-ph">' +
+    '<img src="' + h(src4) + '" srcset="' + h(src4) + ' 400w, ' + h(src8) + ' 800w" ' +
+    'sizes="(max-width:760px) 92vw, 360px" alt="" width="400" height="267" loading="lazy" decoding="async">' +
     '<span class="sr-only">' + h(alt || p.alt) + '</span>' +
     '<span class="card-ph-credit">' + (mark ? 'Иллюстрация · ' : '') + 'Фото: ' + h(p.by) + ' · ' + h(p.lic) + '</span></span>';
 }
@@ -803,11 +806,13 @@ var ES_FAV = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="curre
 var ES_COMPASS = '<svg class="es-ico" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="109" height="53" rx="8" stroke-dasharray="4 6" opacity=".5"/><circle class="acc" cx="60" cy="32" r="15"/><path class="acc" d="M60 20 66 32 60 44 54 32z"/><circle cx="60" cy="32" r="1.5" fill="currentColor" stroke="none"/><path d="M60 12v4M60 50v4M40 32h-4M84 32h-4" opacity=".45"/></svg>';
 /* Карточка сферы с фотографией: фото лежит фоном, текст — поверх затемнения. */
 function sphereCard(code, href, extraClass) {
-  var img = spherePhoto(code, '800');
+  var img = spherePhoto(code, '400');
+  var img8 = spherePhoto(code, '800');
   var s = SPHERES.filter(function (x) { return x.code === code; })[0] || { name: SPHERE_DESC[code] || '', count: 0 };
-  return '<a class="sph-card' + (img ? ' has-photo' : '') + (extraClass ? ' ' + extraClass : '') + '" href="' + href + '"' +
-    (img ? ' style="--ph:url(' + img + ')"' : '') + '>' +
-    '<span class="sph-ph" aria-hidden="true"></span>' +
+  return '<a class="sph-card' + (img ? ' has-photo' : '') + (extraClass ? ' ' + extraClass : '') + '" href="' + href + '">' +
+    '<span class="sph-ph" aria-hidden="true">' + (img
+      ? '<img src="' + h(img) + '" srcset="' + h(img) + ' 400w, ' + h(img8) + ' 800w" sizes="(max-width:760px) 46vw, 360px" alt="" width="400" height="267" loading="lazy" decoding="async">'
+      : '') + '</span>' +
     '<span class="sph-body">' +
     '<span class="c">' + sphereIcon(code) + h(code) + '</span>' +
     '<span class="sph-text">' +
@@ -4275,10 +4280,9 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
-'<li><span class="mono">18 ноября 2026</span><div><b>Пять маршрутов и навыки.</b> На главной появился блок «С чего начать»: не знаю, кем быть; уже выбрал профессию; есть баллы ЕГЭ; сменить профессию; понять, какие навыки нужны. Новая страница «Навыки и смена профессии» показывает профили десяти сфер и разницу между двумя профессиями. Питомец по кнопке «?» предлагает короткий маршрут.</div></li>' +
-'<li><span class="mono">17 ноября 2026</span><div><b>Питомец стал объёмным.</b> Вместо плоского рисунка — процедурная 3D-модель: коралловый корпус, кремовая панель, живое пламя на голове и мягкий свет. Питомец перетаскивается, вращается через Shift или двумя пальцами, а PATHWAY теперь вылетает мыслью в белом облачке.</div></li>' +
-'<li><span class="mono">17 ноября 2026</span><div><b>Выбор питомца.</b> В «Ещё» появился выбор спутника: Коралл, Мята или Небо. Карточки с мягкими тенями и скруглениями, при выборе — волна, прыжок и частицы. Питомец перетаскивается, запоминает место и здоровается при открытии сайта.</div></li>' +
-'<li><span class="mono">17 ноября 2026</span><div><b>Маскот-питомец.</b> Коралловый робот живёт на всех страницах: его можно перетащить мышью или пальцем, он запоминает место, при открытии сайта здоровается и показывает на экране PATHWAY. Двойной клик возвращает его в угол, «Ещё → Скрыть маскота» убирает совсем.</div></li>' +
+'<li><span class="mono">18 ноября 2026</span><div><b>Пять маршрутов и навыки.</b> На главной появился блок «С чего начать»: не знаю, кем быть; уже выбрал профессию; есть баллы ЕГЭ; сменить профессию; понять, какие навыки нужны. Новая страница «Навыки и смена профессии» показывает профили десяти сфер и разницу между двумя профессиями. Помощник по кнопке «?» предлагает короткий маршрут.</div></li>' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Помощник стал объёмным.</b> Вместо плоского рисунка — процедурная 3D-модель: коралловый корпус, кремовая панель, живое пламя на голове и мягкий свет. Помощник перетаскивается, вращается через Shift или двумя пальцами, а PATHWAY теперь вылетает мыслью в белом облачке.</div></li>' +
+'<li><span class="mono">17 ноября 2026</span><div><b>Помощник на всех страницах.</b> Коралловый робот живёт на всех страницах: его можно перетащить мышью или пальцем, он запоминает место, при открытии сайта здоровается и показывает на экране PATHWAY. Двойной клик возвращает его в угол, «Ещё → Скрыть помощника» убирает совсем.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Показатели одной строкой.</b> Цифры атласа на главной стали крупнее и кликабельными: 47 профессий выделены акцентом, рядом — направления, вузы и города. При открытии числа набегают, при наведении подчёркиваются, а источник и дата подписаны под строкой.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Быстрый подбор и баллы.</b> На главной появилась форма: три предмета ЕГЭ и сумма — сразу к результатам, без прохождения шагов. Добавлены раздел «Баллы и шансы» с порогами по направлениям, подборки «Профессии по предметам ЕГЭ» и общий список программ с фильтрами по предмету, баллу и городу.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Кадры без повторов.</b> Карточки направлений берут кадры по кругу из своей группы, сфер и учебных сцен — на странице направлений соседи больше не дублируются. У крупных групп свои вторые и третьи сцены, у двадцати двух вузов — подтверждённые снимки корпусов.</div></li>' +
@@ -6965,6 +6969,8 @@ setTimeout(repaint, 0);
 function injectTools() {
 var actions = document.querySelector('.hdr-actions');
 if (!actions) return;
+var slot = actions.querySelector('.atlas-tools-slot');
+if (slot) slot.remove();
 var wrap = document.getElementById('atlasTools');
 if (!wrap) {
 wrap = document.createElement('div');
@@ -8586,6 +8592,7 @@ history.replaceState(null, '', '#/');
 updateChoice();
 updateFavoritesUI();
 route();
+document.documentElement.classList.remove('booting');
 /* Сборщик статических страниц переиспользует один DOM и вызывает route()
    для каждого адреса: создавать 1500 jsdom-окон подряд дорого. */
 if (window.__ATLAS_PRERENDER__) window.__atlasRoute = route;
