@@ -1,7 +1,7 @@
 /* Pathway — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v106';
+const VERSION = 'atlas-2030-v107';
 const SHELL = [
   './',
   './index.html',
@@ -266,7 +266,11 @@ self.addEventListener('install', (event) => {
       .then((cache) => cache.match('./index.html', { ignoreSearch: true })
         .then((res) => (res ? res.text() : ''))
         .then((html) => {
-          const urls = String(html).match(/(?:[\w.-]+\/)*[\w.-]+\.(?:css|js)\?v=[\w.-]+/g) || [];
+          /* Абсолютные пути в index.html начинаются с имени каталога сайта
+             (/atlas-2030/…). Для cache.put и fetch нужен путь внутри scope. */
+          const scopePath = self.location.pathname.replace(/[^/]*$/, '').replace(/^\//, '');
+          const urls = (String(html).match(/(?:[\w.-]+\/)*[\w.-]+\.(?:css|js)\?v=[\w.-]+/g) || [])
+            .map((u) => (scopePath && u.indexOf(scopePath) === 0) ? u.slice(scopePath.length) : u);
           return Promise.all([...new Set(urls)].map((u) =>
             cache.match(u).then((hit) => hit ? null :
               fetch(new Request('./' + u, { cache: 'reload' }))
