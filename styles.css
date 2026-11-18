@@ -221,6 +221,13 @@ transition:border-color .15s,color .15s,background .15s;
 .qe-field select:focus-visible,.qe-field input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.15)}
 .qe-sum{max-width:96px}
 .qe-go{height:36px;white-space:nowrap}
+.qe-wide{max-width:none;margin-top:30px}
+.qe-wide .qe-grid{grid-template-columns:repeat(3,minmax(0,1fr)) 110px auto;gap:14px}
+@media (max-width:760px){
+.qe-wide .qe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.qe-wide .qe-sum{max-width:none}
+.qe-wide .qe-go{grid-column:1/-1}
+}
 /* Показатели атласа: одна строка крупной типографики, первая цифра — акцент. */
 .hero-facts{margin-top:28px;padding-top:18px;border-top:1px solid var(--rule)}
 .hf-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin:0}
@@ -262,6 +269,33 @@ transition:border-color .15s,color .15s,background .15s;
 .mini-row:first-of-type{border-top:0}
 .mini-row a:hover{color:var(--accent)}
 .mini-row .mono{color:var(--accent);font-size:12px}
+/* Пять маршрутов на главной: строки-входы вместо общего «Порядка работы». */
+.start-card{scroll-margin-top:92px}
+.start-routes{display:grid}
+.start-group{margin:14px 0 2px;padding-top:12px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4)}
+.start-group:first-child{margin-top:0;padding-top:0;border-top:0}
+.start-group + .start-route{border-top:0}
+.start-route{display:grid;grid-template-columns:24px minmax(0,1fr) 16px;gap:10px;align-items:start;width:100%;padding:11px 0;border:0;border-top:1px solid var(--rule);background:none;color:inherit;font:inherit;text-align:left;text-decoration:none;cursor:pointer}
+.start-route:hover .start-arrow{transform:translateX(3px)}
+.start-route:hover .start-body b{color:var(--accent)}
+.start-num{padding-top:2px;font-family:var(--mono);font-size:10px;color:var(--accent)}
+.start-body{display:grid;gap:3px;min-width:0}
+.start-body b{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink);transition:color .15s}
+.start-body span{font-size:12px;line-height:1.4;color:var(--ink-3)}
+.start-arrow{padding-top:1px;font-family:var(--mono);font-size:13px;color:var(--ink-4);transition:transform .15s}
+.start-route-search{grid-template-columns:24px minmax(0,1fr)}
+.start-search{display:grid;grid-template-columns:minmax(0,1fr) 32px;gap:6px;margin-top:7px}
+.start-search input{height:34px;width:100%;min-width:0;padding:0 9px;border:1px solid var(--rule-2);border-radius:7px;background:var(--bg);color:var(--ink);font:inherit;font-size:12.5px}
+.start-search input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.14)}
+.start-search-go{display:grid;place-items:center;width:32px;height:34px;padding:0;border:1px solid var(--rule-2);border-radius:7px;background:var(--bg);color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
+.start-search-go:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+@media (max-width:760px){
+.start-route{padding:12px 0}
+.start-body b{font-size:14px}
+.start-body span{font-size:12.5px}
+.start-search input{height:40px;font-size:16px}
+.start-search-go{width:40px;height:40px}
+}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:12px;overflow:hidden;margin-top:36px}
 .stat{background:var(--bg-2);padding:20px 22px}
 .stat .v{font-family:var(--serif);font-size:clamp(30px,3.6vw,44px);font-weight:700;line-height:1;letter-spacing:-.02em}
@@ -2032,6 +2066,76 @@ html{scroll-behavior:auto}
 .panel,.sph-card,.teach-card,.search-btn,.chip,.btn{border-width:1.5px}
 }
 
+/* ---- навыки и смена профессии ---- */
+.skill-avg{margin-top:14px;padding:22px}
+.skill-avg-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 18px;margin-bottom:16px}
+.skill-avg-head p{margin:0}
+.skill-bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:12px 26px}
+.skill-bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:baseline}
+.skill-bar-n{font-size:12.5px;line-height:1.3;color:var(--ink-2)}
+.skill-bar-v{font-family:var(--mono);font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums}
+.skill-bar-track{grid-column:1/-1;height:7px;border-radius:999px;background:rgba(255,77,46,.12);overflow:hidden}
+.skill-bar-track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent-deep),var(--accent))}
+.skill-note{margin:12px 0 0;font-size:12px;line-height:1.55;color:var(--ink-4)}
+.skill-spheres{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px;margin-top:14px}
+.skill-sph{padding:18px}
+.skill-sph-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px}
+.skill-sph-head .mono{font-size:9.5px;color:var(--accent)}
+.skill-sph-head h3{margin:3px 0 0;font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.2}
+.skill-sph-head h3 a{color:var(--ink);text-decoration:none}
+.skill-sph-head h3 a:hover{color:var(--accent)}
+.skill-mini{display:grid;gap:6px}
+.skill-mini-row{display:grid;grid-template-columns:86px minmax(0,1fr) 30px;gap:8px;align-items:center}
+.skill-mini-row span{font-size:11px;line-height:1.2;color:var(--ink-3)}
+.skill-mini-track{height:5px;border-radius:999px;background:rgba(255,77,46,.12);overflow:hidden}
+.skill-mini-track i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.skill-mini-row b{font-family:var(--mono);font-size:10px;font-weight:400;text-align:right;color:var(--ink-3)}
+.skill-sph-links{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--rule);font-size:11.5px;line-height:1.5;color:var(--ink-4)}
+.skill-sph-links a{color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--rule-2);text-underline-offset:2px}
+.skill-change{scroll-margin-top:92px;margin-top:30px;padding:24px}
+.skill-change-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start;margin-bottom:18px}
+.skill-change-head .sec{margin:4px 0 0}
+.skill-pick{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:20px}
+.skill-pick .select-field{flex:1 1 220px;min-width:min(260px,100%)}
+.skill-pick-arrow{padding-bottom:10px;font-family:var(--mono);color:var(--accent)}
+.skill-gap{display:grid;gap:10px}
+.skill-empty{padding:18px;border:1px dashed var(--rule-2);border-radius:10px;color:var(--ink-3);font-size:13px;line-height:1.55}
+.gap-row{display:grid;grid-template-columns:180px minmax(0,1fr) 54px;gap:12px;align-items:center}
+.gap-name{display:grid;gap:2px}
+.gap-name b{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.gap-name span{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+.gap-tracks{display:grid;gap:4px}
+.gap-track{height:6px;border-radius:999px;background:rgba(120,110,100,.14);overflow:hidden}
+.gap-track i{display:block;height:100%;border-radius:999px;background:var(--ink-4)}
+.gap-track.tgt{background:rgba(255,77,46,.14)}
+.gap-track.tgt i{background:var(--accent)}
+.gap-delta{font-family:var(--mono);font-size:11px;text-align:right;color:var(--ink-4)}
+.gap-delta.up{color:var(--accent)}
+.gap-delta.down{color:var(--ok)}
+.gap-summary{font-size:13px;line-height:1.6;color:var(--ink-2);padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--bg-2)}
+.gap-summary b{color:var(--accent)}
+.gap-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.gap-legend{display:flex;gap:14px;font-size:11px;color:var(--ink-4);margin:2px 0}
+.gap-legend span{display:inline-flex;align-items:center;gap:6px}
+.gap-legend i{width:18px;height:5px;border-radius:999px;background:var(--ink-4)}
+.gap-legend .tgt i{background:var(--accent)}
+@media (max-width:760px){
+.skill-avg{padding:18px}
+.skill-change{padding:18px}
+.skill-change-head{grid-template-columns:1fr;gap:8px}
+.skill-pick-arrow{display:none}
+.gap-row{grid-template-columns:minmax(0,1fr) 58px;gap:6px 10px}
+.gap-tracks{grid-column:1/-1}
+.gap-delta{grid-row:1;grid-column:2}
+.skill-mini-row{grid-template-columns:78px minmax(0,1fr) 28px}
+.skills-page.change-mode .hero{padding:18px 0 16px}
+.skills-page.change-mode .hero .lead,
+.skills-page.change-mode .hero .fact-strip,
+.skills-page.change-mode .hero .hero-cta .btn:not(.btn-primary){display:none}
+.skills-page.change-mode .skill-change{margin-top:16px}
+.skills-page.change-mode .skill-change-head{margin-bottom:10px}
+.skills-page.change-mode .skill-change-head .muted{display:none}
+}
 /* ---- мобильная доводка: экраны 5.4" (320-360 px) ---- */
 .radar-bars{display:none}
 @media (max-width:760px){

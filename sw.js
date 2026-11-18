@@ -1,7 +1,7 @@
 /* Pathway — офлайн-оболочка.
    Стратегия: навигация — сеть, затем кеш index.html, затем offline.html;
    статика — stale-while-revalidate. Все данные атласа хранятся локально. */
-const VERSION = 'atlas-2030-v98';
+const VERSION = 'atlas-2030-v102';
 const SHELL = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const SHELL = [
   './regions/',
   './admission/',
   './calendar/',
+  './skills/',
   './teacher/',
   './about/',
   './methodology/',

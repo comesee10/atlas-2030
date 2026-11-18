@@ -10,6 +10,8 @@ const STORAGE_HIDDEN = 'atlas:mascot';
 
 const MICRO: PetMood[] = ['wink', 'wow', 'sparkle', 'heart'];
 
+type BubbleAlign = 'center' | 'left' | 'right';
+
 function readJson<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key);
@@ -28,6 +30,13 @@ function hasWebGL() {
   }
 }
 
+function isHome() {
+  const hash = location.hash;
+  if (hash && hash !== '#/' && hash !== '#') return false;
+  const path = location.pathname.replace(/\/+$/, '');
+  return path === '' || /\/atlas-2030$/.test(path) || /\/index\.html$/.test(path);
+}
+
 export default function Pet() {
   const reduce = useReducedMotion();
   const [hidden, setHidden] = useState<boolean>(() => {
@@ -39,11 +48,19 @@ export default function Pet() {
   });
   const [mood, setMood] = useState<PetMood>('smile');
   const [bubble, setBubble] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
+  const [home, setHome] = useState(isHome);
+  const [pathwayDone, setPathwayDone] = useState(false);
+  const [bubbleBelow, setBubbleBelow] = useState(false);
+  const [bubbleAlign, setBubbleAlign] = useState<BubbleAlign>('center');
   const [size, setSize] = useState(() =>
     typeof window !== 'undefined' && window.innerWidth <= 760 ? SIZE_MOBILE : SIZE
   );
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [webgl] = useState(hasWebGL);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const badgeRef = useRef<HTMLButtonElement | null>(null);
+  const askRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef({ active: false, id: 0, sx: 0, sy: 0, ox: 0, oy: 0, moved: false, rotate: false });
   const rafRef = useRef(0);
   const nextOffset = useRef({ x: 0, y: 0 });
@@ -52,6 +69,7 @@ export default function Pet() {
   const idleTimer = useRef<number | undefined>(undefined);
   const lastTouch = useRef(Date.now());
   const petApi = useRef<Pet3DHandle | null>(null);
+  const pathwayShown = useRef(false);
   const controls = useAnimationControls();
   const fallback = SKINS[0];
 
@@ -136,10 +154,76 @@ export default function Pet() {
 
   /* PATHWAY — один раз за открытие сайта */
   useEffect(() => {
-    if (hidden) return;
-    const t = window.setTimeout(() => showBubble(2800), 1500);
+    if (hidden || pathwayShown.current) return;
+    const t = window.setTimeout(() => {
+      pathwayShown.current = true;
+      showBubble(2800);
+    }, 1500);
     return () => window.clearTimeout(t);
   }, [hidden, showBubble]);
+
+  /* кнопка «?» появляется после мысли PATHWAY */
+  useEffect(() => {
+    const t = window.setTimeout(() => setPathwayDone(true), 4400);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  const updateBubbleSide = useCallback(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setBubbleBelow(r.top < 320);
+    setBubbleAlign(r.left < 170 ? 'left' : r.right > window.innerWidth - 170 ? 'right' : 'center');
+  }, []);
+
+  const closeAsk = useCallback((restoreFocus = true) => {
+    setAskOpen(false);
+    if (restoreFocus) {
+      window.setTimeout(() => badgeRef.current?.focus({ preventScroll: true }), 0);
+    }
+  }, []);
+
+  const openAsk = useCallback(() => {
+    setBubble(false);
+    setAskOpen(true);
+    updateBubbleSide();
+  }, [updateBubbleSide]);
+
+  useEffect(() => {
+    if (!askOpen) return;
+    updateBubbleSide();
+    const t = window.setTimeout(() => {
+      const first = askRef.current?.querySelector<HTMLElement>('.pet-ask-opts a, .pet-ask-opts button');
+      first?.focus({ preventScroll: true });
+    }, 30);
+    return () => window.clearTimeout(t);
+  }, [askOpen, updateBubbleSide]);
+
+  useEffect(() => {
+    if (!askOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeAsk();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [askOpen, closeAsk]);
+
+  useEffect(() => {
+    if (!askOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (rootRef.current && e.target instanceof Node && rootRef.current.contains(e.target)) return;
+      closeAsk(false);
+    };
+    document.addEventListener('pointerdown', onDown, true);
+    return () => document.removeEventListener('pointerdown', onDown, true);
+  }, [askOpen, closeAsk]);
+
+  useEffect(() => {
+    if (askOpen) updateBubbleSide();
+  }, [askOpen, offset, size, updateBubbleSide]);
 
   /* случайная мимика, сон при простое */
   useEffect(() => {
@@ -168,6 +252,8 @@ export default function Pet() {
   /* спавн на прежнем месте и пробежка при переходах */
   useEffect(() => {
     const onRoute = () => {
+      setHome(isHome());
+      closeAsk(false);
       if (hidden) return;
       setMood('dots');
       window.setTimeout(() => setMood('smile'), 320);
@@ -178,7 +264,7 @@ export default function Pet() {
     };
     document.addEventListener('atlas:route', onRoute as EventListener);
     return () => document.removeEventListener('atlas:route', onRoute as EventListener);
-  }, [hidden, reduce, controls]);
+  }, [hidden, reduce, controls, closeAsk]);
 
   /* меню: скрыть/показать */
   useEffect(() => {
@@ -200,7 +286,7 @@ export default function Pet() {
   }, [hidden]);
 
   const onHover = () => {
-    if (reduce || dragRef.current.active) return;
+    if (reduce || dragRef.current.active || askOpen) return;
     lastTouch.current = Date.now();
     jump();
     temporaryMood('wow', 520);
@@ -215,18 +301,31 @@ export default function Pet() {
     window.setTimeout(() => setMood('smile'), 1150);
   };
 
+  const goScores = () => {
+    setAskOpen(false);
+    document.dispatchEvent(new CustomEvent('atlas:focus-quick-ege'));
+  };
+
+  const goStart = () => {
+    setAskOpen(false);
+    const el = document.getElementById('start');
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start' });
+  };
+
   return (
     <>
       <AnimatePresence>
         {!hidden && (
           <motion.div
             key="pet"
+            ref={rootRef}
             className="pet-root"
             initial={{ opacity: 0, scale: reduce ? 0.98 : 0.86 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: reduce ? 0.98 : 0.88, transition: { duration: reduce ? 0 : 0.2 } }}
             transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 220, damping: 20, mass: 0.8 }}
             onPointerDown={(e) => {
+              if ((e.target as HTMLElement).closest('.pet-ask, .pet-badge')) return;
               if (e.button && e.button !== 0) return;
               lastTouch.current = Date.now();
               dragRef.current = {
@@ -280,6 +379,7 @@ export default function Pet() {
                 const p = clampOffset(nextOffset.current.x, nextOffset.current.y);
                 setOffset(p);
                 savePosition(p.x, p.y);
+                updateBubbleSide();
               } else if (!d.moved) {
                 onTap();
               }
@@ -290,7 +390,8 @@ export default function Pet() {
               setMood('smile');
             }}
             onHoverStart={onHover}
-            onDoubleClick={() => {
+            onDoubleClick={(e) => {
+              if ((e.target as HTMLElement).closest('.pet-ask, .pet-badge')) return;
               lastTouch.current = Date.now();
               setOffset(clampOffset(0, 0));
               savePosition(0, 0);
@@ -306,13 +407,13 @@ export default function Pet() {
               zIndex: 80,
               cursor: dragRef.current.rotate ? 'ew-resize' : 'grab'
             }}
-            role="img"
+            role="group"
             aria-label="Питомец Pathway"
           >
             <AnimatePresence>
-              {bubble && (
+              {bubble && !askOpen && (
                 <motion.div
-                  key="bubble"
+                  key="pathway"
                   className="pet-thought"
                   initial={{ opacity: 0, y: 8, scale: 0.92 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -322,8 +423,63 @@ export default function Pet() {
                   PATHWAY
                 </motion.div>
               )}
+              {askOpen && (
+                <motion.div
+                  key="ask"
+                  id="petAsk"
+                  ref={askRef}
+                  className={`pet-thought pet-ask ${bubbleAlign}${bubbleBelow ? ' below' : ''}`}
+                  role="dialog"
+                  aria-modal="false"
+                  aria-labelledby="petAskQ"
+                  initial={{ opacity: 0, y: 8, scale: 0.94 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                  transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 24 }}
+                >
+                  <button className="pet-ask-close" type="button" aria-label="Закрыть" onClick={() => closeAsk()}>
+                    ×
+                  </button>
+                  <p className="pet-ask-q" id="petAskQ">
+                    С чего начнём?
+                  </p>
+                  <div className="pet-ask-opts">
+                    <a href="#/quiz" onClick={() => setAskOpen(false)}>
+                      Не знаю, кем быть
+                    </a>
+                    <a href="#/professions" onClick={() => setAskOpen(false)}>
+                      Уже выбрал профессию
+                    </a>
+                    <button type="button" onClick={goScores}>
+                      Есть баллы ЕГЭ
+                    </button>
+                    <button type="button" className="pet-ask-all" onClick={goStart}>
+                      Все 5 маршрутов →
+                    </button>
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
-            <motion.div animate={controls} style={{ width: '100%', height: '100%' }}>
+            {home && pathwayDone && !bubble && (
+              <button
+                ref={badgeRef}
+                className="pet-badge"
+                type="button"
+                aria-label="Спросить питомца"
+                title="Спросить питомца"
+                aria-expanded={askOpen}
+                aria-controls="petAsk"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (askOpen) closeAsk();
+                  else openAsk();
+                }}
+              >
+                <span aria-hidden="true">?</span>
+              </button>
+            )}
+            <motion.div animate={controls} style={{ width: '100%', height: '100%' }} aria-hidden="true">
               {webgl ? (
                 <Pet3D ref={petApi} mood={mood} reduce={!!reduce} />
               ) : (

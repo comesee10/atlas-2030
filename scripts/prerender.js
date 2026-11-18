@@ -37,6 +37,7 @@ const SECTIONS = [
   { route: '/calendar', priority: '0.8', changefreq: 'monthly' },
   { route: '/regions', priority: '0.7', changefreq: 'monthly' },
   { route: '/scores', priority: '0.7', changefreq: 'monthly' },
+  { route: '/skills', priority: '0.7', changefreq: 'monthly' },
   { route: '/ege', priority: '0.7', changefreq: 'monthly' },
   { route: '/programs', priority: '0.7', changefreq: 'monthly' },
   { route: '/teacher', priority: '0.7', changefreq: 'monthly' },

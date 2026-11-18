@@ -1605,7 +1605,7 @@ simulator: 'Симулятор баллов',
 colleges: 'Колледжи', specialties: 'Направления', regions: 'Регионы',
 admission: 'Бюджетные места', calendar: 'Календарь приёма', favorites: 'Избранное',
 map: 'Карта', compare: 'Сравнение', about: 'О проекте', methodology: 'Методология',
-teacher: 'Учителю и родителю'
+teacher: 'Учителю и родителю', skills: 'Навыки'
 };
 function absUrl(u) {
 if (!u || u === '#/') return SITE_URL;
@@ -1616,8 +1616,8 @@ return SITE_URL + String(u).replace(/^#?\//, '').replace(/^/, '');
    настоящие URL, а не на hash. Интерактивные разделы (опросник, карта, избранное,
    сравнение) остаются на hash: у них нет смысла в отдельной статической копии. */
 var BASE = '/atlas-2030';
-var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar|simulator|scores|programs|ege)(?:\/[-a-z0-9-]+)?$/;
-var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|simulator|scores|programs|ege(?:\/[-a-z0-9-]+)?|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
+var STATIC_ROUTE = /^\/(?:professions|universities|specialties|colleges|regions|about|methodology|teacher|admission|calendar|simulator|scores|skills|programs|ege)(?:\/[-a-z0-9-]+)?$/;
+var KNOWN_ROUTE = /^\/(?:map|compare|admission|calendar|favorites|quiz|quiz-oge|simulator|scores|skills|programs|ege(?:\/[-a-z0-9-]+)?|professions(?:\/[-a-z0-9-]+)?|specialties(?:\/[-a-z0-9-]+)?|universities(?:\/[-a-z0-9-]+)?|colleges(?:\/[-a-z0-9-]+)?|regions|about|methodology|teacher)\/?(?:\?.*)?$/;
 function cleanPath(path) {
 var p = String(path == null ? '/' : path).split('?')[0];
 if (!p) p = '/';
@@ -1925,7 +1925,7 @@ setJsonLd(jsonLdFor(path, crumbs));
 /* Белый список параметров адреса: неизвестные ключи и длинные значения
    вырезаются до того, как попадут в разметку или history. */
 var QUERY_ALLOWED = ['step', 'q', 'sphere', 'sort', 'e', 'district', 'level', 'region',
-'city', 'mode', 'format', 'dorm', 'exam', 'minAvg', 's', 'b', 'mlevel', 'g', 'unis'];
+'city', 'mode', 'format', 'dorm', 'exam', 'minAvg', 's', 'b', 'mlevel', 'g', 'unis', 'tab', 'from', 'to'];
 var QUERY_VALUE_MAX = 200;
 function cleanQuery(q) {
 var drop = [];
@@ -1986,6 +1986,7 @@ var ROUTES = [
 [/^\/specialties\/([^/]+)$/, function (m) { renderDirection(safeDecode(m[1])); }],
 [/^\/regions$/, renderRegions],
 [/^\/scores$/, renderScores],
+[/^\/skills$/, renderSkills],
 [/^\/ege$/, renderEge],
 [/^\/ege\/([^/]+)$/, function (m) { renderEgeSubject(safeDecode(m[1])); }],
 [/^\/programs$/, renderPrograms],
@@ -2945,6 +2946,45 @@ function advCard(n, title, text) {
 return '<div class="panel adv-card reveal"><span class="adv-num">' + n + '</span>' +
 '<h3>' + h(title) + '</h3><p>' + h(text) + '</p></div>';
 }
+function startRouteHtml(num, title, text, href, arrow) {
+return '<a class="start-route" href="' + href + '"><span class="start-num">' + num + '</span>' +
+'<span class="start-body"><b>' + h(title) + '</b><span>' + h(text) + '</span></span>' +
+'<span class="start-arrow" aria-hidden="true">' + arrow + '</span></a>';
+}
+function startCardHtml() {
+var options = P.slice().sort(function (a, b) { return a.title.localeCompare(b.title, 'ru'); })
+.map(function (p) { return '<option value="' + h(p.title) + '"></option>'; }).join('');
+return '<p class="eyebrow">Пять маршрутов</p>' +
+'<h2>С чего начать</h2>' +
+'<div class="start-routes">' +
+'<p class="start-group">Выбираете профессию</p>' +
+startRouteHtml('01', 'Я не знаю, кем хочу быть', 'Опросник за 4 шага: предметы, сфера, баллы, программы', '#/quiz', '→') +
+'<div class="start-route start-route-search"><span class="start-num">02</span>' +
+'<div class="start-body"><b>Я уже выбрал профессию</b><span>Найдите её в атласе: вузы, ЕГЭ и баллы.</span>' +
+'<form class="start-search" id="startProfForm" novalidate>' +
+'<input id="startProfInput" list="startProfList" type="text" placeholder="Название профессии" aria-label="Название профессии" autocomplete="off" spellcheck="false">' +
+'<datalist id="startProfList">' + options + '</datalist>' +
+'<button class="start-search-go" type="submit" aria-label="Открыть профессию">→</button>' +
+'</form></div></div>' +
+'<button class="start-route" type="button" data-start="scores"><span class="start-num">03</span>' +
+'<span class="start-body"><b>У меня есть баллы ЕГЭ</b><span>Введите предметы и сумму — покажем программы.</span></span>' +
+'<span class="start-arrow" aria-hidden="true">↓</span></button>' +
+'<p class="start-group">Если вы уже работаете</p>' +
+startRouteHtml('04', 'Хочу сменить профессию', 'Сравните навыки текущей и целевой профессии', '#/skills?tab=change', '→') +
+startRouteHtml('05', 'Хочу понять, какие навыки будут востребованы', 'Профили десяти сфер и шесть навыков', '#/skills', '→') +
+'</div>';
+}
+function quickEgeHtml() {
+return '<form class="qe-form qe-wide" id="quickEge" novalidate>' +
+'<p class="qe-label">Быстрый подбор: предметы ЕГЭ и сумма баллов</p>' +
+'<div class="qe-grid">' +
+'<label class="qe-field"><span>Предмет 1</span><select name="e1">' + subjectOptions('Рус') + '</select></label>' +
+'<label class="qe-field"><span>Предмет 2</span><select name="e2">' + subjectOptions('Мат') + '</select></label>' +
+'<label class="qe-field"><span>Предмет 3</span><select name="e3">' + subjectOptions('Инф') + '</select></label>' +
+'<label class="qe-field qe-sum"><span>Сумма</span><input name="b" type="number" inputmode="numeric" min="120" max="300" step="1" value="220" aria-label="Сумма баллов за три экзамена"></label>' +
+'<button class="btn btn-primary btn-sm qe-go" type="submit">Показать программы →</button>' +
+'</div></form>';
+}
 function renderHome() {
 setTitle('Pathway — атлас востребованных профессий');
 var byIndex = P.slice().sort(function (a, b) { return b.index - a.index; });
@@ -2982,42 +3022,17 @@ U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ' и ' +
 '<p class="lead">Атлас объединяет ' + P.length + ' ' + plural(P.length, 'профессия', 'профессии', 'профессий') + ', ' +
 U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + ', ' +
 TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + ' и ' +
-C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'колледжей') + '. Ответьте на три вопроса — и увидите, какие профессии и программы подходят именно вам.</p>' +
-'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Подобрать профессию за 3 шага →</a><a class="btn" href="#/professions">Открыть каталог</a></div>') +
-'<form class="qe-form" id="quickEge" novalidate>' +
-'<p class="qe-label">Быстрый подбор: предметы ЕГЭ и сумма баллов</p>' +
-'<div class="qe-grid">' +
-'<label class="qe-field"><span>Предмет 1</span><select name="e1">' + subjectOptions('Рус') + '</select></label>' +
-'<label class="qe-field"><span>Предмет 2</span><select name="e2">' + subjectOptions('Мат') + '</select></label>' +
-'<label class="qe-field"><span>Предмет 3</span><select name="e3">' + subjectOptions('Инф') + '</select></label>' +
-'<label class="qe-field qe-sum"><span>Сумма</span><input name="b" type="number" inputmode="numeric" min="120" max="300" step="1" value="220" aria-label="Сумма баллов за три экзамена"></label>' +
-'<button class="btn btn-primary btn-sm qe-go" type="submit">Показать программы →</button>' +
-'</div></form>' +
+C.length + ' ' + plural(C.length, 'колледж', 'колледжа', 'колледжей') + '. Ответьте на четыре вопроса — и увидите, какие профессии и программы подходят именно вам.</p>' +
+'<div class="hero-cta"><a class="btn btn-primary" href="#/quiz">Подобрать профессию за 4 шага →</a><a class="btn" href="#/professions">Открыть каталог</a></div>') +
 '<div class="hero-meta">' +
 '<span>' + U.length + ' ' + plural(U.length, 'вуз', 'вуза', 'вузов') + '</span>' +
 '<span>' + TOTAL_PROGRAMS + ' ' + plural(TOTAL_PROGRAMS, 'программа', 'программы', 'программ') + '</span>' +
 '<span>' + REGIONS.length + ' ' + plural(REGIONS.length, 'регион', 'региона', 'регионов') + '</span>' +
 '<span>2027–2030</span></div>' +
 '</div>' +
-'<aside class="panel start-card">' +
-'<h2>' + (teacher ? 'Как провести занятие' : 'Порядок работы') + '</h2>' +
-'<div class="start-steps">' +
-(teacher
-? '<div class="start-step"><b>01</b><span>Выберите сферу и отметьте 2–3 профессии для сравнения.</span></div>' +
-'<div class="start-step"><b>02</b><span>Покажите классу таблицу: спрос, зарплата, предметы ЕГЭ и вузы.</span></div>' +
-'<div class="start-step"><b>03</b><span>Разберите, что проверить на сайте вуза перед подачей документов.</span></div>'
-: '<div class="start-step"><b>01</b><span>Отметьте предметы ЕГЭ, которые планируете сдавать.</span></div>' +
-'<div class="start-step"><b>02</b><span>Выберите сферу или воспользуйтесь общей подборкой.</span></div>' +
-'<div class="start-step"><b>03</b><span>Укажите ожидаемую сумму баллов и получите список программ.</span></div>') +
+'<aside class="panel start-card" id="start">' + startCardHtml() + '</aside>' +
 '</div>' +
-'<div class="start-mini"><p class="label">Наибольший спрос</p>' +
-top.slice(0, 3).map(function (p) {
-return '<div class="mini-row"><a href="#/professions/' + p.slug + '">' + h(p.title) + '</a><span class="mono">' + p.index + '</span></div>';
-}).join('') +
-'</div>' +
-'<a class="btn btn-sm" style="width:100%;margin-top:14px" href="#/quiz">Подобрать программы</a>' +
-'</aside>' +
-'</div>' +
+quickEgeHtml() +
 '</section>' +
 '<div class="hero-facts reveal">' +
 '<p class="hf-line">' +
@@ -3035,7 +3050,7 @@ teacherPanel +
 // Дата — вне .hero-home: у секции overflow:hidden, и transform reveal
 // уводил текст за границу обрезки (IntersectionObserver не срабатывал).
 '<p class="data-date reveal">Данные собраны 26 октября 2026 · проходные баллы — приёмные кампании 2024–2025 · даты кампании 2026–2027 уточняйте в вузе</p>' +
-    '<section class="sec-head reveal"><div><p class="eyebrow">Структура</p><h2 class="sec">Шесть сфер атласа</h2></div>' +
+    '<section class="sec-head reveal"><div><p class="eyebrow">Структура</p><h2 class="sec">Сферы атласа</h2></div>' +
     '<a class="sec-link" href="#/professions">Каталог профессий →</a></section>' +
     '<div class="sph-grid reveal">' + SPHERES.map(function (s) {
       return sphereCard(s.code, '#/professions?sphere=' + s.code);
@@ -3094,7 +3109,45 @@ advCard('06', 'Сравнение и печатный отчёт', 'До трё�
 '</div>';
 renderPlot();
 bindQuickEge();
+bindStartCard();
 animateFacts();
+}
+function focusQuickEge() {
+var form = document.getElementById('quickEge');
+if (!form) return;
+form.scrollIntoView({ block: 'center', behavior: 'auto' });
+var input = form.elements.b;
+if (input && input.focus) {
+try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
+}
+}
+document.addEventListener('atlas:focus-quick-ege', focusQuickEge);
+function bindStartCard() {
+var start = document.getElementById('start');
+if (!start) return;
+var profForm = document.getElementById('startProfForm');
+if (profForm) {
+profForm.addEventListener('submit', function (e) {
+e.preventDefault();
+var input = document.getElementById('startProfInput');
+if (!input) return;
+var value = input.value.trim();
+if (!value) { input.focus(); return; }
+var query = norm(value);
+var hit = null;
+for (var i = 0; i < P.length; i++) {
+if (norm(P[i].title) === query || P[i].slug === query) { hit = P[i]; break; }
+}
+if (!hit) {
+var matches = P.filter(function (p) { return norm(p.title).indexOf(query) >= 0; });
+if (matches.length === 1) hit = matches[0];
+}
+if (hit) location.hash = '#/professions/' + hit.slug;
+else location.hash = '#/professions?q=' + encodeURIComponent(value);
+});
+}
+var score = start.querySelector('[data-start="scores"]');
+if (score) score.addEventListener('click', focusQuickEge);
 }
 function bindQuickEge() {
 var form = document.getElementById('quickEge');
@@ -4222,6 +4275,7 @@ return '<tr><th scope="row">' + h(r[0]) + '</th>' +
 '<div class="photo-credits reveal">' + photoCreditsHtml() + '</div>' +
 '<section class="sec-head reveal"><div><p class="eyebrow">Обновления</p><h2 class="sec">Что нового в атласе</h2></div></section>' +
 '<ul class="changelog reveal">' +
+'<li><span class="mono">18 ноября 2026</span><div><b>Пять маршрутов и навыки.</b> На главной появился блок «С чего начать»: не знаю, кем быть; уже выбрал профессию; есть баллы ЕГЭ; сменить профессию; понять, какие навыки нужны. Новая страница «Навыки и смена профессии» показывает профили десяти сфер и разницу между двумя профессиями. Питомец по кнопке «?» предлагает короткий маршрут.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Питомец стал объёмным.</b> Вместо плоского рисунка — процедурная 3D-модель: коралловый корпус, кремовая панель, живое пламя на голове и мягкий свет. Питомец перетаскивается, вращается через Shift или двумя пальцами, а PATHWAY теперь вылетает мыслью в белом облачке.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Выбор питомца.</b> В «Ещё» появился выбор спутника: Коралл, Мята или Небо. Карточки с мягкими тенями и скруглениями, при выборе — волна, прыжок и частицы. Питомец перетаскивается, запоминает место и здоровается при открытии сайта.</div></li>' +
 '<li><span class="mono">17 ноября 2026</span><div><b>Маскот-питомец.</b> Коралловый робот живёт на всех страницах: его можно перетащить мышью или пальцем, он запоминает место, при открытии сайта здоровается и показывает на экране PATHWAY. Двойной клик возвращает его в угол, «Ещё → Скрыть маскота» убирает совсем.</div></li>' +
@@ -4264,7 +4318,9 @@ photoHero('methodology') +
 'Баллы приведены к приёмным кампаниям 2024–2025 годов и служат ориентиром: реальные значения меняются ежегодно, ' +
 'а даты кампании 2026–2027 нужно уточнять на сайте вуза или колледжа.</p>' +
 '<p class="muted" style="margin-top:10px">Карта России построена по открытым геоданным и в равновеликой конической проекции Альберса; ' +
-'координаты городов приведены к десятым долям градуса. Фотографии сфер — Wikimedia Commons, автор и лицензия указаны под каждым снимком.</p></div>' +
+'координаты городов приведены к десятым долям градуса. Фотографии сфер — Wikimedia Commons, автор и лицензия указаны под каждым снимком.</p>' +
+'<p class="muted" style="margin-top:10px">Профиль по шести навыкам — оценка атласа: сфера деятельности и наборы ЕГЭ программ. ' +
+'Это не тест способностей, не рейтинг работодателей и не гарантия востребованности; для смены профессии в атласе нет программ переподготовки.</p></div>' +
 '</div>';
 rewriteLinks(document.getElementById('prose'));
 var prose = document.getElementById('prose');
@@ -4697,15 +4753,28 @@ encodeURIComponent(title) + '">Все программы по профессии
 sec.appendChild(more);
 }
 var RADAR_AXES = [
-{ k: 'math', name: 'Математика' },
-{ k: 'tech', name: 'Техника' },
-{ k: 'people', name: 'Люди и общение' },
-{ k: 'create', name: 'Творчество' },
-{ k: 'research', name: 'Исследования' },
-{ k: 'duty', name: 'Ответственность' }
+{ k: 'math', name: 'Математика', short: 'Математика' },
+{ k: 'tech', name: 'Техника', short: 'Техника' },
+{ k: 'people', name: 'Люди и общение', short: 'Люди' },
+{ k: 'create', name: 'Творчество', short: 'Творчество' },
+{ k: 'research', name: 'Исследования', short: 'Исследования' },
+{ k: 'duty', name: 'Ответственность', short: 'Ответственность' }
 ];
-/* Профиль профессии по шести навыкам: часть значений берётся из набора
-   ЕГЭ программ, часть — из сферы. Это ориентир атласа, а не тест. */
+/* Оценка атласа: профиль сферы по шести навыкам. Для D-07–D-10 значения
+   добавлены вручную, иначе у педагогики, дизайна, транспорта и агро все
+   навыки получались одинаковыми. Это не тест и не рейтинг работодателей. */
+var RADAR_BASE = {
+'D-01': [0.85, 0.9, 0.45, 0.7, 0.75, 0.6],
+'D-02': [0.6, 0.95, 0.4, 0.4, 0.55, 0.75],
+'D-03': [0.65, 0.5, 0.9, 0.45, 0.85, 0.9],
+'D-04': [0.7, 0.85, 0.4, 0.45, 0.8, 0.8],
+'D-05': [0.55, 0.35, 0.9, 0.5, 0.5, 0.85],
+'D-06': [0.4, 0.4, 0.6, 0.9, 0.5, 0.6],
+'D-07': [0.35, 0.35, 0.95, 0.6, 0.7, 0.9],
+'D-08': [0.5, 0.65, 0.65, 0.95, 0.6, 0.65],
+'D-09': [0.7, 0.75, 0.55, 0.35, 0.55, 0.85],
+'D-10': [0.55, 0.65, 0.5, 0.4, 0.7, 0.8]
+};
 function radarValues(p) {
 var progs = PROG[p.slug] || [];
 var n = progs.length || 1;
@@ -4715,18 +4784,29 @@ var e = norm(pr.ege || '');
 if (e.indexOf('мат') >= 0) math++;
 if (e.indexOf('физ') >= 0 || e.indexOf('инф') >= 0) tech++;
 });
-var base = {
-'D-01': [0.85, 0.9, 0.45, 0.7, 0.75, 0.6],
-'D-02': [0.6, 0.95, 0.4, 0.4, 0.55, 0.75],
-'D-03': [0.65, 0.5, 0.9, 0.45, 0.85, 0.9],
-'D-04': [0.7, 0.85, 0.4, 0.45, 0.8, 0.8],
-'D-05': [0.55, 0.35, 0.9, 0.5, 0.5, 0.85],
-'D-06': [0.4, 0.4, 0.6, 0.9, 0.5, 0.6]
-}[p.sphereCode] || [0.6, 0.6, 0.6, 0.6, 0.6, 0.6];
+var base = RADAR_BASE[p.sphereCode] || [0.6, 0.6, 0.6, 0.6, 0.6, 0.6];
 var v = base.slice();
 v[0] = Math.max(v[0], math / n);
 v[1] = Math.min(1, v[1] + (tech / n) * 0.2);
 return v.map(function (x) { return Math.round(x * 100); });
+}
+function sphereRadarValues(code) {
+var list = P.filter(function (p) { return p.sphereCode === code; });
+if (!list.length) return [0, 0, 0, 0, 0, 0];
+var sums = [0, 0, 0, 0, 0, 0];
+list.forEach(function (p) {
+var v = radarValues(p);
+for (var i = 0; i < 6; i++) sums[i] += v[i];
+});
+return sums.map(function (x) { return Math.round(x / list.length); });
+}
+function averageRadarValues() {
+var sums = [0, 0, 0, 0, 0, 0];
+P.forEach(function (p) {
+var v = radarValues(p);
+for (var i = 0; i < 6; i++) sums[i] += v[i];
+});
+return sums.map(function (x) { return Math.round(x / P.length); });
 }
 function radarSection(p) {
 var vals = radarValues(p);
@@ -5265,6 +5345,145 @@ scoreTable(maxSort.slice(0, 10), 'Направления с высоким ср�
 '<p class="source-note">Баллы — сумма трёх экзаменов ЕГЭ по данным приёмных кампаний 2024–2025 годов. ' +
 'Актуальные значения публикует приёмная комиссия вуза; сравнивайте с запасом.</p>' +
 '</div>';
+}
+/* ---------- навыки и смена профессии ---------- */
+function skillBarHtml(name, value) {
+return '<div class="skill-bar"><span class="skill-bar-n">' + h(name) + '</span>' +
+'<span class="skill-bar-v">' + value + '</span>' +
+'<span class="skill-bar-track"><i style="width:' + value + '%"></i></span></div>';
+}
+function skillSphereCard(s) {
+var vals = sphereRadarValues(s.code);
+var tops = P.filter(function (p) { return p.sphereCode === s.code; })
+.sort(function (a, b) { return b.index - a.index || a.title.localeCompare(b.title, 'ru'); })
+.slice(0, 2);
+var links = tops.map(function (p) {
+return '<a href="#/professions/' + h(p.slug) + '">' + h(p.title) + '</a>';
+}).join(' · ');
+return '<article class="panel skill-sph reveal">' +
+'<header class="skill-sph-head"><div><span class="mono">' + h(s.code) + '</span>' +
+'<h3><a href="#/professions?sphere=' + h(s.code) + '">' + h(s.name) + '</a></h3></div>' +
+'<span class="mono">' + s.count + ' ' + plural(s.count, 'профессия', 'профессии', 'профессий') + '</span></header>' +
+'<div class="skill-mini">' + RADAR_AXES.map(function (a, i) {
+return '<div class="skill-mini-row"><span>' + h(a.short || a.name) + '</span>' +
+'<span class="skill-mini-track"><i style="width:' + vals[i] + '%"></i></span>' +
+'<b>' + vals[i] + '</b></div>';
+}).join('') + '</div>' +
+'<p class="skill-sph-links">Примеры: ' + links + '</p></article>';
+}
+function skillProfOptions(selected) {
+var out = '<option value="">Выберите профессию</option>';
+SPHERES.forEach(function (s) {
+var list = P.filter(function (p) { return p.sphereCode === s.code; })
+.sort(function (a, b) { return a.title.localeCompare(b.title, 'ru'); });
+if (!list.length) return;
+out += '<optgroup label="' + h(s.code + ' · ' + s.name) + '">' +
+list.map(function (p) {
+return '<option value="' + h(p.slug) + '"' + (p.slug === selected ? ' selected' : '') + '>' + h(p.title) + '</option>';
+}).join('') + '</optgroup>';
+});
+return out;
+}
+function skillGapHtml(fromSlug, toSlug) {
+var from = PROF_BY_SLUG[fromSlug] || null;
+var to = PROF_BY_SLUG[toSlug] || null;
+if (!from || !to) {
+return '<p class="skill-empty">Выберите две профессии — покажем, чем отличаются их профили по шести навыкам. Это разница профессий, а не оценка ваших личных навыков.</p>';
+}
+if (from.slug === to.slug) {
+return '<p class="skill-empty">Выберите две разные профессии — например, текущую и желаемую.</p>';
+}
+var cur = radarValues(from);
+var tgt = radarValues(to);
+var diffs = RADAR_AXES.map(function (a, i) {
+return { name: a.name, short: a.short || a.name, cur: cur[i], tgt: tgt[i], d: tgt[i] - cur[i] };
+});
+var avg = Math.round(diffs.reduce(function (sum, d) { return sum + Math.abs(d.d); }, 0) / diffs.length);
+var top = diffs.slice().sort(function (a, b) { return Math.abs(b.d) - Math.abs(a.d) || b.d - a.d; }).slice(0, 3);
+var parts = top.map(function (d) {
+var sign = d.d > 0 ? '+' : (d.d < 0 ? '−' : '');
+return h(d.short) + ' ' + sign + (d.d === 0 ? '0' : Math.abs(d.d));
+});
+var rows = diffs.map(function (d) {
+var sign = d.d > 0 ? '+' : (d.d < 0 ? '−' : '');
+var cls = d.d > 0 ? ' up' : (d.d < 0 ? ' down' : '');
+return '<div class="gap-row">' +
+'<div class="gap-name"><b>' + h(d.name) + '</b><span>' + d.cur + ' → ' + d.tgt + '</span></div>' +
+'<div class="gap-tracks"><span class="gap-track cur"><i style="width:' + d.cur + '%"></i></span>' +
+'<span class="gap-track tgt"><i style="width:' + d.tgt + '%"></i></span></div>' +
+'<span class="gap-delta' + cls + '">' + sign + (d.d === 0 ? '0' : Math.abs(d.d)) + '</span></div>';
+}).join('');
+return '<div class="gap-summary"><b>' + h(from.title) + '</b> → <b>' + h(to.title) + '</b>. ' +
+'Средняя разница — ' + avg + ' ' + plural(avg, 'пункт', 'пункта', 'пунктов') + ' из 100. ' +
+'Сильнее всего отличаются: ' + parts.join(', ') + '.</div>' +
+'<div class="gap-legend"><span><i></i> сейчас</span><span class="tgt"><i></i> цель</span></div>' + rows +
+'<div class="gap-actions"><a class="btn btn-sm btn-primary" href="#/professions/' + h(to.slug) + '">Открыть профессию →</a>' +
+'<a class="btn btn-sm" href="#/compare">Сравнить спрос и зарплату</a></div>';
+}
+function skillChangeHtml(from, to) {
+return '<section class="panel skill-change reveal" id="skillChange" aria-labelledby="skillChangeTitle">' +
+'<div class="skill-change-head"><div><p class="eyebrow">Смена профессии</p><h2 class="sec" id="skillChangeTitle">Что отличается</h2></div>' +
+'<p class="muted">Сравните профили текущей и целевой профессии. Это разница между типичными профилями, а не оценка ваших личных навыков и не рекомендация сменить работу.</p></div>' +
+'<div class="skill-pick"><label class="select-field"><span class="label">Сейчас</span><select id="skillFrom" aria-label="Текущая профессия">' + skillProfOptions(from) + '</select></label>' +
+'<span class="skill-pick-arrow" aria-hidden="true">→</span>' +
+'<label class="select-field"><span class="label">Хочу</span><select id="skillTo" aria-label="Целевая профессия">' + skillProfOptions(to) + '</select></label>' +
+'<a class="btn btn-sm" href="#/compare">Сравнить спрос и зарплату</a></div>' +
+'<div id="skillGap" class="skill-gap" role="status" aria-live="polite">' + skillGapHtml(from, to) + '</div>' +
+'<p class="skill-note">Это разница профилей профессий, а не оценка ваших личных навыков. Программ переподготовки в атласе нет: здесь только профессии, навыки и вузовские программы. Условия второго высшего и курсов уточняйте на сайте вуза.</p></section>';
+}
+function renderSkills(m, q) {
+var tab = q.get('tab') === 'change' ? 'change' : '';
+var changeMode = tab === 'change';
+var fromKey = q.get('from') || '';
+var toKey = q.get('to') || '';
+var from = Object.prototype.hasOwnProperty.call(PROF_BY_SLUG, fromKey) ? fromKey : '';
+var to = Object.prototype.hasOwnProperty.call(PROF_BY_SLUG, toKey) ? toKey : '';
+var avg = averageRadarValues();
+var avgBlock = '<section class="sec-head reveal"><div><p class="eyebrow">Средний профиль</p><h2 class="sec">Шесть навыков в атласе</h2></div>' +
+'<a class="sec-link" href="#/methodology">Как считается →</a></section>' +
+'<div class="panel skill-avg reveal"><div class="skill-avg-head"><p class="label">Среднее по ' + P.length + ' профессиям</p>' +
+'<p class="muted tiny">оценка атласа · не тест и не рейтинг работодателей</p></div>' +
+'<div class="skill-bars">' + RADAR_AXES.map(function (a, i) { return skillBarHtml(a.name, avg[i]); }).join('') + '</div>' +
+'<p class="skill-note">Средние значения сдвинуты к математике и технике: в атласе много ИТ и инженерных профессий. Поэтому ниже — профили сфер: разница между ними важнее общего среднего.</p></div>';
+var spheresBlock = '<section class="sec-head reveal"><div><p class="eyebrow">Сферы</p><h2 class="sec">Профиль зависит от сферы</h2></div>' +
+'<a class="sec-link" href="#/professions">Все профессии →</a></section>' +
+'<p class="muted" style="max-width:70ch;margin-top:-6px">Шесть навыков: математика, техника, люди и общение, творчество, исследования, ответственность. Значения — оценка атласа по сфере и наборам ЕГЭ программ.</p>' +
+'<div class="skill-spheres">' + SPHERES.map(skillSphereCard).join('') + '</div>';
+var changeBlock = skillChangeHtml(from, to);
+var main = changeMode ? changeBlock + avgBlock + spheresBlock : avgBlock + spheresBlock + changeBlock;
+setTitle('Навыки и смена профессии — Pathway');
+app.innerHTML = '<div class="view skills-page' + (changeMode ? ' change-mode' : '') + '">' +
+'<section class="hero" style="padding:44px 0 28px">' +
+'<p class="eyebrow">Раздел · Навыки</p>' +
+'<h1 class="display" style="font-size:clamp(30px,4.6vw,50px)">Навыки, которые нужны <em>профессиям</em></h1>' +
+'<p class="lead">Единого набора нет: в ИТ сильнее математика и техника, в медицине — люди и ответственность, в дизайне — творчество. Ниже — профили десяти сфер по шести навыкам и сравнение двух профессий.</p>' +
+'<div class="hero-cta">' + (changeMode
+? '<a class="btn btn-primary" href="#/skills">Профили сфер →</a>'
+: '<a class="btn btn-primary" href="#/skills?tab=change">Сравнить две профессии →</a>') +
+'<a class="btn" href="#/professions">Каталог профессий</a></div>' +
+'<div class="fact-strip reveal">' +
+'<div><span class="k">Навыков</span><span class="v">6</span></div>' +
+'<div><span class="k">Профессий</span><span class="v">' + P.length + '</span></div>' +
+'<div><span class="k">Сфер</span><span class="v">' + SPHERES.length + '</span></div>' +
+'<div><span class="k">Профиль</span><span class="v">оценка атласа</span></div>' +
+'</div></section>' + main +
+'<p class="source-note">Профиль навыков — оценка атласа: сфера деятельности и наборы ЕГЭ программ. Это не тест способностей и не гарантия востребованности. <a href="#/methodology">Методика и границы данных</a>.</p>' +
+'</div>';
+var fromEl = document.getElementById('skillFrom');
+var toEl = document.getElementById('skillTo');
+var gapEl = document.getElementById('skillGap');
+if (fromEl && toEl && gapEl) {
+var paint = function () {
+gapEl.innerHTML = skillGapHtml(fromEl.value, toEl.value);
+var p = new URLSearchParams();
+p.set('tab', 'change');
+if (fromEl.value) p.set('from', fromEl.value);
+if (toEl.value) p.set('to', toEl.value);
+syncUrl('/skills', p);
+};
+fromEl.addEventListener('change', paint);
+toEl.addEventListener('change', paint);
+}
 }
 function renderEge() {
 setTitle('Профессии и направления по предметам ЕГЭ — Pathway');
