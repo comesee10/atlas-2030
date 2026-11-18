@@ -3,10 +3,12 @@ import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 
 import Pet3D, { type Pet3DHandle, type PetMood } from './Pet3D';
 import { PetArt, SKINS } from './PetArt';
 
-const SIZE = { w: 150, h: 183 };
-const SIZE_MOBILE = { w: 104, h: 127 };
+const SIZE = { w: 190, h: 232 };
+const SIZE_MOBILE = { w: 132, h: 161 };
 const STORAGE_POS = 'atlas:mascot-pos';
 const STORAGE_HIDDEN = 'atlas:mascot';
+
+const MICRO: PetMood[] = ['wink', 'wow', 'sparkle', 'heart'];
 
 function readJson<T>(key: string): T | null {
   try {
@@ -47,6 +49,8 @@ export default function Pet() {
   const nextOffset = useRef({ x: 0, y: 0 });
   const moodTimer = useRef<number | undefined>(undefined);
   const bubbleTimer = useRef<number | undefined>(undefined);
+  const idleTimer = useRef<number | undefined>(undefined);
+  const lastTouch = useRef(Date.now());
   const petApi = useRef<Pet3DHandle | null>(null);
   const controls = useAnimationControls();
   const fallback = SKINS[0];
@@ -92,10 +96,10 @@ export default function Pet() {
     return () => window.removeEventListener('resize', onResize);
   }, [clampOffset]);
 
-  const showBubble = useCallback(() => {
+  const showBubble = useCallback((ms = 2600) => {
     setBubble(true);
     window.clearTimeout(bubbleTimer.current);
-    bubbleTimer.current = window.setTimeout(() => setBubble(false), 2200);
+    bubbleTimer.current = window.setTimeout(() => setBubble(false), ms);
   }, []);
 
   const temporaryMood = useCallback((next: PetMood, ms: number) => {
@@ -107,10 +111,10 @@ export default function Pet() {
   const jump = useCallback(() => {
     if (reduce) return;
     controls.start({
-      y: [0, -10, 0],
-      scaleY: [1, 0.96, 1],
-      scaleX: [1, 1.03, 1],
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+      y: [0, -8, 0],
+      scaleY: [1, 0.97, 1],
+      scaleX: [1, 1.02, 1],
+      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
     });
     petApi.current?.kick();
   }, [controls, reduce]);
@@ -130,27 +134,56 @@ export default function Pet() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* спавн на прежнем месте при переходах */
+  /* PATHWAY — один раз за открытие сайта */
+  useEffect(() => {
+    if (hidden) return;
+    const t = window.setTimeout(() => showBubble(2800), 1500);
+    return () => window.clearTimeout(t);
+  }, [hidden, showBubble]);
+
+  /* случайная мимика, сон при простое */
+  useEffect(() => {
+    if (hidden || reduce) return;
+    const loop = () => {
+      idleTimer.current = window.setTimeout(() => {
+        const idle = Date.now() - lastTouch.current;
+        if (document.hidden || dragRef.current.active) {
+          loop();
+          return;
+        }
+        if (idle > 60000) {
+          setMood('sleep');
+          window.setTimeout(() => setMood('smile'), 2400);
+        } else if (mood === 'smile') {
+          const pick = MICRO[Math.floor(Math.random() * MICRO.length)];
+          temporaryMood(pick, 1100);
+        }
+        loop();
+      }, 9000 + Math.random() * 7000);
+    };
+    loop();
+    return () => window.clearTimeout(idleTimer.current);
+  }, [hidden, reduce, mood, temporaryMood]);
+
+  /* спавн на прежнем месте и пробежка при переходах */
   useEffect(() => {
     const onRoute = () => {
       if (hidden) return;
       setMood('dots');
-      window.setTimeout(() => setMood('smile'), 300);
+      window.setTimeout(() => setMood('smile'), 320);
+      petApi.current?.run();
       if (!reduce) {
-        controls.start({ scale: [0.96, 1], transition: { type: 'spring', stiffness: 300, damping: 20 } });
+        controls.start({ scale: [0.98, 1], transition: { type: 'spring', stiffness: 300, damping: 20 } });
       }
     };
     document.addEventListener('atlas:route', onRoute as EventListener);
     return () => document.removeEventListener('atlas:route', onRoute as EventListener);
   }, [hidden, reduce, controls]);
 
-  /* меню: только скрыть/показать */
+  /* меню: скрыть/показать */
   useEffect(() => {
     const hideBtn = document.getElementById('mascotHide');
-    const sync = () => {
-      if (hideBtn) hideBtn.textContent = hidden ? 'Показать питомца' : 'Скрыть питомца';
-    };
-    sync();
+    if (hideBtn) hideBtn.textContent = hidden ? 'Показать питомца' : 'Скрыть питомца';
     const onClick = () => {
       setHidden((prev) => {
         const next = !prev;
@@ -168,16 +201,18 @@ export default function Pet() {
 
   const onHover = () => {
     if (reduce || dragRef.current.active) return;
+    lastTouch.current = Date.now();
     jump();
-    showBubble();
-    temporaryMood('q', 500);
+    temporaryMood('wow', 520);
   };
 
   const onTap = () => {
     if (reduce) return;
-    jump();
-    temporaryMood('joy', 950);
-    showBubble();
+    lastTouch.current = Date.now();
+    petApi.current?.run();
+    setMood('eq');
+    window.setTimeout(() => setMood('joy'), 700);
+    window.setTimeout(() => setMood('smile'), 1150);
   };
 
   return (
@@ -193,6 +228,7 @@ export default function Pet() {
             transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 220, damping: 20, mass: 0.8 }}
             onPointerDown={(e) => {
               if (e.button && e.button !== 0) return;
+              lastTouch.current = Date.now();
               dragRef.current = {
                 active: true,
                 id: e.pointerId,
@@ -214,6 +250,7 @@ export default function Pet() {
             onPointerMove={(e) => {
               const d = dragRef.current;
               if (!d.active || e.pointerId !== d.id) return;
+              lastTouch.current = Date.now();
               const dx = e.clientX - d.sx;
               const dy = e.clientY - d.sy;
               if (Math.abs(dx) > 4 || Math.abs(dy) > 4) d.moved = true;
@@ -254,7 +291,7 @@ export default function Pet() {
             }}
             onHoverStart={onHover}
             onDoubleClick={() => {
-              const pad = window.innerWidth <= 760 ? 70 : 24;
+              lastTouch.current = Date.now();
               setOffset(clampOffset(0, 0));
               savePosition(0, 0);
               setMood('smile');
@@ -290,7 +327,7 @@ export default function Pet() {
               {webgl ? (
                 <Pet3D ref={petApi} mood={mood} reduce={!!reduce} />
               ) : (
-                <PetArt skin={fallback} mood={mood} className="pet-svg" />
+                <PetArt skin={fallback} mood="smile" className="pet-svg" />
               )}
             </motion.div>
           </motion.div>

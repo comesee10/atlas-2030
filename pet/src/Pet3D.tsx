@@ -23,11 +23,12 @@ import {
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
-export type PetMood = 'smile' | 'joy' | 'dots' | 'heart' | 'q' | 'eq';
+export type PetMood = 'smile' | 'joy' | 'wink' | 'wow' | 'heart' | 'dots' | 'eq' | 'sparkle' | 'sleep';
 
 export type Pet3DHandle = {
   rotate: (dx: number, dy: number) => void;
   kick: () => void;
+  run: () => void;
 };
 
 const CORAL = 0xff4d2e;
@@ -41,94 +42,140 @@ function drawFace(canvas: HTMLCanvasElement, mood: PetMood) {
   if (!ctx) return;
   const W = canvas.width;
   const H = canvas.height;
+  const ink = '#241a16';
+  const light = '#fff6ee';
   ctx.clearRect(0, 0, W, H);
-  const eyeY = H * 0.44;
-  const lx = W * 0.32;
-  const rx = W * 0.68;
-  const ink = '#1d1613';
-  ctx.fillStyle = '#fff8f3';
-  ctx.strokeStyle = ink;
   ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
-  if (mood === 'joy') {
-    ctx.strokeStyle = '#fff8f3';
-    ctx.lineWidth = H * 0.035;
-    ctx.beginPath();
-    ctx.arc(lx, eyeY + H * 0.02, W * 0.06, Math.PI * 1.15, Math.PI * 1.85);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(rx, eyeY + H * 0.02, W * 0.06, Math.PI * 1.15, Math.PI * 1.85);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(W / 2, H * 0.63, W * 0.05, 0.15 * Math.PI, 0.85 * Math.PI);
-    ctx.stroke();
-  } else if (mood === 'heart') {
-    const drawHeart = (x: number, y: number, s: number) => {
-      ctx.beginPath();
-      ctx.moveTo(x, y + s * 0.25);
-      ctx.bezierCurveTo(x, y - s * 0.1, x - s * 0.45, y - s * 0.1, x - s * 0.45, y + s * 0.22);
-      ctx.bezierCurveTo(x - s * 0.45, y + s * 0.5, x, y + s * 0.7, x, y + s * 0.9);
-      ctx.bezierCurveTo(x, y + s * 0.7, x + s * 0.45, y + s * 0.5, x + s * 0.45, y + s * 0.22);
-      ctx.bezierCurveTo(x + s * 0.45, y - s * 0.1, x, y - s * 0.1, x, y + s * 0.25);
-      ctx.fill();
-    };
-    ctx.fillStyle = '#ff8a72';
-    drawHeart(W / 2, H * 0.36, H * 0.3);
-  } else if (mood === 'dots') {
-    ctx.fillStyle = '#ffe0d6';
-    [0.42, 0.5, 0.58].forEach((k, i) => {
-      ctx.beginPath();
-      ctx.arc(W * k, H * 0.52 + (i === 1 ? -H * 0.03 : 0), W * 0.024, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  } else if (mood === 'q') {
-    ctx.fillStyle = '#ffe0d6';
-    ctx.font = `700 ${Math.round(H * 0.5)}px "Onest", system-ui, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('?', W / 2, H * 0.5);
-  } else if (mood === 'eq') {
-    const bars = [0.55, 0.8, 0.65, 0.95, 0.7];
-    ctx.fillStyle = '#ffe0d6';
-    bars.forEach((h, i) => {
-      const bw = W * 0.035;
-      ctx.fillRect(W * (0.4 + i * 0.05), H * 0.62 - H * 0.28 * h, bw, H * 0.28 * h);
-    });
-  } else {
-    // улыбка
-    ctx.fillStyle = '#fff8f3';
-    ctx.beginPath();
-    ctx.ellipse(lx, eyeY, W * 0.07, H * 0.1, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(rx, eyeY, W * 0.07, H * 0.1, 0, 0, Math.PI * 2);
-    ctx.fill();
+  const lx = W * 0.36;
+  const rx = W * 0.64;
+  const ey = H * 0.46;
+
+  const dot = (x: number, y: number, k = 1) => {
     ctx.fillStyle = ink;
     ctx.beginPath();
-    ctx.ellipse(lx, eyeY + H * 0.014, W * 0.031, H * 0.045, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y, W * 0.022 * k, H * 0.034 * k, 0, 0, Math.PI * 2);
     ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
     ctx.beginPath();
-    ctx.ellipse(rx, eyeY + H * 0.014, W * 0.031, H * 0.045, 0, 0, Math.PI * 2);
+    ctx.arc(x - W * 0.006 * k, y - H * 0.012 * k, W * 0.006 * k, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#ffffff';
+  };
+  const arcEye = (x: number, y: number, up = true) => {
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = H * 0.026;
     ctx.beginPath();
-    ctx.arc(lx - W * 0.018, eyeY - H * 0.03, W * 0.013, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(rx - W * 0.018, eyeY - H * 0.03, W * 0.013, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,138,114,.55)';
-    ctx.beginPath();
-    ctx.ellipse(W * 0.19, H * 0.61, W * 0.05, H * 0.03, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(W * 0.81, H * 0.61, W * 0.05, H * 0.03, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#3a211b';
-    ctx.lineWidth = H * 0.022;
-    ctx.beginPath();
-    ctx.arc(W / 2, H * 0.6, W * 0.052, 0.2 * Math.PI, 0.8 * Math.PI);
+    ctx.arc(x, y + (up ? H * 0.015 : -H * 0.01), W * 0.045, up ? Math.PI * 1.15 : Math.PI * 0.15, up ? Math.PI * 1.85 : Math.PI * 0.85);
     ctx.stroke();
+  };
+  const blush = () => {
+    ctx.fillStyle = 'rgba(255,138,114,.5)';
+    ctx.beginPath();
+    ctx.ellipse(W * 0.24, H * 0.62, W * 0.042, H * 0.024, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(W * 0.76, H * 0.62, W * 0.042, H * 0.024, 0, 0, Math.PI * 2);
+    ctx.fill();
+  };
+  const mouth = (wide = 1) => {
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = H * 0.018;
+    ctx.beginPath();
+    ctx.arc(W / 2, H * 0.6, W * 0.034 * wide, 0.18 * Math.PI, 0.82 * Math.PI);
+    ctx.stroke();
+  };
+
+  if (mood === 'joy') {
+    arcEye(lx, ey, true);
+    arcEye(rx, ey, true);
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = H * 0.02;
+    ctx.beginPath();
+    ctx.arc(W / 2, H * 0.59, W * 0.05, 0.12 * Math.PI, 0.88 * Math.PI);
+    ctx.stroke();
+    blush();
+  } else if (mood === 'wink') {
+    dot(lx, ey, 1);
+    arcEye(rx, ey, true);
+    mouth(0.9);
+    blush();
+  } else if (mood === 'wow') {
+    ctx.fillStyle = ink;
+    ctx.beginPath();
+    ctx.ellipse(lx, ey, W * 0.03, H * 0.046, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(rx, ey, W * 0.03, H * 0.046, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.beginPath();
+    ctx.arc(lx - W * 0.008, ey - H * 0.016, W * 0.008, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(rx - W * 0.008, ey - H * 0.016, W * 0.008, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(W / 2, H * 0.63, W * 0.016, H * 0.02, 0, 0, Math.PI * 2);
+    ctx.fill();
+    blush();
+  } else if (mood === 'sparkle') {
+    const star = (x: number, y: number, r: number) => {
+      ctx.fillStyle = ink;
+      ctx.beginPath();
+      ctx.moveTo(x, y - r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.quadraticCurveTo(x, y, x, y + r);
+      ctx.quadraticCurveTo(x, y, x - r, y);
+      ctx.quadraticCurveTo(x, y, x, y - r);
+      ctx.fill();
+    };
+    star(lx, ey, W * 0.036);
+    star(rx, ey, W * 0.036);
+    mouth(0.8);
+    blush();
+  } else if (mood === 'heart') {
+    const heart = (x: number, y: number, s: number) => {
+      ctx.fillStyle = ink;
+      ctx.beginPath();
+      ctx.moveTo(x, y + s * 0.2);
+      ctx.bezierCurveTo(x, y - s * 0.15, x - s * 0.5, y - s * 0.15, x - s * 0.5, y + s * 0.2);
+      ctx.bezierCurveTo(x - s * 0.5, y + s * 0.5, x, y + s * 0.7, x, y + s * 0.9);
+      ctx.bezierCurveTo(x, y + s * 0.7, x + s * 0.5, y + s * 0.5, x + s * 0.5, y + s * 0.2);
+      ctx.bezierCurveTo(x + s * 0.5, y - s * 0.15, x, y - s * 0.15, x, y + s * 0.2);
+      ctx.fill();
+    };
+    heart(lx, ey - H * 0.02, H * 0.09);
+    heart(rx, ey - H * 0.02, H * 0.09);
+  } else if (mood === 'sleep') {
+    arcEye(lx, ey, false);
+    arcEye(rx, ey, false);
+    ctx.fillStyle = ink;
+    ctx.font = `600 ${Math.round(H * 0.09)}px system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('z', W * 0.74, H * 0.3);
+    ctx.font = `600 ${Math.round(H * 0.06)}px system-ui, sans-serif`;
+    ctx.fillText('z', W * 0.8, H * 0.24);
+  } else if (mood === 'dots') {
+    ctx.fillStyle = ink;
+    [0.43, 0.5, 0.57].forEach((k, i) => {
+      ctx.beginPath();
+      ctx.arc(W * k, H * 0.52 + (i === 1 ? -H * 0.03 : 0), W * 0.02, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  } else if (mood === 'eq') {
+    const bars = [0.55, 0.8, 0.65, 0.95, 0.7];
+    ctx.fillStyle = ink;
+    bars.forEach((h, i) => {
+      const bw = W * 0.03;
+      ctx.fillRect(W * (0.4 + i * 0.05), H * 0.62 - H * 0.26 * h, bw, H * 0.26 * h);
+    });
+    blush();
+  } else {
+    dot(lx, ey);
+    dot(rx, ey);
+    mouth(1);
+    blush();
   }
 }
 
@@ -164,7 +211,8 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
 
   useImperativeHandle(ref, () => ({
     rotate: (dx, dy) => apiRef.current?.rotate(dx, dy),
-    kick: () => apiRef.current?.kick()
+    kick: () => apiRef.current?.kick(),
+    run: () => apiRef.current?.run()
   }));
 
   useEffect(() => {
@@ -247,7 +295,7 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
       return arm;
     };
     const armR = makeArm(1);
-    makeArm(-1);
+    const armL = makeArm(-1);
 
     const makeLeg = (side: number) => {
       const g = new Group();
@@ -261,8 +309,8 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
       root.add(g);
       return g;
     };
-    makeLeg(1);
-    makeLeg(-1);
+    const legR = makeLeg(1);
+    const legL = makeLeg(-1);
 
     const makeEar = (side: number) => {
       const ear = new Mesh(new RoundedBoxGeometry(0.2, 0.62, 0.5, 4, 0.12), coralDark);
@@ -339,6 +387,7 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
     let jump = 0;
     let vy = 0;
     let flash = 0;
+    let runT = 0;
     let lastMood = moodRef.current;
 
     apiRef.current = {
@@ -350,6 +399,11 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
       kick: () => {
         if (reduceRef.current) return;
         vy = 2.6;
+        flash = 1;
+      },
+      run: () => {
+        if (reduceRef.current) return;
+        runT = 0.8;
         flash = 1;
       }
     };
@@ -391,8 +445,25 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
         flash = Math.max(0, flash - dt * 2.2);
         const glow = 1 + flash * 0.55;
         flame.scale.set(glow, glow, 1);
-        root.position.y = Math.sin(t * 1.7) * 0.02 + jump;
-        armR.rotation.z = -0.22 + Math.sin(t * 1.4) * 0.03;
+        runT = Math.max(0, runT - dt);
+        if (runT > 0) {
+          const ph = t * 15;
+          legR.rotation.x = Math.sin(ph) * 0.55;
+          legL.rotation.x = -Math.sin(ph) * 0.55;
+          armR.rotation.x = -Math.sin(ph) * 0.32;
+          armL.rotation.x = Math.sin(ph) * 0.32;
+          armR.rotation.z = -0.22;
+          root.position.y = Math.abs(Math.sin(ph)) * 0.045 + jump;
+          root.rotation.x = rotX + 0.07;
+        } else {
+          legR.rotation.x *= 0.82;
+          legL.rotation.x *= 0.82;
+          armR.rotation.x *= 0.82;
+          armL.rotation.x *= 0.82;
+          armR.rotation.z = -0.22 + Math.sin(t * 1.4) * 0.03;
+          root.position.y = Math.sin(t * 1.7) * 0.02 + jump;
+          root.rotation.x = rotX;
+        }
         sparks.rotation.y = t * 0.15;
         const arr = sparkGeo.getAttribute('position') as Float32BufferAttribute;
         for (let i = 0; i < sparkCount; i++) {
@@ -405,7 +476,6 @@ const Pet3D = forwardRef<Pet3DHandle, { mood: PetMood; reduce: boolean }>(functi
         rotY += (rotTargetY - rotY) * Math.min(1, dt * 6);
         rotX += (rotTargetX - rotX) * Math.min(1, dt * 6);
         root.rotation.y = rotY;
-        root.rotation.x = rotX;
         flame.rotation.y = -rotY;
         flame.rotation.x = -rotX;
         rotTargetY *= 0.985;
